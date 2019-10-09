@@ -18,7 +18,7 @@
     <ClCompile Include="MQ2Status.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyFunctions.cpp">
+    <ClCompile Include="StatusFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -26,7 +26,7 @@
     <ClInclude Include="..\MQ2Plugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MyFunctions.h">
+    <ClInclude Include="StatusFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

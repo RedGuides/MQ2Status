@@ -1,14 +1,23 @@
 // MQ2Status.cpp : Defines the entry point for the DLL application.
-//
+/**
+MQ2Status by Chatwiththisname and Sic
+Commands: 
+    /status
 
-// PLUGIN_API is only to be used for callbacks.  All existing callbacks at this time
-// are shown below. Remove the ones your plugin does not use.  Always use Initialize
-// and Shutdown for setup and cleanup, do NOT do it in DllMain.
-
-
-
+Purpose: 
+	to quickly display your "status" as relevant to if:
+		a class plugin is running
+		a macro is running
+			if the macro is kissassist variation
+				what your role is
+			If the macro is paused
+		if you are hidden
+Usage:
+	using the command /status to output to /bc the information in purpose. 
+	can be used with "/bcaa //status" to get all members of eqbc to output their current status (also bcga, bca, bct etc as needed by the user).
+**/
 #include "../MQ2Plugin.h"
-#include "MyFunctions.h"
+#include "StatusFunctions.h"
 
 
 PreSetup("MQ2Status");
@@ -16,38 +25,34 @@ PreSetup("MQ2Status");
 // Called once, when the plugin is to initialize
 PLUGIN_API VOID InitializePlugin(VOID)
 {
-	EzCommand("/squelch /alias /status delete");
-	AddCommand("/status", StatusCmd);
-    //Add commands, MQ2Data items, hooks, etc.
-    //AddCommand("/mycommand",MyCommand);
-    //AddXMLFile("MQUI_MyXMLFile.xml");
-    //bmMyBenchmark=AddMQ2Benchmark("My Benchmark Name");
+	if (HaveAlias("/status")) {
+		WriteChatf("\ar[\a-tMQ2Status\ar]\ao:: \arIt appears you already have an Alias for \ap/status\ar please type \"\ay/alias /status delete\ar\" then reload this plugin.");
+			EzCommand("/timed 10 /plugin MQ2Status Unload");
+	}
+	else {
+		AddCommand("/status", StatusCmd);
+	}
 }
 
 // Called once, when the plugin is to shutdown
 PLUGIN_API VOID ShutdownPlugin(VOID)
 {
-    DebugSpewAlways("Shutting down MQ2Status");
-
-    //Remove commands, MQ2Data items, hooks, etc.
-    //RemoveMQ2Benchmark(bmMyBenchmark);
-    //RemoveCommand("/mycommand");
-    //RemoveXMLFile("MQUI_MyXMLFile.xml");
+	RemoveCommand("/status");
 }
 
-
+/* THIS IS A BLOCK COMMENT!
 // Called once directly after initialization, and then every time the gamestate changes
 PLUGIN_API VOID SetGameState(DWORD GameState)
 {
     //if (GameState==GAMESTATE_INGAME)
-    // create custom windows if theyre not set up, etc
+	//Wasn't sure if this would ever be needed, so holding onto it.
 }
 
 
 // This is called every time MQ pulses (MainLOOP!)
 PLUGIN_API VOID OnPulse(VOID)
 {
-
+	//Not sure if this will ever bee needed, so holding onto it. 
 }
 
 // This is called every time WriteChatColor is called by MQ2Main or any plugin,
@@ -55,7 +60,7 @@ PLUGIN_API VOID OnPulse(VOID)
 // CALL CEverQuest::dsp_chat MAKE SURE TO IMPLEMENT EVENTS HERE (for chat plugins)
 PLUGIN_API DWORD OnWriteChatColor(PCHAR Line, DWORD Color, DWORD Filter)
 {
-    DebugSpewAlways("MQ2Status::OnWriteChatColor(%s)",Line);
+	//Wasn't sure if this would ever be needed, so hanging onto it.
     return 0;
 }
 
@@ -63,5 +68,7 @@ PLUGIN_API DWORD OnWriteChatColor(PCHAR Line, DWORD Color, DWORD Filter)
 // but after MQ filters and chat events are taken care of.
 PLUGIN_API DWORD OnIncomingChat(PCHAR Line, DWORD Color)
 {
+	//Wasn't sure if this would ever be needed, so hanging onto it.
     return 0;
 }
+*/
