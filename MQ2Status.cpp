@@ -4,6 +4,21 @@ MQ2Status by Chatwiththisname and Sic
 Commands: 
     /status
 
+	/status item - Using finditemcount this will return the amount of the first item matched with your string
+		you can do up to /status item bone chips and it would do a ${FindItemCount[bone chips]}
+		/status item bone chips returns how many bone chips you have on your person
+
+	/status stat
+		/status stat Hdex returns how much HDex you have
+		/status stat Hstr returns how much HStr you have
+		/status stat HSta returns how much HSta you have
+		/status stat HInt returns how much HInt you have
+		/status stat HAgi returns how much HAgi you have
+		/status stat HWis returns how much HWis you have
+		/status stat HCha returns how much HCha you have
+		/status stat Hps returns current hps / total hps and %
+		/status stat mana returns current mana / total mana and %
+
 Purpose: 
 	to quickly display your "status" as relevant to if:
 		a class plugin is running

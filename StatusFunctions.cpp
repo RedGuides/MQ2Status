@@ -20,8 +20,84 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	bool classPlugin = false;//only true if there is a class plugin for this class, and the plugin was loaded.
 	bool notLoaded = false;//would only be true if one of the classes in the switch has a plugin, but it's not loaded
 
-	DWORD classID = GetCharInfo2()->Class;
-	switch (classID) {
+	/// Get our Parameters
+	CHAR Arg[MAX_STRING] = { 0 };
+	GetArg(Arg, szLine, 1);
+
+	/// /status item stuff
+	if (!_stricmp(Arg, "item")) {
+		GetArg(Arg, szLine, 2); \
+			if (!strlen(Arg)) {
+				WriteChatf("\arPlease provide a valid Item to search for\aw");
+				WriteChatf("\arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
+			}
+			else {
+				char findItem[MAX_STRING] = "${FindItemCount["; // better "MQ2" way of doing this?
+				for (int i = 2; i < 20; i++) {
+					GetArg(Arg, szLine, i); // grab all params after szLine 1
+					if (strlen(Arg)) {
+						if (i > 2) strcat_s(findItem, " ");
+						strcat_s(findItem, Arg);
+					}
+					else {
+						break;
+					}
+				}
+				strcat_s(findItem, "]}");
+				strcat_s(buffer, findItem);
+				EzCommand(buffer);
+			}
+	}
+	// /status stat <whateverstat>
+	if (!_stricmp(Arg, "stat")) {
+		GetArg(Arg, szLine, 2); \
+			if (!strlen(Arg)) {
+				WriteChatf("\arPlease provide a valid MQ2Status stat\aw");
+				WriteChatf("\arThese are currently: hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, and mana.\aw");
+			}
+			else {
+				char stat[MAX_STRING] = "[+g+]${Me.";
+				bool bFound = true;
+				if (!_stricmp(Arg, "hstr")) {
+					strcat_s(stat, "STRBonus} HStr");
+				}
+				else if (!_stricmp(Arg, "hsta")) {
+					strcat_s(stat, "HeroicSTABonus}[+w+] HSta");
+				}
+				else if (!_stricmp(Arg, "hint")) {
+					strcat_s(stat, "HeroicINTBonus}[+w+] HInt");
+				}
+				else if (!_stricmp(Arg, "hwis")) {
+					strcat_s(stat, "HeroicWISBonus}[+w+] HWis");
+				}
+				else if (!_stricmp(Arg, "hagi")) {
+					strcat_s(stat, "HeroicAGIBonus}[+w+] HAgi");
+				}
+				else if (!_stricmp(Arg, "hdex")) {
+					strcat_s(stat, "HeroicDEXBonus}[+w+] HDex");
+				}
+				else if (!_stricmp(Arg, "hcha")) {
+					strcat_s(stat, "HeroicCHABonus}[+w+] HCha");
+				}
+				else if (!_stricmp(Arg, "hps")) {
+					strcat_s(stat, "CurrentHPs} / ${Me.MaxHPs}[+w+] at [+g+]${Me.PctHPs}%[+w+] Hit Points");
+				}
+				else if (!_stricmp(Arg, "mana")) {
+					strcat_s(stat, "CurrentMana} / ${Me.MaxMana}[+w+] at [+g+]${Me.PctMana}%[+w+] Mana");
+				}
+				else {
+					WriteChatf("\arThat was not a valid stat, please use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana for this option!\aw");
+					bFound = false;
+				}
+				if (bFound) {
+					strcat_s(buffer, stat);
+					EzCommand(buffer);
+				}
+			}
+	}
+	if (!strlen(szLine)) {
+		DWORD classID = GetCharInfo2()->Class;
+		switch (classID) {
 		case EQData::Berserker:
 			if (FindPlugin("MQ2BerZerker")) {
 				classPlugin = true;
@@ -56,61 +132,61 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			break;
 		default:
 			break;
-	}
-	if (classPlugin) {
-		strcat_s(buffer, "Class Plugin:[+g+] Loaded! [+w+] ");
-	}
-	else if (notLoaded) {//Only outputs if there is a classPlugin available for that class, and it wasn't loaded.
-		strcat_s(buffer, "Class Plugin:[+r+] Not Loaded! [+w+] ");
-	}
+		}
+		if (classPlugin) {
+			strcat_s(buffer, "Class Plugin:[+g+] Loaded! [+w+] ");
+		}
+		else if (notLoaded) {//Only outputs if there is a classPlugin available for that class, and it wasn't loaded.
+			strcat_s(buffer, "Class Plugin:[+r+] Not Loaded! [+w+] ");
+		}
 
-	//Am I running a macro.
-	if (gMacroStack && strlen(gszMacroName)) {
-		char temp[MAX_STRING] = "Macro:";
-		//Is the currently running macro "kiss"Assist? Where any macro with the word "kiss" will be found for people running customer KA's or older KA's etc. 
-		if (strstr(gszMacroName, "kiss")) {
-			if (IsDefined("Role")) {
-				strcat_s(temp, "[+g+] ");
-				strcat_s(temp, gszMacroName);
-				strcat_s(temp, "[+w+] Role: [+g+]");
-				//Get the value of the Role variable
-				char theRole[64] = "${Role}";
-				ParseMacroData(theRole, 64);
-				strcat_s(temp, theRole);
-				strcat_s(temp, "[+w+] ");
+		//Am I running a macro.
+		if (gMacroStack && strlen(gszMacroName)) {
+			char temp[MAX_STRING] = "Macro:";
+			//Is the currently running macro "kiss"Assist? Where any macro with the word "kiss" will be found for people running customer KA's or older KA's etc. 
+			if (strstr(gszMacroName, "kiss")) {
+				if (IsDefined("Role")) {
+					strcat_s(temp, "[+g+] ");
+					strcat_s(temp, gszMacroName);
+					strcat_s(temp, "[+w+] Role: [+g+]");
+					//Get the value of the Role variable
+					char theRole[64] = "${Role}";
+					ParseMacroData(theRole, 64);
+					strcat_s(temp, theRole);
+					strcat_s(temp, "[+w+] ");
+				}
+				else {
+					strcat_s(temp, "[+r+] ");
+					//Seem to not have a role. That's fucking weird. 
+				}
 			}
 			else {
 				strcat_s(temp, "[+r+] ");
-				//Seem to not have a role. That's fucking weird. 
+				strcat_s(temp, gszMacroName);
+				strcat_s(temp, "[+w+] ");
 			}
+			if (PMACROBLOCK pBlock = GetCurrentMacroBlock()) {
+				if (pBlock->Paused) {
+					strcat_s(temp, "[+r+]***PAUSED***[+w+] ");
+				}
+			}
+			strcat_s(buffer, temp);
 		}
 		else {
-			strcat_s(temp, "[+r+] ");
-			strcat_s(temp, gszMacroName);
-			strcat_s(temp, "[+w+] ");
-		}
-		if (PMACROBLOCK pBlock = GetCurrentMacroBlock()) {
-			if (pBlock->Paused) {
-				strcat_s(temp, "[+r+]***PAUSED***[+w+] ");
+			if (!classPlugin) {
+				strcat_s(buffer, "Macro:[+r+] FALSE [+w+]");
 			}
 		}
-		strcat_s(buffer, temp);
-	}
-	else {
-		if (!classPlugin) {
-			strcat_s(buffer, "Macro:[+r+] FALSE [+w+]");
+
+		//Am I Invis?
+		if (int amHidden = pChar->HideMode) {
+			strcat_s(buffer, "Hiding:[+r+] TRUE[+w+]");
 		}
-	}
 
-	//Am I Invis?
-	if (int amHidden = pChar->HideMode) {
-		strcat_s(buffer, "Hiding:[+r+] TRUE[+w+]");
+		//Do the command we've decided on.
+		EzCommand(buffer);
 	}
-
-	//Do the command we've decided on.
-	EzCommand(buffer);
 }
-
 //Check to see if a plugin is loaded.
 PMQPLUGIN FindPlugin(PCHAR szLine)
 {
