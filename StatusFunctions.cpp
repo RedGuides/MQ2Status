@@ -281,3 +281,25 @@ bool HaveAlias(PCHAR ShortCommand) {
 	}
 	return false;
 }
+
+void ReverseString(PCHAR szLine) {
+	std::string temp2 = szLine;
+	std::reverse(temp2.rbegin(), temp2.rend());
+	sprintf_s(szLine, MAX_STRING, temp2.c_str());
+}
+
+void PutCommas(PCHAR szLine) {
+	ReverseString(szLine);
+	unsigned int j = 0;
+	char temp[MAX_STRING] = { 0 };
+	for (unsigned int i = 0; i < strlen(szLine) + 1; i++) {
+		if (i % 3 == 0 && i != 0 && i != strlen(szLine)) {
+			temp[j] = ',';
+			j++;
+		}
+		temp[j] = szLine[i];
+		j++;
+	}
+	sprintf_s(szLine, MAX_STRING, temp);
+	ReverseString(szLine);
+}
