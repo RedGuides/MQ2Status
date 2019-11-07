@@ -139,7 +139,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				}
 				else if (!_stricmp(Arg, "mana")) {
 					strcat_s(stat, "CurrentMana} / ${Me.MaxMana}[+w+] at [+g+]${Me.PctMana}%[+w+] Mana");
-					sprintf_s(stat, "Current Mana: \ag%i\aw Max Manas: \ag%i\aw Percent Mana: \ag%2.2f %%\aw", me->ManaCurrent, me->ManaMax, PercentMana(me));
+					sprintf_s(stat, "Current Mana: \ag%i\aw Max Manas: \ag%i\aw Percent Mana: \ag%2.2f %%\aw", me->GetCurrentMana(), me->GetMaxMana(), PercentMana(me));
 				}
 				else if (!_stricmp(Arg, "money")) {
 					unsigned long myPlat = pChar2->Plat;
