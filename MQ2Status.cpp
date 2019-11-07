@@ -3,11 +3,12 @@
 MQ2Status by Chatwiththisname and Sic
 Commands: 
     /status
-
 	/status item - Using finditemcount this will return the amount of the first item matched with your string
 		you can do up to /status item bone chips and it would do a ${FindItemCount[bone chips]}
 		/status item bone chips returns how many bone chips you have on your person
-
+	/status itembank - same as item, but checks your bank
+	/status merc - outputs mercenary information
+	/status aa - shows how many banked aa you have
 	/status stat
 		/status stat Hdex returns how much HDex you have
 		/status stat Hstr returns how much HStr you have
@@ -18,6 +19,7 @@ Commands:
 		/status stat HCha returns how much HCha you have
 		/status stat Hps returns current hps / total hps and %
 		/status stat mana returns current mana / total mana and %
+		/status stat money returns how much platinum you have
 
 Purpose: 
 	to quickly display your "status" as relevant to if:
@@ -27,15 +29,21 @@ Purpose:
 				what your role is
 			If the macro is paused
 		if you are hidden
+		if you have a merc alive
 Usage:
 	using the command /status to output to /bc the information in purpose. 
 	can be used with "/bcaa //status" to get all members of eqbc to output their current status (also bcga, bca, bct etc as needed by the user).
+
+To Do:
+	Convert the finditem and findbankitem to not use macro code
+	Clean up redundant code
 **/
 #include "../MQ2Plugin.h"
 #include "StatusFunctions.h"
 
 
 PreSetup("MQ2Status");
+PLUGIN_VERSION(1.4f);
 
 // Called once, when the plugin is to initialize
 PLUGIN_API VOID InitializePlugin(VOID)
@@ -55,7 +63,7 @@ PLUGIN_API VOID ShutdownPlugin(VOID)
 	RemoveCommand("/status");
 }
 
-/* THIS IS A BLOCK COMMENT!
+/** THIS IS A BLOCK COMMENT!
 // Called once directly after initialization, and then every time the gamestate changes
 PLUGIN_API VOID SetGameState(DWORD GameState)
 {
@@ -86,4 +94,4 @@ PLUGIN_API DWORD OnIncomingChat(PCHAR Line, DWORD Color)
 	//Wasn't sure if this would ever be needed, so hanging onto it.
     return 0;
 }
-*/
+**/

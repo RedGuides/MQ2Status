@@ -23,7 +23,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	/// Get our Parameters
 	CHAR Arg[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
-	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !strlen(Arg)) {
+	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "aa") || !strlen(Arg)) {
 		/// /status item stuff - this is doing a search for how many of these items we have on our person.
 		if (!_stricmp(Arg, "item")) {
 			GetArg(Arg, szLine, 2);
@@ -100,49 +100,53 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 		// /status stat <whateverstat>
 		if (!_stricmp(Arg, "stat")) {
+			PCHARINFO pChar = GetCharInfo(); // need this for heroic stats
+			PCHARINFO2 pChar2 = GetCharInfo2(); // need this for money
+			PSPAWNINFO me = GetCharInfo()->pSpawn;
 			GetArg(Arg, szLine, 2);
 			if (!strlen(Arg)) {
 				WriteChatf("\arPlease provide a valid MQ2Status stat\aw");
 				WriteChatf("\arThese are currently: hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, money, and mana.\aw");
 			}
 			else {
-				char stat[256] = "[+g+]${Me.";
+				//char stat[256] = "[+g+]${Me.";
+				//					pChar->HeroicSTRBonus
+				char stat[MAX_STRING] = "We have ";
 				bool bFound = true;
 				if (!_stricmp(Arg, "hstr")) {
-					strcat_s(stat, "HeroicSTRBonus} HStr");
+					sprintf_s(stat, "I have \ag%lu\aw \ayHStr\aw.", pChar->HeroicSTRBonus);
 				}
 				else if (!_stricmp(Arg, "hsta")) {
-					strcat_s(stat, "HeroicSTABonus}[+w+] HSta");
+					sprintf_s(stat, "I have \ag%lu\aw \ayHSta\aw.", pChar->HeroicSTABonus);
 				}
 				else if (!_stricmp(Arg, "hint")) {
-					strcat_s(stat, "HeroicINTBonus}[+w+] HInt");
+					sprintf_s(stat, "I have \ag%lu\aw \ayHInt\aw.", pChar->HeroicINTBonus);
 				}
 				else if (!_stricmp(Arg, "hwis")) {
-					strcat_s(stat, "HeroicWISBonus}[+w+] HWis");
+					sprintf_s(stat, "I have \ag%lu\aw \ayHWis\aw.", pChar->HeroicWISBonus);
 				}
 				else if (!_stricmp(Arg, "hagi")) {
-					strcat_s(stat, "HeroicAGIBonus}[+w+] HAgi");
+					sprintf_s(stat, "I have \ag%lu\aw \ayHAgi\aw.", pChar->HeroicAGIBonus);
 				}
 				else if (!_stricmp(Arg, "hdex")) {
-					strcat_s(stat, "HeroicDEXBonus}[+w+] HDex");
+					sprintf_s(stat, "I have \ag%lu\aw \ayHDex\aw.", pChar->HeroicDEXBonus);
 				}
 				else if (!_stricmp(Arg, "hcha")) {
-					strcat_s(stat, "HeroicCHABonus}[+w+] HCha");
+					sprintf_s(stat, "I have \ag%lu\aw \ayHCHA\aw.", pChar->HeroicCHABonus);
 				}
 				else if (!_stricmp(Arg, "hps")) {
-					strcat_s(stat, "CurrentHPs} / ${Me.MaxHPs}[+w+] at [+g+]${Me.PctHPs}%[+w+] Hit Points");
+					sprintf_s(stat, "Current HPS: \ag%llu\aw Max HPs: \ag%llu\aw Percent Health: \ag%2.2f %%\aw", me->HPCurrent, me->HPMax, PercentHealth(me));
 				}
 				else if (!_stricmp(Arg, "mana")) {
 					strcat_s(stat, "CurrentMana} / ${Me.MaxMana}[+w+] at [+g+]${Me.PctMana}%[+w+] Mana");
+					sprintf_s(stat, "Current Mana: \ag%i\aw Max Manas: \ag%i\aw Percent Mana: \ag%2.2f %%\aw", me->ManaCurrent, me->ManaMax, PercentMana(me));
 				}
 				else if (!_stricmp(Arg, "money")) {
-					if (PCHARINFO2 pChar2 = GetCharInfo2()) {
-						unsigned long myPlat = pChar2->Plat;
+					unsigned long myPlat = pChar2->Plat;
 						char szmyPlat[MAX_STRING] = "";
 						_ltoa_s(myPlat, szmyPlat, 10);
 						PutCommas(szmyPlat);
 						sprintf_s(stat, "[+y+]I have [+g+]%s [+y+]platinum!", szmyPlat);
-					}
 				}
 				else {
 					WriteChatf("\arThat was not a valid stat, please use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, money, or mana for this option!\aw");
@@ -153,6 +157,155 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					EzCommand(buffer);
 				}
 			}
+		}
+		if (!_stricmp(Arg, "aa")) {
+			char myAABank[32] = "";
+			PCHARINFO2 pChar2 = GetCharInfo2();
+			sprintf_s(myAABank, "We have \ag%d\aw banked AA points.", pChar2->AAPoints);
+			strcat_s(buffer, myAABank);
+			EzCommand(buffer);
+		}
+		if (!_stricmp(Arg, "merc")) {
+			char temp[32] = { 0 };
+			char mercStatInfo[MAX_STRING] = "";
+			char mercClass[128] = "";
+			if (pMercInfo) {
+				ZeroMemory(&MercenarySpawn, sizeof(MercenarySpawn));
+				if (pMercInfo->HaveMerc == 1) {
+					switch (pMercInfo->MercState)
+					{
+					case 0:
+						strcpy_s(MercenarySpawn.Name, "\arDEAD\aw");
+						sprintf_s(mercStatInfo, "Mercenary State: %s  ", MercenarySpawn.Name);
+						break;
+					case 1:
+						strcpy_s(MercenarySpawn.Name, "\arSUSPENDED\aw");
+						break;
+					case 5:
+						strcpy_s(MercenarySpawn.Name, "\agALIVE\aw");
+						
+						{
+							DWORD mercStance = pMercInfo->ActiveStance;
+							//WriteChatf("Stance: %lu", mercStance);
+							if (PSPAWNINFO myMerc = (PSPAWNINFO)GetSpawnByID(pMercInfo->MercSpawnId)) {
+								//WriteChatf("Merc ClassID: %i", myMerc->GetClass());
+								switch (myMerc->GetClass()) {
+								case EQData::Cleric:
+									sprintf_s(mercClass, "\agCleric \aw");
+									{
+										switch (mercStance) {
+										case 0:
+											sprintf_s(temp, "\agBalanced\aw");
+											//status Balanced
+											break;
+										case 1:
+											sprintf_s(temp, "\agEfficient\aw");
+											//status Efficient
+											break;							
+										case 2:
+											sprintf_s(temp, "\agReactive\aw");
+											//status Reactive
+											break;
+										case 3:
+											sprintf_s(temp, "\arPassive\aw");
+											//status Passive
+											break;
+										default:
+											sprintf_s(temp, "Unknown\aw");
+											break;
+										}
+									}
+									break;
+								case EQData::Warrior:
+									sprintf_s(mercClass, "\agWarrior \aw");
+									{
+										switch (mercStance) {
+										case 0:
+											sprintf_s(temp, "\apAggressive\aw");
+											//status Aggressive
+											break;
+										case 1:
+											sprintf_s(temp, "\agAssist\aw");
+											//status Assist
+											break;							
+										case 2:
+											sprintf_s(temp, "\arPassive\aw");
+											//status Passive
+											break;
+										default:
+											sprintf_s(temp, "Unknown\aw");
+											break;
+										}
+									}
+									break;
+								case EQData::Wizard:
+									sprintf_s(mercClass, "\agWizard \aw");
+									{
+										switch (mercStance) {
+										case 0:
+											sprintf_s(temp, "\arPassive\aw");
+											//status Passive
+											break;
+										case 1:
+											sprintf_s(temp, "\agBalanced\aw");
+											//status Balanced
+											break;							
+										case 2:
+											sprintf_s(temp, "\aoBurn\aw");
+											//status Burn
+											break;
+										case 3:
+											sprintf_s(temp, "\aoBurn AE\aw");
+											//status Burn AE
+											break;
+										default:
+											sprintf_s(temp, "Unknown\aw");
+											break;
+										}
+									}
+									break;
+								case EQData::Rogue:
+									sprintf_s(mercClass, "\agRogue \aw");
+									{
+										switch (mercStance) {
+										case 0:
+											sprintf_s(temp, "\arPassive");
+											//status Passive
+											break;
+										case 1:
+											sprintf_s(temp, "\agBalanced\aw");
+											//status Balanced
+											break;							
+										case 2:
+											sprintf_s(temp, "\aoBurn\aw");
+											//status Burn
+											break;
+										default:
+											sprintf_s(temp, "Unknown\aw");
+											break;
+										}
+									}
+									break;
+								default:
+									sprintf_s(temp, "Unknown class\aw");
+									break;
+								}
+								sprintf_s(mercStatInfo, "Mercenary State: %s Mercenary Class: %s Mercenary Stance: %s ", MercenarySpawn.Name, mercClass, temp);
+							}
+						}
+						break;
+					default:
+						strcpy_s(MercenarySpawn.Name, "UNKNOWN");
+						WriteChatf("%s", MercenarySpawn.Name);
+						break;
+					}
+				}
+			}
+			else {
+				sprintf_s(mercStatInfo, "No Merc");
+			}
+			strcat_s(buffer, mercStatInfo);
+			EzCommand(buffer);
 		}
 		if (!strlen(szLine)) {
 			DWORD classID = GetCharInfo2()->Class;
@@ -198,7 +351,6 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			else if (notLoaded) {//Only outputs if there is a classPlugin available for that class, and it wasn't loaded.
 				strcat_s(buffer, "Class Plugin:[+r+] Not Loaded! [+w+] ");
 			}
-
 			//Am I running a macro.
 			if (gMacroStack && strlen(gszMacroName)) {
 				char temp[MAX_STRING] = "Macro:";
@@ -236,6 +388,27 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					strcat_s(buffer, "Macro:[+r+] FALSE [+w+]");
 				}
 			}
+			if (pMercInfo) {
+				ZeroMemory(&MercenarySpawn, sizeof(MercenarySpawn));
+				if (pMercInfo->HaveMerc == 1) {
+					switch (pMercInfo->MercState)
+					{
+					case 0:
+						//strcat_s(buffer, "Mercenary State: \arDEAD \aw");
+						break;
+					case 1:
+						//strcat_s(buffer, "Mercenary State: \arSUSPENDED \aw");
+						break;
+					case 5:
+						strcat_s(buffer, "Mercenary State: \agALIVE \aw");
+						break;
+					default:
+						//strcat_s(buffer, "Mercenary State: UNKNOWN" );
+						break;
+					}
+				}
+			}
+				//strcat_s(buffer, "Mercenary State: %s");
 
 			//Am I Invis?
 			if (int amHidden = pChar->HideMode) {
@@ -247,7 +420,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 	} 
 	else {
-		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, or no argument at all.", Arg);
+		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, merc, aa, or no argument at all.", Arg);
 	}
 }
 //Check to see if a plugin is loaded.
@@ -302,4 +475,22 @@ void PutCommas(PCHAR szLine) {
 	}
 	sprintf_s(szLine, MAX_STRING, temp);
 	ReverseString(szLine);
+}
+
+inline float PercentHealth(PSPAWNINFO& pSpawn)
+{
+	return (float)pSpawn->HPCurrent / (float)pSpawn->HPMax * 100.0f;
+}
+
+inline float PercentEndurance(PSPAWNINFO& pSpawn)
+{
+	return (float)pSpawn->GetCurrentEndurance() / (float)pSpawn->GetMaxEndurance() * 100.0f;
+}
+
+inline float PercentMana(PSPAWNINFO& pSpawn)
+{
+	if (GetCharInfo()->pSpawn->ManaMax == 0) { // need to ensure we have mana before we start diving by stuff
+		return 0;
+	}
+	return (float)pSpawn->ManaCurrent / (float)pSpawn->ManaMax * 100.0f;
 }
