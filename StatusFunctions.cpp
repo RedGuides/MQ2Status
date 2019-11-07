@@ -492,5 +492,5 @@ inline float PercentMana(PSPAWNINFO& pSpawn)
 	if (GetCharInfo()->pSpawn->ManaMax == 0) { // need to ensure we have mana before we start diving by stuff
 		return 0;
 	}
-	return (float)pSpawn->ManaCurrent / (float)pSpawn->ManaMax * 100.0f;
+	return (float)pSpawn->GetCurrentMana() / (float)pSpawn->GetMaxMana() * 100.0f;
 }
