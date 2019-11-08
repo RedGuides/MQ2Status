@@ -5,7 +5,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	if (!FindPlugin("MQ2EQBC")) {
 		WriteChatf("\ar[\a-tMQ2Status\ar]\ao:: \arYou don't appear to have MQ2EQBC Loaded!");
 		return;
-	} 
+	}
 	else {//If the MQ2EQBC was loaded, let's see if we're connected to the EQBC Server, if not output an error and return out without doing anything.
 		char amConnected[24] = "${EQBC.Connected}";
 		ParseMacroData(amConnected, 64);
@@ -139,14 +139,14 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				}
 				else if (!_stricmp(Arg, "mana")) {
 					strcat_s(stat, "CurrentMana} / ${Me.MaxMana}[+w+] at [+g+]${Me.PctMana}%[+w+] Mana");
-					sprintf_s(stat, "Current Mana: \ag%i\aw Max Manas: \ag%i\aw Percent Mana: \ag%2.2f %%\aw", me->ManaCurrent, me->ManaMax, PercentMana(me));
+					sprintf_s(stat, "Current Mana: \ag%i\aw Max Manas: \ag%i\aw Percent Mana: \ag%2.2f %%\aw", me->GetCurrentMana(), me->GetMaxMana(), PercentMana(me));
 				}
 				else if (!_stricmp(Arg, "money")) {
 					unsigned long myPlat = pChar2->Plat;
-						char szmyPlat[MAX_STRING] = "";
-						_ltoa_s(myPlat, szmyPlat, 10);
-						PutCommas(szmyPlat);
-						sprintf_s(stat, "[+y+]I have [+g+]%s [+y+]platinum!", szmyPlat);
+					char szmyPlat[MAX_STRING] = "";
+					_ltoa_s(myPlat, szmyPlat, 10);
+					PutCommas(szmyPlat);
+					sprintf_s(stat, "[+y+]I have [+g+]%s [+y+]platinum!", szmyPlat);
 				}
 				else {
 					WriteChatf("\arThat was not a valid stat, please use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, money, or mana for this option!\aw");
@@ -161,7 +161,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		if (!_stricmp(Arg, "aa")) {
 			char myAABank[32] = "";
 			PCHARINFO2 pChar2 = GetCharInfo2();
-			sprintf_s(myAABank, "We have \ag%d\aw banked AA points.", pChar2->AAPoints);
+			sprintf_s(myAABank, "We have \ag%lu\aw banked AA points.", pChar2->AAPoints);
 			strcat_s(buffer, myAABank);
 			EzCommand(buffer);
 		}
@@ -183,12 +183,10 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						break;
 					case 5:
 						strcpy_s(MercenarySpawn.Name, "\agALIVE\aw");
-						
+
 						{
 							DWORD mercStance = pMercInfo->ActiveStance;
-							//WriteChatf("Stance: %lu", mercStance);
 							if (PSPAWNINFO myMerc = (PSPAWNINFO)GetSpawnByID(pMercInfo->MercSpawnId)) {
-								//WriteChatf("Merc ClassID: %i", myMerc->GetClass());
 								switch (myMerc->GetClass()) {
 								case EQData::Cleric:
 									sprintf_s(mercClass, "\agCleric \aw");
@@ -201,7 +199,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 										case 1:
 											sprintf_s(temp, "\agEfficient\aw");
 											//status Efficient
-											break;							
+											break;
 										case 2:
 											sprintf_s(temp, "\agReactive\aw");
 											//status Reactive
@@ -227,7 +225,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 										case 1:
 											sprintf_s(temp, "\agAssist\aw");
 											//status Assist
-											break;							
+											break;
 										case 2:
 											sprintf_s(temp, "\arPassive\aw");
 											//status Passive
@@ -249,7 +247,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 										case 1:
 											sprintf_s(temp, "\agBalanced\aw");
 											//status Balanced
-											break;							
+											break;
 										case 2:
 											sprintf_s(temp, "\aoBurn\aw");
 											//status Burn
@@ -275,7 +273,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 										case 1:
 											sprintf_s(temp, "\agBalanced\aw");
 											//status Balanced
-											break;							
+											break;
 										case 2:
 											sprintf_s(temp, "\aoBurn\aw");
 											//status Burn
@@ -408,9 +406,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					}
 				}
 			}
-				//strcat_s(buffer, "Mercenary State: %s");
+			//strcat_s(buffer, "Mercenary State: %s");
 
-			//Am I Invis?
+		//Am I Invis?
 			if (int amHidden = pChar->HideMode) {
 				strcat_s(buffer, "Hiding:[+r+] TRUE[+w+]");
 			}
@@ -418,7 +416,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			//Do the command we've decided on.
 			EzCommand(buffer);
 		}
-	} 
+	}
 	else {
 		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, merc, aa, or no argument at all.", Arg);
 	}
@@ -489,8 +487,8 @@ inline float PercentEndurance(PSPAWNINFO& pSpawn)
 
 inline float PercentMana(PSPAWNINFO& pSpawn)
 {
-	if (GetCharInfo()->pSpawn->ManaMax == 0) { // need to ensure we have mana before we start diving by stuff
+	if (GetCharInfo()->pSpawn->GetMaxMana() == 0) {
 		return 0;
 	}
-	return (float)pSpawn->ManaCurrent / (float)pSpawn->ManaMax * 100.0f;
+	return (float)pSpawn->GetCurrentMana() / (float)pSpawn->GetMaxMana() * 100.0f;
 }
