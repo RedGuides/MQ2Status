@@ -161,7 +161,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		if (!_stricmp(Arg, "aa")) {
 			char myAABank[32] = "";
 			PCHARINFO2 pChar2 = GetCharInfo2();
-			sprintf_s(myAABank, "We have \ag%d\aw banked AA points.", pChar2->AAPoints);
+			sprintf_s(myAABank, "We have \ag%lu\aw banked AA points.", pChar2->AAPoints);
 			strcat_s(buffer, myAABank);
 			EzCommand(buffer);
 		}
@@ -186,9 +186,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						
 						{
 							DWORD mercStance = pMercInfo->ActiveStance;
-							//WriteChatf("Stance: %lu", mercStance);
 							if (PSPAWNINFO myMerc = (PSPAWNINFO)GetSpawnByID(pMercInfo->MercSpawnId)) {
-								//WriteChatf("Merc ClassID: %i", myMerc->GetClass());
 								switch (myMerc->GetClass()) {
 								case EQData::Cleric:
 									sprintf_s(mercClass, "\agCleric \aw");
