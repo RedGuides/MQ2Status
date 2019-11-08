@@ -139,7 +139,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				}
 				else if (!_stricmp(Arg, "mana")) {
 					strcat_s(stat, "CurrentMana} / ${Me.MaxMana}[+w+] at [+g+]${Me.PctMana}%[+w+] Mana");
-					sprintf_s(stat, "Current Mana: \ag%i\aw Max Manas: \ag%i\aw Percent Mana: \ag%2.2f %%\aw", me->GetCurrentMana(), me->GetMaxMana(), PercentMana(me));
+					sprintf_s(stat, "Current Mana: \ag%i\aw Max Manas: \ag%i\aw Percent Mana: \ag%2.2f %%\aw", me->ManaCurrent, me->ManaMax, PercentMana(me));
 				}
 				else if (!_stricmp(Arg, "money")) {
 					unsigned long myPlat = pChar2->Plat;
@@ -161,7 +161,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		if (!_stricmp(Arg, "aa")) {
 			char myAABank[32] = "";
 			PCHARINFO2 pChar2 = GetCharInfo2();
-			sprintf_s(myAABank, "We have \ag%lu\aw banked AA points.", pChar2->AAPoints);
+			sprintf_s(myAABank, "We have \ag%d\aw banked AA points.", pChar2->AAPoints);
 			strcat_s(buffer, myAABank);
 			EzCommand(buffer);
 		}
@@ -186,7 +186,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						
 						{
 							DWORD mercStance = pMercInfo->ActiveStance;
+							//WriteChatf("Stance: %lu", mercStance);
 							if (PSPAWNINFO myMerc = (PSPAWNINFO)GetSpawnByID(pMercInfo->MercSpawnId)) {
+								//WriteChatf("Merc ClassID: %i", myMerc->GetClass());
 								switch (myMerc->GetClass()) {
 								case EQData::Cleric:
 									sprintf_s(mercClass, "\agCleric \aw");
@@ -487,8 +489,8 @@ inline float PercentEndurance(PSPAWNINFO& pSpawn)
 
 inline float PercentMana(PSPAWNINFO& pSpawn)
 {
-	if (GetCharInfo()->pSpawn->GetMaxMana() == 0) { 
+	if (GetCharInfo()->pSpawn->ManaMax == 0) { // need to ensure we have mana before we start diving by stuff
 		return 0;
 	}
-	return (float)pSpawn->GetCurrentMana() / (float)pSpawn->GetMaxMana() * 100.0f;
+	return (float)pSpawn->ManaCurrent / (float)pSpawn->ManaMax * 100.0f;
 }
