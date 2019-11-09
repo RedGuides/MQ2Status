@@ -159,9 +159,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			}
 		}
 		if (!_stricmp(Arg, "aa")) {
-			char myAABank[32] = "";
+			char myAABank[MAX_STRING] = "";
 			PCHARINFO2 pChar2 = GetCharInfo2();
-			sprintf_s(myAABank, "We have \ag%lu\aw banked AA points.", pChar2->AAPoints);
+			sprintf_s(myAABank,"We have \ag %lu \aw banked AA points.", pChar2->AAPoints);
 			strcat_s(buffer, myAABank);
 			EzCommand(buffer);
 		}
