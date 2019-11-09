@@ -23,7 +23,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	/// Get our Parameters
 	CHAR Arg[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
-	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "aa") || !strlen(Arg)) {
+	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !strlen(Arg)) {
 		/// /status item stuff - this is doing a search for how many of these items we have on our person.
 		if (!_stricmp(Arg, "item")) {
 			GetArg(Arg, szLine, 2);
@@ -149,7 +149,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					sprintf_s(stat, "[+y+]I have [+g+]%s [+y+]platinum!", szmyPlat);
 				}
 				else {
-					WriteChatf("\arThat was not a valid stat, please use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, money, or mana for this option!\aw");
+					WriteChatf("\arThat was not a valid stat, please use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, or money for this option!\aw");
 					bFound = false;
 				}
 				if (bFound) {
@@ -164,6 +164,17 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			sprintf_s(myAABank,"We have \ag %lu \aw banked AA points.", pChar2->AAPoints);
 			strcat_s(buffer, myAABank);
 			EzCommand(buffer);
+		}
+		if (!_stricmp(Arg, "help")) { 
+			WriteChatf("Welcome to MQ2Status");
+			WriteChatf("By \aoChatWithThisName\aw & \agSic\aw Exclusively for \arRedGuides\aw.");
+			WriteChatf("\agValid Status options are:\aw");
+			WriteChatf("/status will output : If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
+			WriteChatf("/status \agitem\aw \ayitem name\aw : how many \ayitem name\aw you have in your inventory.");
+			WriteChatf("/status \agitembank\aw \ayitem name\aw : how many \ayitem name\aw you have in your bank.");
+			WriteChatf("/status \agstat\aw \ayoption\aw : options: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, and, Money.");
+			WriteChatf("/status \agaa\aw : How many \"banked\" AA points you have.");
+			WriteChatf("/status \agmerc\aw : This returns mercenary information including class, and role.");
 		}
 		if (!_stricmp(Arg, "merc")) {
 			char temp[32] = { 0 };
@@ -298,9 +309,10 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						break;
 					}
 				}
+				sprintf_s(mercStatInfo, "\arIt does not appear we have a merc.\aw");
 			}
 			else {
-				sprintf_s(mercStatInfo, "No Merc");
+				sprintf_s(mercStatInfo, "\arIt does not appear we have a merc.\aw");
 			}
 			strcat_s(buffer, mercStatInfo);
 			EzCommand(buffer);

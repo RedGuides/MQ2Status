@@ -3,6 +3,7 @@
 MQ2Status by Chatwiththisname and Sic
 Commands: 
     /status
+	/status help - returns help information for the / commands
 	/status item - Using finditemcount this will return the amount of the first item matched with your string
 		you can do up to /status item bone chips and it would do a ${FindItemCount[bone chips]}
 		/status item bone chips returns how many bone chips you have on your person
@@ -43,7 +44,7 @@ To Do:
 
 
 PreSetup("MQ2Status");
-PLUGIN_VERSION(1.4f);
+PLUGIN_VERSION(1.5f);
 
 // Called once, when the plugin is to initialize
 PLUGIN_API VOID InitializePlugin(VOID)
