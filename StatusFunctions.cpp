@@ -23,8 +23,20 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	/// Get our Parameters
 	CHAR Arg[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
-	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !strlen(Arg)) {
+	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) {
 		/// /status item stuff - this is doing a search for how many of these items we have on our person.
+		if (!_stricmp(Arg, "help")) {
+			WriteChatf("Welcome to MQ2Status");
+			WriteChatf("By \aoChatWithThisName\aw & \agSic\aw Exclusively for \arRedGuides\aw.");
+			WriteChatf("\agValid Status options are:\aw");
+			WriteChatf("/status will output : If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
+			WriteChatf("/status \agitem\aw \ayitem name\aw : how many \ayitem name\aw you have in your inventory.");
+			WriteChatf("/status \agitembank\aw \ayitem name\aw : how many \ayitem name\aw you have in your bank.");
+			WriteChatf("/status \agstat\aw \ayoption\aw : options: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, and, Money.");
+			WriteChatf("/status \agaa\aw : How many \"banked\" AA points you have.");
+			WriteChatf("/status \agmerc\aw : This returns mercenary information including class, and role.");
+			WriteChatf("/status \agcampfire\aw : This returns campfire information including Active, Duration, and Zone.");
+		}
 		if (!_stricmp(Arg, "item")) {
 			GetArg(Arg, szLine, 2);
 			if (!strlen(Arg)) {
@@ -164,17 +176,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			sprintf_s(myAABank,"We have [+g+] %lu [+w+] banked AA points.", pChar2->AAPoints);
 			strcat_s(buffer, myAABank);
 			EzCommand(buffer);
-		}
-		if (!_stricmp(Arg, "help")) { 
-			WriteChatf("Welcome to MQ2Status");
-			WriteChatf("By \aoChatWithThisName\aw & \agSic\aw Exclusively for \arRedGuides\aw.");
-			WriteChatf("\agValid Status options are:\aw");
-			WriteChatf("/status will output : If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
-			WriteChatf("/status \agitem\aw \ayitem name\aw : how many \ayitem name\aw you have in your inventory.");
-			WriteChatf("/status \agitembank\aw \ayitem name\aw : how many \ayitem name\aw you have in your bank.");
-			WriteChatf("/status \agstat\aw \ayoption\aw : options: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, and, Money.");
-			WriteChatf("/status \agaa\aw : How many \"banked\" AA points you have.");
-			WriteChatf("/status \agmerc\aw : This returns mercenary information including class, and role.");
+			return;
 		}
 		if (!_stricmp(Arg, "merc")) {
 			char temp[32] = { 0 };
@@ -320,6 +322,84 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			strcat_s(buffer, mercStatInfo);
 			EzCommand(buffer);
 		}
+		if (!_stricmp(Arg, "campfire")) {
+			if (pLocalPlayer && ((PSPAWNINFO)pLocalPlayer)->Campfire) {
+				char cfStatus[MAX_STRING] = "";
+				char cfInfo[MAX_STRING] = "";
+				char cfTimeRemainHMS[MAX_STRING] = "";
+				char cfZoneLongName[MAX_STRING] = "";
+				if (unsigned long cfTimeRemain = ((PSPAWNINFO)pLocalPlayer)->CampfireTimestamp - GetFastTime()) {
+					unsigned long Hrs = ((cfTimeRemain / 60) / 60);
+					unsigned long Mins = ((cfTimeRemain / 60) - (Hrs * 60));
+					unsigned long Secs = ((cfTimeRemain) - ((Mins + (Hrs * 60)) * 60));
+					sprintf_s(cfTimeRemainHMS, "%lu:%02lu:%02lu ", Hrs, Mins, Secs);
+					if (DWORD ZoneID = (((PSPAWNINFO)pLocalPlayer)->CampfireZoneID & 0x7FFF)) {
+						if (ZoneID < MAX_ZONES && pWorldData) {
+							 if (PZONELIST pZoneID = ((PWORLDDATA)pWorldData)->ZoneArray[ZoneID]) {
+								 //WriteChatf("Zone Long Name is: %s", pZoneID->LongName);
+								 strcat_s(cfZoneLongName, pZoneID->LongName);
+							 }
+							 else {
+								 strcat_s(buffer, "[+r+]I don't appear to have a campfire[+w+]");
+							 }
+						}
+						else {
+							if (ZoneID > MAX_ZONES) {
+								strcat_s(buffer, "[+r+]ZoneID is bad?![+w+] ");
+							}
+							if (!pWorldData) {
+								strcat_s(buffer, "[+r+]There was no pWorldData, are you in game?![+w+] ");
+							}
+						}
+					}
+					else {
+						return;
+					}
+					PCHARINFO2 pChar2 = GetCharInfo2();
+					sprintf_s(cfStatus, "[+g+]Active[+w+]");
+				}
+				sprintf_s(cfInfo, "Campfire: [+g+]%s[+w+] Time Left: [+g+]%s[+w+] Campfire Zone: [+g+]%s[+w+] ", cfStatus, cfTimeRemainHMS, cfZoneLongName);
+				strcat_s(buffer, cfInfo);
+				EzCommand(buffer);
+			}
+			else {
+				strcat_s(buffer, "[+r+]We do not appear to have a campfire in a usable location![+w+]"); // if the fellowship is in an instance we can't fellowship to - it returns out
+				EzCommand(buffer);
+			}
+		}
+		if (!_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) {
+			if (PCHARINFO pChar = GetCharInfo()) {
+				char ClassName[64] = { 0 };
+				PFELLOWSHIPINFO Fellowship = (PFELLOWSHIPINFO)&pChar->pSpawn->Fellowship;
+				WriteChatf("FS MoTD: %s", Fellowship->MotD);
+				WriteChatf("FS Leader is: %s , We have : %lu members", Fellowship->Leader, Fellowship->Members);
+				if (PFELLOWSHIPINFO pFellowship = (PFELLOWSHIPINFO)&pChar->pSpawn->Fellowship) {
+					if (int NumMembers = pFellowship->Members) {
+						for (int i = 0; i < NumMembers; i++) {
+							if (PFELLOWSHIPMEMBER thisMember = &pFellowship->FellowshipMember[i]) {
+
+								char ClassDesc[64] = { 0 };
+								sprintf_s(ClassDesc, GetClassDesc(thisMember->Class));
+								WriteChatf("%s - %lu - Class Name: %s ", thisMember->Name, thisMember->Level, ClassDesc);
+							}
+						}
+					}
+				}
+			}
+
+		}
+		if (!_stricmp(Arg, "bagspace")) {
+			char stat[MAX_STRING] = "I have ";
+			GetFreeInventory(0);
+			int getbagspace = GetFreeInventory(4);
+			char bagspace[MAX_STRING] = "";
+			_ltoa_s(getbagspace, bagspace, 10);
+			sprintf_s(stat, "[+o+]Free Inventory Slots: [+g+]%s[+w+]", bagspace);
+			strcat_s(buffer, stat);
+			EzCommand(buffer);
+			return;
+		}
+		
 		if (!strlen(szLine)) {
 			DWORD classID = GetCharInfo2()->Class;
 			switch (classID) {
@@ -430,7 +510,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 	}
 	else {
-		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, merc, aa, or no argument at all.", Arg);
+		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, merc, aa, fellowship, campfire, bagspace, or no argument at all.", Arg);
 	}
 }
 //Check to see if a plugin is loaded.
