@@ -25,6 +25,7 @@
 //	/status fellowship - returns some information on your fellowship (WIP)
 //	/status campfire - returns information on your campfire
 //	/status bagspace - returns how many free inventory spaces you have
+//	/status sub reports your subscription level, and if gold how much time is left
 //		
 //
 //Purpose: 

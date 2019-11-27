@@ -23,19 +23,22 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	/// Get our Parameters
 	CHAR Arg[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
-	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) {
+	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship") || !_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription")) {
 		/// /status item stuff - this is doing a search for how many of these items we have on our person.
 		if (!_stricmp(Arg, "help")) {
 			WriteChatf("Welcome to MQ2Status");
 			WriteChatf("By \aoChatWithThisName\aw & \agSic\aw Exclusively for \arRedGuides\aw.");
 			WriteChatf("\agValid Status options are:\aw");
-			WriteChatf("/status will output : If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
-			WriteChatf("/status \agitem\aw \ayitem name\aw : how many \ayitem name\aw you have in your inventory.");
-			WriteChatf("/status \agitembank\aw \ayitem name\aw : how many \ayitem name\aw you have in your bank.");
-			WriteChatf("/status \agstat\aw \ayoption\aw : options: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, and, Money.");
-			WriteChatf("/status \agaa\aw : How many \"banked\" AA points you have.");
-			WriteChatf("/status \agmerc\aw : This returns mercenary information including class, and role.");
-			WriteChatf("/status \agcampfire\aw : This returns campfire information including Active, Duration, and Zone.");
+			WriteChatf("/status will output to eqbc : If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
+			WriteChatf("/status \agitem\aw \ayitem name\aw : reports to eqbc how many \ayitem name\aw you have in your inventory.");
+			WriteChatf("/status \agitembank\aw \ayitem name\aw : reports to eqbc how many \ayitem name\aw you have in your bank.");
+			WriteChatf("/status \agstat\aw \ayoption\aw : reports the following options to eqbc: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, and, Money.");
+			WriteChatf("/status \agaa\aw : Reports to eqbc how many \"banked\" AA points you have.");
+			WriteChatf("/status \agmerc\aw : Reports to eqbc mercenary information including class, and role.");
+			WriteChatf("/status \agcampfire\aw : Reports to eqbc campfire information including Active, Duration, and Zone.");
+			WriteChatf("/status \agfellowship\aw : This returns to your mq2window (does not eqbc) information on your fellowship");
+			WriteChatf("/status \agbagspace\aw : Reports to eqbc how many open bagspaces you have.");
+			WriteChatf("/status \agsub\aw : Reports to eqbc our subscription level, and if we are gold, how many days are left.");
 		}
 		if (!_stricmp(Arg, "item")) {
 			GetArg(Arg, szLine, 2);
@@ -175,6 +178,35 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			PCHARINFO2 pChar2 = GetCharInfo2();
 			sprintf_s(myAABank,"We have [+g+] %lu [+w+] banked AA points.", pChar2->AAPoints);
 			strcat_s(buffer, myAABank);
+			EzCommand(buffer);
+			return;
+		}
+		if (!_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription")) {
+			PCHARINFO pChar = GetCharInfo();
+			char subLevel[MAX_STRING] = "";
+			char subDays[64] = "";
+
+			switch (GetSubscriptionLevel())
+			{
+			case SUB_GOLD:
+				sprintf_s(subLevel, "My subscription level is [+y+]GOLD[+w+]");
+				break;
+			case SUB_SILVER:
+				sprintf_s(subLevel, "My subscription level is: [+r+] SILVER[+w+]");
+				break;
+			case SUB_BRONZE:
+				sprintf_s(subLevel, "My subscription level is: [+r+] BRONZE[+w+]");
+				break;
+			default:
+				break;
+			}
+			if (GetSubscriptionLevel() == SUB_GOLD) {
+				if (pChar->SubscriptionDays) {
+					sprintf_s(subDays, " & I have [+g+]%i[+w+] days remaining.", pChar->SubscriptionDays);
+				}
+				strcat_s(subLevel, subDays);
+			}
+			strcat_s(buffer, subLevel);
 			EzCommand(buffer);
 			return;
 		}
@@ -370,23 +402,26 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		if (!_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) {
 			if (PCHARINFO pChar = GetCharInfo()) {
 				char ClassName[64] = { 0 };
-				PFELLOWSHIPINFO Fellowship = (PFELLOWSHIPINFO)&pChar->pSpawn->Fellowship;
-				WriteChatf("FS MoTD: %s", Fellowship->MotD);
-				WriteChatf("FS Leader is: %s , We have : %lu members", Fellowship->Leader, Fellowship->Members);
 				if (PFELLOWSHIPINFO pFellowship = (PFELLOWSHIPINFO)&pChar->pSpawn->Fellowship) {
-					if (int NumMembers = pFellowship->Members) {
-						for (int i = 0; i < NumMembers; i++) {
-							if (PFELLOWSHIPMEMBER thisMember = &pFellowship->FellowshipMember[i]) {
+					if (pFellowship->Members > 0) {
+						WriteChatf("FS MoTD: \ag%s\aw", pFellowship->MotD);
+						WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->Leader, pFellowship->Members);
+						if (int NumMembers = pFellowship->Members) {
+							for (int i = 0; i < NumMembers; i++) {
+								if (PFELLOWSHIPMEMBER thisMember = &pFellowship->FellowshipMember[i]) {
 
-								char ClassDesc[64] = { 0 };
-								sprintf_s(ClassDesc, GetClassDesc(thisMember->Class));
-								WriteChatf("%s - %lu - Class Name: %s ", thisMember->Name, thisMember->Level, ClassDesc);
+									char ClassDesc[64] = { 0 };
+									sprintf_s(ClassDesc, GetClassDesc(thisMember->Class));
+									WriteChatf("\ag%s\aw - \ay%lu\aw - \ap%s\aw ", thisMember->Name, thisMember->Level, ClassDesc);
+								}
 							}
 						}
 					}
+					else {
+						WriteChatf("\arIt does not appear we are in a fellowship.\aw");
+					}
 				}
 			}
-
 		}
 		if (!_stricmp(Arg, "bagspace")) {
 			char stat[MAX_STRING] = "I have ";
@@ -401,6 +436,13 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 		
 		if (!strlen(szLine)) {
+			if (GetSubscriptionLevel() == SUB_SILVER) {
+				strcat_s(buffer, "[+w+]Sub: [+r+]SILVER[+w+] ");
+			}
+			else if (GetSubscriptionLevel() == SUB_BRONZE) {
+				strcat_s(buffer, "[+w+]Sub: [+r+]Bronze[+w+] ");
+			}
+
 			DWORD classID = GetCharInfo2()->Class;
 			switch (classID) {
 			case EQData::Berserker:
@@ -510,7 +552,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 	}
 	else {
-		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, merc, aa, fellowship, campfire, bagspace, or no argument at all.", Arg);
+		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, merc, aa, fellowship, campfire, bagspace, sub, or no argument at all.", Arg);
 	}
 }
 //Check to see if a plugin is loaded.
@@ -583,4 +625,14 @@ inline float PercentMana(PSPAWNINFO& pSpawn)
 		return 0;
 	}
 	return (float)pSpawn->GetCurrentMana() / (float)pSpawn->GetMaxMana() * 100.0f;
+}
+
+int GetSubscriptionLevel() {
+	if (EQADDR_SUBSCRIPTIONTYPE && *EQADDR_SUBSCRIPTIONTYPE) {
+		if (DWORD dwsubtype = *(DWORD*)EQADDR_SUBSCRIPTIONTYPE) {
+			BYTE subtype = *(BYTE*)dwsubtype;
+			return subtype;
+		}
+	}
+	return false;
 }
