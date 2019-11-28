@@ -201,7 +201,10 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				break;
 			}
 			if (GetSubscriptionLevel() == SUB_GOLD) {
-				if (pChar->SubscriptionDays) {
+				if (pChar->SubscriptionDays == -1) {
+					sprintf_s(subDays, " & I appear to have a lifetime subscription.");
+				}
+				else if (pChar->SubscriptionDays) {
 					sprintf_s(subDays, " & I have [+g+]%i[+w+] days remaining.", pChar->SubscriptionDays);
 				}
 				strcat_s(subLevel, subDays);
