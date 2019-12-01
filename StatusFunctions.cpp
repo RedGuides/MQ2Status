@@ -204,6 +204,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				if (pChar->SubscriptionDays == -1) {
 					sprintf_s(subDays, " & I appear to have a lifetime subscription.");
 				}
+				else if (pChar->SubscriptionDays == 0) {
+					sprintf_s(subDays, " & I appear to have a lifetime subscription.");
+				}
 				else if (pChar->SubscriptionDays) {
 					sprintf_s(subDays, " & I have [+g+]%i[+w+] days remaining.", pChar->SubscriptionDays);
 				}
