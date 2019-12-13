@@ -26,7 +26,8 @@
 //	/status campfire - returns information on your campfire
 //	/status bagspace - returns how many free inventory spaces you have
 //	/status sub reports your subscription level, and if gold how much time is left
-//		
+//  /status xp - reports Level - XP % - Banked AA - AAXP %
+//	/status aaxp - reports Spent AA - AAXP % - Banked AA
 //
 //Purpose: 
 //	to quickly display your "status" as relevant to if:
@@ -50,7 +51,7 @@
 
 
 PreSetup("MQ2Status");
-PLUGIN_VERSION(1.6f);
+PLUGIN_VERSION(1.7f);
 
 // Called once, when the plugin is to initialize
 PLUGIN_API VOID InitializePlugin(VOID)

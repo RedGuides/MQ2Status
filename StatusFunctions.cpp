@@ -23,8 +23,10 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	/// Get our Parameters
 	CHAR Arg[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
-	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship") || !_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription")) {
+	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship") || !_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription") || !_stricmp(Arg, "xp") || !_stricmp(Arg, "aaxp")) {
 		/// /status item stuff - this is doing a search for how many of these items we have on our person.
+		PCHARINFO pChar = GetCharInfo();
+		PCHARINFO2 pChar2 = GetCharInfo2();
 		if (!_stricmp(Arg, "help")) {
 			WriteChatf("Welcome to MQ2Status");
 			WriteChatf("By \aoChatWithThisName\aw & \agSic\aw Exclusively for \arRedGuides\aw.");
@@ -115,8 +117,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 		// /status stat <whateverstat>
 		if (!_stricmp(Arg, "stat")) {
-			PCHARINFO pChar = GetCharInfo(); // need this for heroic stats
-			PCHARINFO2 pChar2 = GetCharInfo2(); // need this for money
+
 			PSPAWNINFO me = GetCharInfo()->pSpawn;
 			GetArg(Arg, szLine, 2);
 			if (!strlen(Arg)) {
@@ -175,14 +176,12 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 		if (!_stricmp(Arg, "aa")) {
 			char myAABank[MAX_STRING] = "";
-			PCHARINFO2 pChar2 = GetCharInfo2();
 			sprintf_s(myAABank,"We have [+g+] %lu [+w+] banked AA points.", pChar2->AAPoints);
 			strcat_s(buffer, myAABank);
 			EzCommand(buffer);
 			return;
 		}
 		if (!_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription")) {
-			PCHARINFO pChar = GetCharInfo();
 			char subLevel[MAX_STRING] = "";
 			char subDays[64] = "";
 
@@ -393,7 +392,6 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					else {
 						return;
 					}
-					PCHARINFO2 pChar2 = GetCharInfo2();
 					sprintf_s(cfStatus, "[+g+]Active[+w+]");
 				}
 				sprintf_s(cfInfo, "Campfire: [+g+]%s[+w+] Time Left: [+g+]%s[+w+] Campfire Zone: [+g+]%s[+w+] ", cfStatus, cfTimeRemainHMS, cfZoneLongName);
@@ -406,26 +404,24 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			}
 		}
 		if (!_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) {
-			if (PCHARINFO pChar = GetCharInfo()) {
-				char ClassName[64] = { 0 };
-				if (PFELLOWSHIPINFO pFellowship = (PFELLOWSHIPINFO)&pChar->pSpawn->Fellowship) {
-					if (pFellowship->Members > 0) {
-						WriteChatf("FS MoTD: \ag%s\aw", pFellowship->MotD);
-						WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->Leader, pFellowship->Members);
-						if (int NumMembers = pFellowship->Members) {
-							for (int i = 0; i < NumMembers; i++) {
-								if (PFELLOWSHIPMEMBER thisMember = &pFellowship->FellowshipMember[i]) {
+			char ClassName[64] = { 0 };
+			if (PFELLOWSHIPINFO pFellowship = (PFELLOWSHIPINFO)&pChar->pSpawn->Fellowship) {
+				if (pFellowship->Members > 0) {
+					WriteChatf("FS MoTD: \ag%s\aw", pFellowship->MotD);
+					WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->Leader, pFellowship->Members);
+					if (int NumMembers = pFellowship->Members) {
+						for (int i = 0; i < NumMembers; i++) {
+							if (PFELLOWSHIPMEMBER thisMember = &pFellowship->FellowshipMember[i]) {
 
-									char ClassDesc[64] = { 0 };
-									sprintf_s(ClassDesc, GetClassDesc(thisMember->Class));
-									WriteChatf("\ag%s\aw - \ay%lu\aw - \ap%s\aw ", thisMember->Name, thisMember->Level, ClassDesc);
-								}
+								char ClassDesc[64] = { 0 };
+								sprintf_s(ClassDesc, GetClassDesc(thisMember->Class));
+								WriteChatf("\ag%s\aw - \ay%lu\aw - \ap%s\aw ", thisMember->Name, thisMember->Level, ClassDesc);
 							}
 						}
 					}
-					else {
-						WriteChatf("\arIt does not appear we are in a fellowship.\aw");
-					}
+				}
+				else {
+					WriteChatf("\arIt does not appear we are in a fellowship.\aw");
 				}
 			}
 		}
@@ -437,6 +433,26 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			_ltoa_s(getbagspace, bagspace, 10);
 			sprintf_s(stat, "[+o+]Free Inventory Slots: [+g+]%s[+w+]", bagspace);
 			strcat_s(buffer, stat);
+			EzCommand(buffer);
+			return;
+		}
+
+		if (!_stricmp(Arg, "xp")) {
+			char me[MAX_STRING] = "";
+			PSPAWNINFO pMe = (PSPAWNINFO)pLocalPlayer;
+			int level = pMe->Level;
+			double exp = pChar->Exp * .001;
+			exp = floor(exp * 100.0) / 100.0;
+			char xp[MAX_STRING] = "Level: ";
+			sprintf_s(xp, "[+o+]Level:[+g+] %i [+o+]XP: [+g+]%0.02lf%%[+w+] [+o+]Banked AA: [+g+]%lu [+o+]AAXP: [+g+]%02.2f%%[+w+]", level, exp, pChar2->AAPoints, (float)pChar->AAExp * .001);
+			strcat_s(buffer, xp);
+			EzCommand(buffer);
+			return;
+		}
+		if (!_stricmp(Arg, "aaxp")) {
+			char xp[MAX_STRING] = "";
+			sprintf_s(xp, "[+o+]Spent AA: [+g+]%lu[+w+] [+o+]AAXP: [+g+]%02.2f%%[+w+] [+o+]Banked AA: [+g+]%lu[+w+]", pChar2->AAPointsSpent, (double)pChar->AAExp * .001, pChar2->AAPoints);
+			strcat_s(buffer, xp);
 			EzCommand(buffer);
 			return;
 		}
@@ -549,7 +565,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			}
 
 		//Am I Invis?
-			if (int amHidden = pChar->HideMode) {
+			if (int amHidden = pChar->pSpawn->HideMode) {
 				strcat_s(buffer, "Hiding:[+r+] TRUE[+w+]");
 			}
 
