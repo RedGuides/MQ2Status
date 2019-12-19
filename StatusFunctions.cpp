@@ -475,6 +475,14 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					notLoaded = true;
 				}
 				break;
+			case EQData::Monk:
+				if (FindPlugin("MQ2Monk")) {
+					classPlugin = true;
+				}
+				else {
+					notLoaded = true;
+				}
+				break;
 			case EQData::Rogue:
 				if (FindPlugin("MQ2Rogue")) {
 					classPlugin = true;
