@@ -41,6 +41,8 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			WriteChatf("/status \agfellowship\aw : This returns to your mq2window (does not eqbc) information on your fellowship");
 			WriteChatf("/status \agbagspace\aw : Reports to eqbc how many open bagspaces you have.");
 			WriteChatf("/status \agsub\aw : Reports to eqbc our subscription level, and if we are gold, how many days are left.");
+			WriteChatf("/status \agxp\aw : Reports to eqbc our level, Current XP %, Banked AA, and our AAXP %.");
+			WriteChatf("/status \agaaxp\aw : Reports to eqbc our Spent AA, our AAXP %, and our Banked AA.");
 		}
 		if (!_stricmp(Arg, "item")) {
 			GetArg(Arg, szLine, 2);
@@ -181,6 +183,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			EzCommand(buffer);
 			return;
 		}
+#if !defined(ROF2EMU)//subscription doesn't exist in EMU'
 		if (!_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription")) {
 			char subLevel[MAX_STRING] = "";
 			char subDays[64] = "";
@@ -215,6 +218,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			EzCommand(buffer);
 			return;
 		}
+#endif
 		if (!_stricmp(Arg, "merc")) {
 			char temp[32] = { 0 };
 			char mercStatInfo[MAX_STRING] = "";
@@ -436,7 +440,6 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			EzCommand(buffer);
 			return;
 		}
-
 		if (!_stricmp(Arg, "xp")) {
 			char me[MAX_STRING] = "";
 			PSPAWNINFO pMe = (PSPAWNINFO)pLocalPlayer;
@@ -458,13 +461,14 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 		
 		if (!strlen(szLine)) {
+#if !defined(ROF2EMU)//subscription doesn't exist in EMU'
 			if (GetSubscriptionLevel() == SUB_SILVER) {
 				strcat_s(buffer, "[+w+]Sub: [+r+]SILVER[+w+] ");
 			}
 			else if (GetSubscriptionLevel() == SUB_BRONZE) {
 				strcat_s(buffer, "[+w+]Sub: [+r+]Bronze[+w+] ");
 			}
-
+#endif
 			DWORD classID = GetCharInfo2()->Class;
 			switch (classID) {
 			case EQData::Berserker:
@@ -582,7 +586,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 	}
 	else {
-		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, merc, aa, fellowship, campfire, bagspace, sub, or no argument at all.", Arg);
+		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, merc, aa, fellowship, campfire, bagspace, sub, xp, aaxp, or no argument at all.", Arg);
 	}
 }
 //Check to see if a plugin is loaded.
@@ -641,20 +645,18 @@ void PutCommas(PCHAR szLine) {
 
 inline float PercentHealth(PSPAWNINFO& pSpawn)
 {
-	return (float)pSpawn->HPCurrent / (float)pSpawn->HPMax * 100.0f;
+	return ((float)pSpawn->HPCurrent / (float)pSpawn->HPMax) * 100.0f;
 }
 
 inline float PercentEndurance(PSPAWNINFO& pSpawn)
 {
-	return (float)pSpawn->GetCurrentEndurance() / (float)pSpawn->GetMaxEndurance() * 100.0f;
+	return ((float)pSpawn->GetCurrentEndurance() / (float)pSpawn->GetMaxEndurance()) * 100.0f;
 }
 
 inline float PercentMana(PSPAWNINFO& pSpawn)
 {
-	if (GetCharInfo()->pSpawn->GetMaxMana() == 0) {
-		return 0;
-	}
-	return (float)pSpawn->GetCurrentMana() / (float)pSpawn->GetMaxMana() * 100.0f;
+	if (pSpawn->GetMaxMana() <= 0) return 100.0f;
+	return ((float)pSpawn->GetCurrentMana() / (float)pSpawn->GetMaxMana()) * 100.0f;
 }
 
 int GetSubscriptionLevel() {

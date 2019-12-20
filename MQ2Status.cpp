@@ -51,7 +51,7 @@
 
 
 PreSetup("MQ2Status");
-PLUGIN_VERSION(1.7f);
+PLUGIN_VERSION(1.8);
 
 // Called once, when the plugin is to initialize
 PLUGIN_API VOID InitializePlugin(VOID)
