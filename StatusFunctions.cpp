@@ -23,7 +23,11 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	/// Get our Parameters
 	CHAR Arg[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
+#if !defined(ROF2EMU)
 	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship") || !_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription") || !_stricmp(Arg, "xp") || !_stricmp(Arg, "aaxp")) {
+#else
+	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship") || !_stricmp(Arg, "xp") || !_stricmp(Arg, "aaxp")) {
+#endif
 		/// /status item stuff - this is doing a search for how many of these items we have on our person.
 		PCHARINFO pChar = GetCharInfo();
 		PCHARINFO2 pChar2 = GetCharInfo2();
@@ -40,7 +44,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			WriteChatf("/status \agcampfire\aw : Reports to eqbc campfire information including Active, Duration, and Zone.");
 			WriteChatf("/status \agfellowship\aw : This returns to your mq2window (does not eqbc) information on your fellowship");
 			WriteChatf("/status \agbagspace\aw : Reports to eqbc how many open bagspaces you have.");
+#if !defined(ROF2EMU)
 			WriteChatf("/status \agsub\aw : Reports to eqbc our subscription level, and if we are gold, how many days are left.");
+#endif
 			WriteChatf("/status \agxp\aw : Reports to eqbc our level, Current XP %, Banked AA, and our AAXP %.");
 			WriteChatf("/status \agaaxp\aw : Reports to eqbc our Spent AA, our AAXP %, and our Banked AA.");
 		}
@@ -152,9 +158,15 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				else if (!_stricmp(Arg, "hcha")) {
 					sprintf_s(stat, "I have [+g+]%lu[+w+] [+y+]HCHA[+w+].", pChar->HeroicCHABonus);
 				}
+#if !defined(ROF2EMU)
 				else if (!_stricmp(Arg, "hps")) {
-					sprintf_s(stat, "Current HPS: [+g+]%llu[+w+] Max HPs: [+g+]%llu[+w+] Percent Health: [+g+]%2.2f %%[+w+]", me->HPCurrent, me->HPMax, PercentHealth(me));
+					sprintf_s(stat, "Current HPS: [+g+]%lld[+w+] Max HPs: [+g+]%lld[+w+] Percent Health: [+g+]%2.2f %%[+w+]", me->HPCurrent, me->HPMax, PercentHealth(me));
 				}
+#else
+				else if (!_stricmp(Arg, "hps")) {
+					sprintf_s(stat, "Current HPS: [+g+]%d[+w+] Max HPs: [+g+]%d[+w+] Percent Health: [+g+]%2.2f %%[+w+]", me->HPCurrent, me->HPMax, PercentHealth(me));
+				}
+#endif
 				else if (!_stricmp(Arg, "mana")) {
 					strcat_s(stat, "CurrentMana} / ${Me.MaxMana}[+w+] at [+g+]${Me.PctMana}%[+w+] Mana");
 					sprintf_s(stat, "Current Mana: [+g+]%i[+w+] Max Mana: [+g+]%i[+w+] Percent Mana: [+g+]%2.2f %%[+w+]", me->GetCurrentMana(), me->GetMaxMana(), PercentMana(me));
