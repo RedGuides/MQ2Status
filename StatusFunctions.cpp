@@ -47,8 +47,8 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 #if !defined(ROF2EMU)
 			WriteChatf("/status \agsub\aw : Reports to eqbc our subscription level, and if we are gold, how many days are left.");
 #endif
-			WriteChatf("/status \agxp\aw : Reports to eqbc our level, Current XP %, Banked AA, and our AAXP %.");
-			WriteChatf("/status \agaaxp\aw : Reports to eqbc our Spent AA, our AAXP %, and our Banked AA.");
+			WriteChatf("/status \agxp\aw : Reports to eqbc our level, Current XP %%, Banked AA, and our AAXP %%.");
+			WriteChatf("/status \agaaxp\aw : Reports to eqbc our Spent AA, our AAXP %%, and our Banked AA.");
 		}
 		if (!_stricmp(Arg, "item")) {
 			GetArg(Arg, szLine, 2);
