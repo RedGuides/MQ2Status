@@ -491,8 +491,24 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					notLoaded = true;
 				}
 				break;
+			case EQData::Cleric:
+				if (FindPlugin("MQ2Cleric")) {
+					classPlugin = true;
+				}
+				else {
+					notLoaded = true;
+				}
+				break;
 			case EQData::Monk:
 				if (FindPlugin("MQ2Monk")) {
+					classPlugin = true;
+				}
+				else {
+					notLoaded = true;
+				}
+				break;
+			case EQData::Beastlord:
+				if (FindPlugin("MQ2Bst")) {
 					classPlugin = true;
 				}
 				else {
