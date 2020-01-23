@@ -1,4 +1,21 @@
 #include "StatusFunctions.h"
+bool bShowPlugin = true;
+bool bShowWarrior = true;
+bool bShowCleric = true;
+bool bShowPaladin = false;
+bool bShowRanger = false;
+bool bShowShadowknight = true;
+bool bShowDruid = false;
+bool bShowMonk = true;
+bool bShowBard = false;
+bool bShowRogue = true;
+bool bShowShaman = false;
+bool bShowNecromancer = false;
+bool bShowWizard = false;
+bool bShowMage = false;
+bool bShowEnchanter = false;
+bool bShowBeastlord = true;
+bool bShowBerserker = true;
 
 void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	//Check to see if MQ2EQBC Plugin is loaded, if not output an error and return out without doing anything. 
@@ -22,7 +39,93 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 
 	/// Get our Parameters
 	CHAR Arg[MAX_STRING] = { 0 };
+	CHAR Arg2[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
+	GetArg(Arg2, szLine, 2);
+
+	if (!_stricmp(Arg, "show")) {
+		if (!_stricmp(Arg2, "plugin")) {
+			ParseBoolArg(szLine, &bShowPlugin, "ShowPlugin");
+			return;
+		}
+
+		if (!_stricmp(Arg2, "warrior")) {
+			ParseBoolArg(szLine, &bShowWarrior, "ShowPlugin");
+			return;
+		}
+
+		if (!_stricmp(Arg2, "cleric")) {
+			ParseBoolArg(szLine, &bShowCleric, "ShowPlugin");
+			return;
+		}
+
+		if (!_stricmp(Arg2, "paladin")) {
+			ParseBoolArg(szLine, &bShowPaladin, "ShowPlugin");
+			return;
+		}
+
+		if (!_stricmp(Arg2, "ranger")) {
+			ParseBoolArg(szLine, &bShowRanger, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "shadowknight")) {
+			ParseBoolArg(szLine, &bShowShadowknight, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "druid")) {
+			ParseBoolArg(szLine, &bShowDruid, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "monk")) {
+			ParseBoolArg(szLine, &bShowMonk, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "bard")) {
+			ParseBoolArg(szLine, &bShowBard, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "rogue")) {
+			ParseBoolArg(szLine, &bShowRogue, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "shaman")) {
+			ParseBoolArg(szLine, &bShowShaman, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "necromancer")) {
+			ParseBoolArg(szLine, &bShowNecromancer, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "wizard")) {
+			ParseBoolArg(szLine, &bShowWizard, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "magician")) {
+			ParseBoolArg(szLine, &bShowMage, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "enchanter")) {
+			ParseBoolArg(szLine, &bShowEnchanter, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "beastlord")) {
+			ParseBoolArg(szLine, &bShowBeastlord, "ShowPlugin");
+			return;
+		}
+		if (!_stricmp(Arg2, "berserker")) {
+			ParseBoolArg(szLine, &bShowBerserker, "ShowPlugin");
+			return;
+		}
+		WriteChatf("\arPlease provide a valid \agShow\aw option.\aw");
+		WriteChatf("\ayImportant!\aw \agShow Plugin Off\aw will hide ALL the plugins.");
+		WriteChatf("\ayImportant!\aw To display an individual plugin, you will need \agShow Plugin On\aw as well as the individual class plugin set to on.");
+		WriteChatf("\arExamples: \agShow\ay Plugin, \agShow\ay Warrior, \agShow\ay Cleric, \agShow\ay Paladin, \agShow\ay Ranger, \agShow\ay Shadowknight, \agShow\ay Druid, \agShow\ay Monk, \agShow\ay Bard\aw");
+		WriteChatf("\arExamples: \agShow\ay Rogue, \agShow\ay Shaman, \agShow\ay Necromancer, \agShow\ay Wizard, \agShow\ay Mage, \agShow\ay Enchanter, \agShow\ay Beastlord, \agShow\ay Berserker\aw");
+		return;
+	}
+
+
+
 #if !defined(ROF2EMU)
 	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship") || !_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription") || !_stricmp(Arg, "xp") || !_stricmp(Arg, "aaxp")) {
 #else
@@ -49,6 +152,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 #endif
 			WriteChatf("/status \agxp\aw : Reports to eqbc our level, Current XP %%, Banked AA, and our AAXP %%.");
 			WriteChatf("/status \agaaxp\aw : Reports to eqbc our Spent AA, our AAXP %%, and our Banked AA.");
+			WriteChatf("/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
 		}
 		if (!_stricmp(Arg, "item")) {
 			GetArg(Arg, szLine, 2);
@@ -484,6 +588,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			DWORD classID = GetCharInfo2()->Class;
 			switch (classID) {
 			case EQData::Berserker:
+				if (!bShowBerserker) {
+					break;
+				}
 				if (FindPlugin("MQ2BerZerker")) {
 					classPlugin = true;
 				}
@@ -492,6 +599,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				}
 				break;
 			case EQData::Cleric:
+				if (!bShowCleric) {
+					break;
+				}
 				if (FindPlugin("MQ2Cleric")) {
 					classPlugin = true;
 				}
@@ -500,6 +610,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				}
 				break;
 			case EQData::Monk:
+				if (!bShowMonk) {
+					break;
+				}
 				if (FindPlugin("MQ2Monk")) {
 					classPlugin = true;
 				}
@@ -508,6 +621,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				}
 				break;
 			case EQData::Beastlord:
+				if (!bShowBeastlord) {
+					break;
+				}
 				if (FindPlugin("MQ2Bst")) {
 					classPlugin = true;
 				}
@@ -516,6 +632,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				}
 				break;
 			case EQData::Rogue:
+				if (!bShowRogue) {
+					break;
+				}
 				if (FindPlugin("MQ2Rogue")) {
 					classPlugin = true;
 				}
@@ -524,6 +643,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				}
 				break;
 			case EQData::Warrior:
+				if (!bShowWarrior) {
+					break;
+				}
 				if (FindPlugin("MQ2War")) {
 					classPlugin = true;
 				}
@@ -532,6 +654,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				}
 				break;
 			case EQData::Shadowknight:
+				if (!bShowShadowknight) {
+					break;
+				}
 				if (FindPlugin("MQ2Eskay")) {
 					classPlugin = true;
 				}
@@ -542,10 +667,10 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			default:
 				break;
 			}
-			if (classPlugin) {
+			if (bShowPlugin && classPlugin) {
 				strcat_s(buffer, "Class Plugin:[+g+] Loaded! [+w+] ");
 			}
-			else if (notLoaded) {//Only outputs if there is a CWTN classPlugin available for that class, and it wasn't loaded.
+			else if (bShowPlugin && notLoaded) {//Only outputs if there is a CWTN classPlugin available for that class, and it wasn't loaded.
 				strcat_s(buffer, "Class Plugin:[+r+] Not Loaded! [+w+] ");
 			}
 			//Am I running a macro.
@@ -568,6 +693,24 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						//Seem to not have a role. That's weird. 
 					}
 				}
+				// IHC Mercs do not use "Roles" everyone is Assist - this will return who they are assisting
+				else if (strstr(gszMacroName, "IHC")) {
+					if (IsDefined("assistname")) {
+						strcat_s(temp, "[+g+] ");
+						strcat_s(temp, gszMacroName);
+						strcat_s(temp, "[+w+] Assisting: [+g+]");
+						//Get the value of the Role variable
+						char theRole[64] = "${assistname}";
+						ParseMacroData(theRole, 64);
+						strcat_s(temp, theRole);
+						strcat_s(temp, "[+w+] ");
+					}
+					else {
+						strcat_s(temp, "[+r+] ");
+						// assistname isn't defined. That is weird.
+					}
+				}
+
 				else {
 					strcat_s(temp, "[+r+] ");
 					strcat_s(temp, gszMacroName);
