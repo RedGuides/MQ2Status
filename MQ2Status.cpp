@@ -120,7 +120,6 @@ void VerifyINI(char* Section, char* Key, char* Default)
 }
 
 void DoINIThings() {
-	WriteChatf("Doing Ini Things");
 	char temp[MAX_STRING] = { 0 };
 
 	VerifyINI("ShowPlugin", "Plugin", "on");
