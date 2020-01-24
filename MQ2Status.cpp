@@ -105,33 +105,37 @@ PLUGIN_API VOID ShutdownPlugin(VOID)
 //}
 
 
-void VerifyINI(char* Section, char* Key, char* Default, bool& plugin) {
+bool VerifyINI(char* Section, char* Key, char* Default) {
 	char temp[MAX_STRING] = { 0 };
 	if (GetPrivateProfileString(Section, Key, nullptr, temp, MAX_STRING, INIFileName) == 0) {
 		WritePrivateProfileString(Section, Key, Default, INIFileName);
-		plugin = atob(temp);
+		// Because there was nothing in the ini, we're going to return the default value
+		return atob(Default);
 	}
+	// Because there was a value in the ini, we're going to atob and return it
+	return atob(temp);
 }
 
 void DoINIThings() {
-	VerifyINI("ShowPlugin", "Plugin", "on", bShowPlugin);
-	VerifyINI("ShowPlugin", "Warrior", "on", bShowWarrior);
-	VerifyINI("ShowPlugin", "Warrior", "on", bShowWarrior);
-	VerifyINI("ShowPlugin", "Cleric", "on", bShowCleric);
-	VerifyINI("ShowPlugin", "Paladin", "on", bShowPaladin);
-	VerifyINI("ShowPlugin", "Ranger", "on", bShowRanger);
-	VerifyINI("ShowPlugin", "Shadowknight", "on", bShowShadowknight);
-	VerifyINI("ShowPlugin", "Druid", "on", bShowDruid);
-	VerifyINI("ShowPlugin", "Monk", "on", bShowMonk);
-	VerifyINI("ShowPlugin", "Bard", "on", bShowBard);
-	VerifyINI("ShowPlugin", "Rogue", "on", bShowRogue);
-	VerifyINI("ShowPlugin", "Shaman", "on", bShowShaman);
-	VerifyINI("ShowPlugin", "Necromancer", "on", bShowNecromancer);
-	VerifyINI("ShowPlugin", "Wizard", "on", bShowWizard);
-	VerifyINI("ShowPlugin", "Magician", "on", bShowMage);
-	VerifyINI("ShowPlugin", "Enchanter", "on", bShowEnchanter);
-	VerifyINI("ShowPlugin", "Beastlord", "on", bShowBeastlord);
-	VerifyINI("ShowPlugin", "Berserker", "on", bShowBerserker);
+	// We are going to Check the ini status, and if there is no ini
+	// We are going to write these defaults
+	bShowPlugin =		VerifyINI("ShowPlugin", "Plugin", "on");
+	bShowWarrior =		VerifyINI("ShowPlugin", "Warrior", "on");
+	bShowCleric =		VerifyINI("ShowPlugin", "Cleric", "on");
+	bShowPaladin =		VerifyINI("ShowPlugin", "Paladin", "on");
+	bShowRanger	=		VerifyINI("ShowPlugin", "Ranger", "on");
+	bShowShadowknight = VerifyINI("ShowPlugin", "Shadowknight", "on");
+	bShowDruid =		VerifyINI("ShowPlugin", "Druid", "on");
+	bShowMonk =			VerifyINI("ShowPlugin", "Monk", "on");
+	bShowBard =			VerifyINI("ShowPlugin", "Bard", "on");
+	bShowRogue =		VerifyINI("ShowPlugin", "Rogue", "on");
+	bShowShaman =		VerifyINI("ShowPlugin", "Shaman", "on");
+	bShowNecromancer =	VerifyINI("ShowPlugin", "Necromancer", "on");
+	bShowWizard =		VerifyINI("ShowPlugin", "Wizard", "on");
+	bShowMage =			VerifyINI("ShowPlugin", "Magician", "on");
+	bShowEnchanter =	VerifyINI("ShowPlugin", "Enchanter", "on");
+	bShowBeastlord =	VerifyINI("ShowPlugin", "Beastlord", "on");
+	bShowBerserker =	VerifyINI("ShowPlugin", "Berserker", "on");
 }
 
 bool atob(char* x) {

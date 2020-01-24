@@ -14,7 +14,7 @@ int GetSubscriptionLevel();
 bool atob(char x[MAX_STRING]);
 void ParseBoolArg(PCHAR Arg, PCHAR Arg2, PCHAR Arg3, bool* theOption, char* INIsection);
 void DoINIThings();
-void VerifyINI(char* Section, char* Key, char* Default, char *plugin);
+bool VerifyINI(char* Section, char* Key, char* Default);
 
 enum Subscription {
 	SUB_BRONZE,
