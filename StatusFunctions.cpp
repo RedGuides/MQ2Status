@@ -40,87 +40,89 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 	/// Get our Parameters
 	CHAR Arg[MAX_STRING] = { 0 };
 	CHAR Arg2[MAX_STRING] = { 0 };
+	CHAR Arg3[MAX_STRING] = { 0 };
 	GetArg(Arg, szLine, 1);
 	GetArg(Arg2, szLine, 2);
+	GetArg(Arg3, szLine, 3);
 
 	if (!_stricmp(Arg, "show")) {
 		if (!_stricmp(Arg2, "plugin")) {
-			ParseBoolArg(szLine, &bShowPlugin, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowPlugin, "ShowPlugin");
 			return;
 		}
 
 		if (!_stricmp(Arg2, "warrior")) {
-			ParseBoolArg(szLine, &bShowWarrior, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowWarrior, "ShowPlugin");
 			return;
 		}
 
 		if (!_stricmp(Arg2, "cleric")) {
-			ParseBoolArg(szLine, &bShowCleric, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowCleric, "ShowPlugin");
 			return;
 		}
 
 		if (!_stricmp(Arg2, "paladin")) {
-			ParseBoolArg(szLine, &bShowPaladin, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowPaladin, "ShowPlugin");
 			return;
 		}
 
 		if (!_stricmp(Arg2, "ranger")) {
-			ParseBoolArg(szLine, &bShowRanger, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowRanger, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "shadowknight")) {
-			ParseBoolArg(szLine, &bShowShadowknight, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowShadowknight, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "druid")) {
-			ParseBoolArg(szLine, &bShowDruid, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowDruid, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "monk")) {
-			ParseBoolArg(szLine, &bShowMonk, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowMonk, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "bard")) {
-			ParseBoolArg(szLine, &bShowBard, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowBard, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "rogue")) {
-			ParseBoolArg(szLine, &bShowRogue, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowRogue, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "shaman")) {
-			ParseBoolArg(szLine, &bShowShaman, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowShaman, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "necromancer")) {
-			ParseBoolArg(szLine, &bShowNecromancer, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowNecromancer, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "wizard")) {
-			ParseBoolArg(szLine, &bShowWizard, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowWizard, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "magician")) {
-			ParseBoolArg(szLine, &bShowMage, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowMage, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "enchanter")) {
-			ParseBoolArg(szLine, &bShowEnchanter, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowEnchanter, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "beastlord")) {
-			ParseBoolArg(szLine, &bShowBeastlord, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowBeastlord, "ShowPlugin");
 			return;
 		}
 		if (!_stricmp(Arg2, "berserker")) {
-			ParseBoolArg(szLine, &bShowBerserker, "ShowPlugin");
+			ParseBoolArg(Arg, Arg2, Arg3, &bShowBerserker, "ShowPlugin");
 			return;
 		}
 		WriteChatf("\arPlease provide a valid \agShow\aw option.\aw");
 		WriteChatf("\ayImportant!\aw \agShow Plugin Off\aw will hide ALL the plugins.");
 		WriteChatf("\ayImportant!\aw To display an individual plugin, you will need \agShow Plugin On\aw as well as the individual class plugin set to on.");
 		WriteChatf("\arExamples: \agShow\ay Plugin, \agShow\ay Warrior, \agShow\ay Cleric, \agShow\ay Paladin, \agShow\ay Ranger, \agShow\ay Shadowknight, \agShow\ay Druid, \agShow\ay Monk, \agShow\ay Bard\aw");
-		WriteChatf("\arExamples: \agShow\ay Rogue, \agShow\ay Shaman, \agShow\ay Necromancer, \agShow\ay Wizard, \agShow\ay Mage, \agShow\ay Enchanter, \agShow\ay Beastlord, \agShow\ay Berserker\aw");
+		WriteChatf("\arExamples: \agShow\ay Rogue, \agShow\ay Shaman, \agShow\ay Necromancer, \agShow\ay Wizard, \agShow\ay Magician, \agShow\ay Enchanter, \agShow\ay Beastlord, \agShow\ay Berserker\aw");
 		return;
 	}
 
@@ -585,93 +587,88 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 				strcat_s(buffer, "[+w+]Sub: [+r+]Bronze[+w+] ");
 			}
 #endif
-			DWORD classID = GetCharInfo2()->Class;
-			switch (classID) {
-			case EQData::Berserker:
-				if (!bShowBerserker) {
+			if (bShowPlugin) {
+				DWORD classID = GetCharInfo2()->Class;
+				switch (classID) {
+				case EQData::Berserker:
+					if (bShowBerserker) {
+						if (FindPlugin("MQ2BerZerker")) {
+							classPlugin = true;
+						}
+						else {
+							notLoaded = true;
+						}
+					}
+					break;
+				case EQData::Cleric:
+					if (bShowCleric) {
+						if (FindPlugin("MQ2Cleric")) {
+							classPlugin = true;
+						}
+						else {
+							notLoaded = true;
+						}
+					}
+					break;
+				case EQData::Monk:
+					if (bShowMonk) {
+						if (FindPlugin("MQ2Monk")) {
+							classPlugin = true;
+						}
+						else {
+							notLoaded = true;
+						}
+					}
+					break;
+				case EQData::Beastlord:
+					if (bShowBeastlord) {
+						if (bShowBeastlord && FindPlugin("MQ2Bst")) {
+							classPlugin = true;
+						}
+						else {
+							notLoaded = true;
+						}
+					}
+					break;
+				case EQData::Rogue:
+					if (bShowRogue) {
+						if (bShowRogue && FindPlugin("MQ2Rogue")) {
+							classPlugin = true;
+						}
+						else {
+							notLoaded = true;
+						}
+					}
+					break;
+				case EQData::Warrior:
+					if (bShowWarrior) {
+						if (FindPlugin("MQ2War")) {
+							classPlugin = true;
+						}
+						else {
+							notLoaded = true;
+						}
+					}
+					break;
+				case EQData::Shadowknight:
+					if (!bShowShadowknight) {
+						if (FindPlugin("MQ2Eskay")) {
+							classPlugin = true;
+						}
+						else {
+							notLoaded = true;
+						}
+					}
+					break;
+				default:
 					break;
 				}
-				if (FindPlugin("MQ2BerZerker")) {
-					classPlugin = true;
+				if (classPlugin) {
+					strcat_s(buffer, "Class Plugin:[+g+] Loaded! [+w+] ");
 				}
-				else {
-					notLoaded = true;
+				else if (notLoaded) {//Only outputs if there is a CWTN classPlugin available for that class, and it wasn't loaded.
+					strcat_s(buffer, "Class Plugin:[+r+] Not Loaded! [+w+] ");
 				}
-				break;
-			case EQData::Cleric:
-				if (!bShowCleric) {
-					break;
-				}
-				if (FindPlugin("MQ2Cleric")) {
-					classPlugin = true;
-				}
-				else {
-					notLoaded = true;
-				}
-				break;
-			case EQData::Monk:
-				if (!bShowMonk) {
-					break;
-				}
-				if (FindPlugin("MQ2Monk")) {
-					classPlugin = true;
-				}
-				else {
-					notLoaded = true;
-				}
-				break;
-			case EQData::Beastlord:
-				if (!bShowBeastlord) {
-					break;
-				}
-				if (FindPlugin("MQ2Bst")) {
-					classPlugin = true;
-				}
-				else {
-					notLoaded = true;
-				}
-				break;
-			case EQData::Rogue:
-				if (!bShowRogue) {
-					break;
-				}
-				if (FindPlugin("MQ2Rogue")) {
-					classPlugin = true;
-				}
-				else {
-					notLoaded = true;
-				}
-				break;
-			case EQData::Warrior:
-				if (!bShowWarrior) {
-					break;
-				}
-				if (FindPlugin("MQ2War")) {
-					classPlugin = true;
-				}
-				else {
-					notLoaded = true;
-				}
-				break;
-			case EQData::Shadowknight:
-				if (!bShowShadowknight) {
-					break;
-				}
-				if (FindPlugin("MQ2Eskay")) {
-					classPlugin = true;
-				}
-				else {
-					notLoaded = true;
-				}
-				break;
-			default:
-				break;
-			}
-			if (bShowPlugin && classPlugin) {
-				strcat_s(buffer, "Class Plugin:[+g+] Loaded! [+w+] ");
-			}
-			else if (bShowPlugin && notLoaded) {//Only outputs if there is a CWTN classPlugin available for that class, and it wasn't loaded.
-				strcat_s(buffer, "Class Plugin:[+r+] Not Loaded! [+w+] ");
 			}
 			//Am I running a macro.
 			if (gMacroStack && strlen(gszMacroName)) {

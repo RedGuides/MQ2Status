@@ -64,10 +64,7 @@ PLUGIN_API VOID InitializePlugin(VOID)
 	else {
 		AddCommand("/status", StatusCmd);
 	}
-	char szinifile[MAX_STRING] = { 0 };
-	sprintf_s(szinifile, "%s\\MQ2Status.ini", gszINIPath);
-
-
+	DoINIThings();
 }
 
 // Called once, when the plugin is to shutdown
@@ -76,16 +73,14 @@ PLUGIN_API VOID ShutdownPlugin(VOID)
 	RemoveCommand("/status");
 }
 
+
+// Called once directly after initialization, and then every time the gamestate changes
+//PLUGIN_API VOID SetGameState(DWORD GameState) {
+//
+//	if (GameState == GAMESTATE_INGAME) {
+//	}
+//}
 // THIS IS A BLOCK COMMENT!
-
-//// Called once directly after initialization, and then every time the gamestate changes
-PLUGIN_API VOID SetGameState(DWORD GameState) {
-
-	if (GameState == GAMESTATE_INGAME) {
-		DoINIThings();
-	}
-}
-
 //// This is called every time MQ pulses (MainLOOP!)
 //PLUGIN_API VOID OnPulse(VOID)
 //{
@@ -110,63 +105,55 @@ PLUGIN_API VOID SetGameState(DWORD GameState) {
 //}
 
 
-void VerifyINI(char* Section, char* Key, char* Default)
-{
+void VerifyINI(char* Section, char* Key, char* Default, bool& plugin) {
 	char temp[MAX_STRING] = { 0 };
-	if (GetPrivateProfileString(Section, Key, 0, temp, MAX_STRING, INIFileName) == 0)
-	{
+	if (GetPrivateProfileString(Section, Key, nullptr, temp, MAX_STRING, INIFileName) == 0) {
 		WritePrivateProfileString(Section, Key, Default, INIFileName);
+		plugin = atob(temp);
 	}
 }
 
 void DoINIThings() {
-	char temp[MAX_STRING] = { 0 };
-
-	VerifyINI("ShowPlugin", "Plugin", "on");
-	GetPrivateProfileString("ShowPlugin", "Plugin", "on", temp, MAX_STRING, INIFileName);
-	bShowPlugin = atob(temp);
-
-	VerifyINI("ShowPlugin", "warrior", "1");
-	GetPrivateProfileString("ShowPlugin", "warrior", "on", temp, MAX_STRING, INIFileName);
-	bShowWarrior = atob(temp);
+	VerifyINI("ShowPlugin", "Plugin", "on", bShowPlugin);
+	VerifyINI("ShowPlugin", "Warrior", "on", bShowWarrior);
+	VerifyINI("ShowPlugin", "Warrior", "on", bShowWarrior);
+	VerifyINI("ShowPlugin", "Cleric", "on", bShowCleric);
+	VerifyINI("ShowPlugin", "Paladin", "on", bShowPaladin);
+	VerifyINI("ShowPlugin", "Ranger", "on", bShowRanger);
+	VerifyINI("ShowPlugin", "Shadowknight", "on", bShowShadowknight);
+	VerifyINI("ShowPlugin", "Druid", "on", bShowDruid);
+	VerifyINI("ShowPlugin", "Monk", "on", bShowMonk);
+	VerifyINI("ShowPlugin", "Bard", "on", bShowBard);
+	VerifyINI("ShowPlugin", "Rogue", "on", bShowRogue);
+	VerifyINI("ShowPlugin", "Shaman", "on", bShowShaman);
+	VerifyINI("ShowPlugin", "Necromancer", "on", bShowNecromancer);
+	VerifyINI("ShowPlugin", "Wizard", "on", bShowWizard);
+	VerifyINI("ShowPlugin", "Magician", "on", bShowMage);
+	VerifyINI("ShowPlugin", "Enchanter", "on", bShowEnchanter);
+	VerifyINI("ShowPlugin", "Beastlord", "on", bShowBeastlord);
+	VerifyINI("ShowPlugin", "Berserker", "on", bShowBerserker);
 }
 
-bool atob(char x[MAX_STRING])
-{
-	for (int i = 0; i < 4; i++)
-		x[i] = tolower(x[i]);
-	if (!_stricmp(x, "true") || atoi(x) != 0 || !_stricmp(x, "on"))
+bool atob(char* x) {
+	if (!_stricmp(x, "true") || strtol(x, nullptr, 10) != 0 || !_stricmp(x, "on")) {
 		return true;
+	}
 	return false;
 }
 
-void ParseBoolArg(PCHAR szLine, bool* theOption, char* INIsection) {
-	char Arg[MAX_STRING] = "";
-	char Arg2[MAX_STRING] = "";
-	char Arg3[MAX_STRING] = "";
-	GetArg(Arg, szLine, 1);
-	GetArg(Arg2, szLine, 2);
-	GetArg(Arg3, szLine, 3);
+void ParseBoolArg(PCHAR Arg, PCHAR Arg2, PCHAR Arg3, bool *theOption, char* INIsection) {
 	if (!strlen(Arg3)) {
 		WriteChatf("\at%s is currently: \ap%s", Arg2, *theOption ? "\agOn" : "\arOff");
 		WriteChatf("\ayTo Change this, type /status %s %s [true, false, 0, 1, on, off].", Arg, Arg2);
 		return;
 	}
-	if (IsNumber(Arg3))
-	{
+	if (IsNumber(Arg3) || !_stricmp(Arg3, "true") || !_stricmp(Arg3, "false") || !_stricmp(Arg3, "on") || !_stricmp(Arg3, "off")) {
 		*theOption = atob(Arg3);
-		WritePrivateProfileString(INIsection, Arg, Arg2, INIFileName);
+		WritePrivateProfileString(INIsection, Arg2, *theOption ? "on" : "off", INIFileName);
 		WriteChatf("\at%s is now: \ap%s", Arg2, *theOption ? "\agOn" : "\arOff");
-		return;
-	}
-	else if (!_stricmp(Arg3, "true") || !_stricmp(Arg3, "false") || !_stricmp(Arg3, "on") || !_stricmp(Arg3, "off")) {
-		*theOption = atob(Arg3);
-		WritePrivateProfileString(INIsection, Arg2, Arg3, INIFileName);
-		WriteChatf("\at%s is now: \ap%s", Arg2, *theOption ? "\agOn" : "\arOff");
-		return;
 	}
 	else {
 		WriteChatf("\ap%s \aris not a valid option for \ag%s %s\aw. \arValid options are: \aytrue, false, 0, 1, on, off.", Arg3, Arg, Arg2);
-		return;
 	}
+	return;
 }

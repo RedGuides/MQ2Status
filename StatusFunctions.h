@@ -12,8 +12,9 @@ inline float PercentEndurance(PSPAWNINFO& pSpawn);
 inline float PercentMana(PSPAWNINFO& pSpawn);
 int GetSubscriptionLevel();
 bool atob(char x[MAX_STRING]);
-void ParseBoolArg(PCHAR szLine, bool* theOption, char* INIsection);
+void ParseBoolArg(PCHAR Arg, PCHAR Arg2, PCHAR Arg3, bool* theOption, char* INIsection);
 void DoINIThings();
+void VerifyINI(char* Section, char* Key, char* Default, char *plugin);
 
 enum Subscription {
 	SUB_BRONZE,
