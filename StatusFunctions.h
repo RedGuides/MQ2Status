@@ -12,7 +12,7 @@ inline float PercentEndurance(PSPAWNINFO& pSpawn);
 inline float PercentMana(PSPAWNINFO& pSpawn);
 int GetSubscriptionLevel();
 bool atob(char x[MAX_STRING]);
-void ParseBoolArg(PCHAR Arg, PCHAR Arg2, PCHAR Arg3, bool* theOption, char* INIsection);
+void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption, char* INIsection)
 void DoINIThings();
 bool VerifyINI(char* Section, char* Key, char* Default);
 
