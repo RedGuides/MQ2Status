@@ -145,7 +145,7 @@ bool atob(char* x) {
 	return false;
 }
 
-void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool *theOption, char* INIsection) {
+void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption, char* INIsection) {
 	// Arg3 must be a char* because we are using it with IsNumber which needs a char* and will not accept const char*
 	if (!strlen(Arg3)) {
 		WriteChatf("\at%s is currently: \ap%s", Arg2, *theOption ? "\agOn" : "\arOff");
