@@ -129,9 +129,12 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 
 
 #if !defined(ROF2EMU)
-	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship") || !_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription") || !_stricmp(Arg, "xp") || !_stricmp(Arg, "aaxp")) {
+	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") ||
+		!_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship") || !_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription") || !_stricmp(Arg, "xp") ||
+		!_stricmp(Arg, "aaxp") || !_stricmp(Arg, "parcel") || !_stricmp(Arg, "invis")) {
 #else
-	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") || !_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship") || !_stricmp(Arg, "xp") || !_stricmp(Arg, "aaxp")) {
+	if (!_stricmp(Arg, "item") || !_stricmp(Arg, "itembank") || !_stricmp(Arg, "stat") || !_stricmp(Arg, "merc") || !_stricmp(Arg, "campfire") || !_stricmp(Arg, "aa") || !_stricmp(Arg, "help") ||
+		!_stricmp(Arg, "bagspace") || !strlen(Arg) || !_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship") || !_stricmp(Arg, "xp") || !_stricmp(Arg, "aaxp")) {
 #endif
 		/// /status item stuff - this is doing a search for how many of these items we have on our person.
 		PCHARINFO pChar = GetCharInfo();
@@ -140,21 +143,23 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			WriteChatf("Welcome to MQ2Status");
 			WriteChatf("By \aoChatWithThisName\aw & \agSic\aw Exclusively for \arRedGuides\aw.");
 			WriteChatf("\agValid Status options are:\aw");
-			WriteChatf("/status will output to eqbc : If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
-			WriteChatf("/status \agitem\aw \ayitem name\aw : reports to eqbc how many \ayitem name\aw you have in your inventory.");
-			WriteChatf("/status \agitembank\aw \ayitem name\aw : reports to eqbc how many \ayitem name\aw you have in your bank.");
-			WriteChatf("/status \agstat\aw \ayoption\aw : reports the following options to eqbc: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, and, Money.");
-			WriteChatf("/status \agaa\aw : Reports to eqbc how many \"banked\" AA points you have.");
-			WriteChatf("/status \agmerc\aw : Reports to eqbc mercenary information including class, and role.");
-			WriteChatf("/status \agcampfire\aw : Reports to eqbc campfire information including Active, Duration, and Zone.");
+			WriteChatf("/status will output to eqbc: If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
+			WriteChatf("/status \agitem\aw \ayitem name\aw: reports to eqbc how many \ayitem name\aw you have in your inventory.");
+			WriteChatf("/status \agitembank\aw \ayitem name\aw: reports to eqbc how many \ayitem name\aw you have in your bank.");
+			WriteChatf("/status \agstat\aw \ayoption\aw: reports the following options to eqbc: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, and, Money.");
+			WriteChatf("/status \agaa\aw: Reports to eqbc how many \"banked\" AA points you have.");
+			WriteChatf("/status \agmerc\aw: Reports to eqbc mercenary information including class, and role.");
+			WriteChatf("/status \agcampfire\aw: Reports to eqbc campfire information including Active, Duration, and Zone.");
 			WriteChatf("/status \agfellowship\aw : This returns to your mq2window (does not eqbc) information on your fellowship");
-			WriteChatf("/status \agbagspace\aw : Reports to eqbc how many open bagspaces you have.");
+			WriteChatf("/status \agbagspace\aw: Reports to eqbc how many open bagspaces you have.");
 #if !defined(ROF2EMU)
-			WriteChatf("/status \agsub\aw : Reports to eqbc our subscription level, and if we are gold, how many days are left.");
+			WriteChatf("/status \agsub\aw: Reports to eqbc our subscription level, and if we are gold, how many days are left.");
 #endif
-			WriteChatf("/status \agxp\aw : Reports to eqbc our level, Current XP %%, Banked AA, and our AAXP %%.");
-			WriteChatf("/status \agaaxp\aw : Reports to eqbc our Spent AA, our AAXP %%, and our Banked AA.");
+			WriteChatf("/status \agxp\aw: Reports to eqbc our level, Current XP %%, Banked AA, and our AAXP %%.");
+			WriteChatf("/status \agaaxp\aw: Reports to eqbc our Spent AA, our AAXP %%, and our Banked AA.");
 			WriteChatf("/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
+			WriteChatf("/status \agparcel\aw: Reports our \"Parcel\" status.");
+			WriteChatf("/status \aginvis\aw: Reports our Invis and IVU status, so we can check we are \Double Invis\".");
 		}
 		if (!_stricmp(Arg, "item")) {
 			GetArg(Arg, szLine, 2);
@@ -577,7 +582,48 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			EzCommand(buffer);
 			return;
 		}
+
+		if (!_stricmp(Arg, "parcel")) {
+			int parcelstatus = GetCharInfo()->ParcelStatus;
+			char parcelOutput[MAX_STRING] = "";
+
+			switch (parcelstatus) {
+			case eParcelStatus::ePS_HasParcels:
+				sprintf_s(parcelOutput, "[+g+]We have parcels![+w+]");
+				break;
+			case eParcelStatus::ePS_NoParcels:
+				sprintf_s(parcelOutput, "[+t+]We do not have any parcels![+w+]");
+				break;
+			case eParcelStatus::ePS_OverParcelsLimit:
+				sprintf_s(parcelOutput, "[+p+]We have a PARCEL OVERLOAD![+w+]");
+				break;
+			default:
+				break;
+			}
+			strcat_s(buffer, parcelOutput);
+			EzCommand(buffer);
+			return;
+		}
 		
+		if (!_stricmp(Arg, "invis")) {
+			char invisStatus[MAX_STRING] = "";
+			if (IHaveSpa(12) || IHaveSpa(314)) {
+				strcat_s(invisStatus, "[+g+]INVIS[+o+] :: ");
+			}
+			else {
+				strcat_s(invisStatus, "[+r+]INVIS[+o+] :: ");
+			}
+			if (IHaveSpa(28) || IHaveSpa(315)) {
+				strcat_s(invisStatus, "[+g+]IVU[+o+]");				
+			}
+			else {
+				strcat_s(invisStatus, "[+r+]IVU[+o+]");
+			}		
+			strcat_s(buffer, invisStatus);
+			EzCommand(buffer);
+			return;
+		}
+
 		if (!strlen(szLine)) {
 #if !defined(ROF2EMU)//subscription doesn't exist in EMU'
 			if (GetSubscriptionLevel() == SUB_SILVER) {
@@ -835,4 +881,26 @@ int GetSubscriptionLevel() {
 		}
 	}
 	return false;
+}
+
+bool IHaveSpa(int spa) {
+	for (int i = 0; i < NUM_LONG_BUFFS; i++) {
+		PSPELL pBuff = GetSpellByID(GetCharInfo2()->Buff[i].SpellID);
+		if (!pBuff)
+			continue;
+		if (HasSPAEffect(pBuff, spa))
+			return true;
+	}
+	return false;
+}
+
+bool HasSPAEffect(PSPELL pBuff, int spa) {
+	int effects = GetSpellNumEffects(pBuff);
+	bool spaFound = false;
+	for (int j = 0; j < effects; j++) {
+		if (GetSpellAttrib(pBuff, j) == spa) {
+			spaFound = true;
+		}
+	}
+	return spaFound;
 }
