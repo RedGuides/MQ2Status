@@ -159,7 +159,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			WriteChatf("/status \agaaxp\aw: Reports to eqbc our Spent AA, our AAXP %%, and our Banked AA.");
 			WriteChatf("/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
 			WriteChatf("/status \agparcel\aw: Reports our \"Parcel\" status.");
-			WriteChatf("/status \aginvis\aw: Reports our Invis and IVU status, so we can check we are \Double Invis\".");
+			WriteChatf("/status \aginvis\aw: Reports our Invis and IVU status, so we can check we are \"Double Invis\".");
 		}
 		if (!_stricmp(Arg, "item")) {
 			GetArg(Arg, szLine, 2);
@@ -888,19 +888,19 @@ bool IHaveSpa(int spa) {
 		PSPELL pBuff = GetSpellByID(GetCharInfo2()->Buff[i].SpellID);
 		if (!pBuff)
 			continue;
-		if (HasSPAEffect(pBuff, spa))
+		if (IsSPAEffect(pBuff, spa))
+			return true;
+	}
+	for (int i = 0; i < NUM_SHORT_BUFFS; i++) {
+		PSPELL pBuff = GetSpellByID(GetCharInfo2()->Buff[i].SpellID);
+		if (!pBuff)
+			continue;
+		if (IsSPAEffect(pBuff, spa))
 			return true;
 	}
 	return false;
 }
 
-bool HasSPAEffect(PSPELL pBuff, int spa) {
-	int effects = GetSpellNumEffects(pBuff);
-	bool spaFound = false;
-	for (int j = 0; j < effects; j++) {
-		if (GetSpellAttrib(pBuff, j) == spa) {
-			spaFound = true;
-		}
-	}
-	return spaFound;
-}
+
+
+

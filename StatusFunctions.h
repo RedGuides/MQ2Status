@@ -16,7 +16,6 @@ void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption
 void DoINIThings();
 bool VerifyINI(char* Section, char* Key, char* Default);
 bool IHaveSpa(int spa);
-bool HasSPAEffect(PSPELL pBuff, int spa);
 
 enum Subscription {
 	SUB_BRONZE,
