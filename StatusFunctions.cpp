@@ -697,7 +697,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					}
 					break;
 				case EQData::Shadowknight:
-					if (!bShowShadowknight) {
+					if (bShowShadowknight) {
 						if (FindPlugin("MQ2Eskay")) {
 							classPlugin = true;
 						}
