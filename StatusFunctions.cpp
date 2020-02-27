@@ -18,8 +18,8 @@ bool bShowBeastlord = true;
 bool bShowBerserker = true;
 
 void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
-	//Check to see if MQ2EQBC Plugin is loaded, if not output an error and return out without doing anything. 
-	if (!FindPlugin("MQ2EQBC")) {
+	//Check to see if MQ2EQBC Plugin is loaded, if not output an error and return out without doing anything.
+	if (!GetPlugin("MQ2EQBC")) {
 		WriteChatf("\ar[\a-tMQ2Status\ar]\ao:: \arYou don't appear to have MQ2EQBC Loaded!");
 		return;
 	}
@@ -138,7 +138,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 #endif
 		/// /status item stuff - this is doing a search for how many of these items we have on our person.
 		PCHARINFO pChar = GetCharInfo();
-		PCHARINFO2 pChar2 = GetCharInfo2();
+		auto pChar2 = GetPcProfile();
 		if (!_stricmp(Arg, "help")) {
 			WriteChatf("Welcome to MQ2Status");
 			WriteChatf("By \aoChatWithThisName\aw & \agSic\aw Exclusively for \arRedGuides\aw.");
@@ -366,7 +366,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 							DWORD mercStance = pMercInfo->ActiveStance;
 							if (PSPAWNINFO myMerc = (PSPAWNINFO)GetSpawnByID(pMercInfo->MercSpawnId)) {
 								switch (myMerc->GetClass()) {
-								case EQData::Cleric:
+								case Cleric:
 									sprintf_s(mercClass, "[+g+]Cleric [+w+]");
 									{
 										switch (mercStance) {
@@ -392,7 +392,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 										}
 									}
 									break;
-								case EQData::Warrior:
+								case Warrior:
 									sprintf_s(mercClass, "[+g+]Warrior [+w+]");
 									{
 										switch (mercStance) {
@@ -414,7 +414,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 										}
 									}
 									break;
-								case EQData::Wizard:
+								case Wizard:
 									sprintf_s(mercClass, "[+g+]Wizard [+w+]");
 									{
 										switch (mercStance) {
@@ -440,7 +440,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 										}
 									}
 									break;
-								case EQData::Rogue:
+								case Rogue:
 									sprintf_s(mercClass, "[+g+]Rogue [+w+]");
 									{
 										switch (mercStance) {
@@ -532,13 +532,13 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		}
 		if (!_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) {
 			char ClassName[64] = { 0 };
-			if (PFELLOWSHIPINFO pFellowship = (PFELLOWSHIPINFO)&pChar->pSpawn->Fellowship) {
+			if (FELLOWSHIPINFO* pFellowship = (FELLOWSHIPINFO*)&pChar->pSpawn->Fellowship) {
 				if (pFellowship->Members > 0) {
 					WriteChatf("FS MoTD: \ag%s\aw", pFellowship->MotD);
 					WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->Leader, pFellowship->Members);
 					if (int NumMembers = pFellowship->Members) {
 						for (int i = 0; i < NumMembers; i++) {
-							if (PFELLOWSHIPMEMBER thisMember = &pFellowship->FellowshipMember[i]) {
+							if (FELLOWSHIPMEMBER* thisMember = &pFellowship->FellowshipMember[i]) {
 
 								char ClassDesc[64] = { 0 };
 								sprintf_s(ClassDesc, GetClassDesc(thisMember->Class));
@@ -634,11 +634,11 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 			}
 #endif
 			if (bShowPlugin) {
-				DWORD classID = GetCharInfo2()->Class;
+				DWORD classID = GetPcProfile()->Class;
 				switch (classID) {
-				case EQData::Berserker:
+				case Berserker:
 					if (bShowBerserker) {
-						if (FindPlugin("MQ2BerZerker")) {
+						if (GetPlugin("MQ2BerZerker")) {
 							classPlugin = true;
 						}
 						else {
@@ -646,9 +646,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						}
 					}
 					break;
-				case EQData::Cleric:
+				case Cleric:
 					if (bShowCleric) {
-						if (FindPlugin("MQ2Cleric")) {
+						if (GetPlugin("MQ2Cleric")) {
 							classPlugin = true;
 						}
 						else {
@@ -656,9 +656,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						}
 					}
 					break;
-				case EQData::Monk:
+				case Monk:
 					if (bShowMonk) {
-						if (FindPlugin("MQ2Monk")) {
+						if (GetPlugin("MQ2Monk")) {
 							classPlugin = true;
 						}
 						else {
@@ -666,9 +666,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						}
 					}
 					break;
-				case EQData::Beastlord:
+				case Beastlord:
 					if (bShowBeastlord) {
-						if (bShowBeastlord && FindPlugin("MQ2Bst")) {
+						if (bShowBeastlord && GetPlugin("MQ2Bst")) {
 							classPlugin = true;
 						}
 						else {
@@ -676,9 +676,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						}
 					}
 					break;
-				case EQData::Rogue:
+				case Rogue:
 					if (bShowRogue) {
-						if (bShowRogue && FindPlugin("MQ2Rogue")) {
+						if (bShowRogue && GetPlugin("MQ2Rogue")) {
 							classPlugin = true;
 						}
 						else {
@@ -686,9 +686,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						}
 					}
 					break;
-				case EQData::Warrior:
+				case Warrior:
 					if (bShowWarrior) {
-						if (FindPlugin("MQ2War")) {
+						if (GetPlugin("MQ2War")) {
 							classPlugin = true;
 						}
 						else {
@@ -696,9 +696,9 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 						}
 					}
 					break;
-				case EQData::Shadowknight:
+				case Shadowknight:
 					if (bShowShadowknight) {
-						if (FindPlugin("MQ2Eskay")) {
+						if (GetPlugin("MQ2Eskay")) {
 							classPlugin = true;
 						}
 						else {
@@ -759,7 +759,7 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 					strcat_s(temp, gszMacroName);
 					strcat_s(temp, "[+w+] ");
 				}
-				if (PMACROBLOCK pBlock = GetCurrentMacroBlock()) {
+				if (MQMacroBlockPtr pBlock = GetCurrentMacroBlock()) {
 					if (pBlock->Paused) {
 						strcat_s(temp, "[+r+]***PAUSED***[+w+] ");
 					}
@@ -803,22 +803,6 @@ void StatusCmd(PSPAWNINFO pChar, PCHAR szLine) {
 		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, merc, aa, fellowship, campfire, bagspace, sub, xp, aaxp, or no argument at all.", Arg);
 	}
 }
-//Check to see if a plugin is loaded.
-PMQPLUGIN FindPlugin(PCHAR szLine)
-{
-	if (!strlen(szLine)) return false;
-	PMQPLUGIN pPlugin = pPlugins;
-	while (pPlugin)
-	{
-		if (!_stricmp(szLine, pPlugin->szFilename))
-		{
-			return pPlugin;
-		}
-
-		pPlugin = pPlugin->pNext;
-	}
-	return false;
-}
 
 //Check to see if a macro variable is defined.
 bool IsDefined(PCHAR szLine) {
@@ -829,11 +813,11 @@ bool IsDefined(PCHAR szLine) {
 bool HaveAlias(PCHAR ShortCommand) {
 	std::string sName = ShortCommand;
 	std::transform(sName.begin(), sName.end(), sName.begin(), tolower);
-	if (mAliases.find(sName) != mAliases.end()) {
-		return true;
+	const std::string alias = GetPrivateProfileString("Aliases", sName, "None", gPathMQini);
+	if (alias == "None") {
+		return false;
 	}
-	return false;
-}
+	return true;}
 
 void ReverseString(PCHAR szLine) {
 	std::string temp2 = szLine;
@@ -885,14 +869,14 @@ int GetSubscriptionLevel() {
 
 bool IHaveSpa(int spa) {
 	for (int i = 0; i < NUM_LONG_BUFFS; i++) {
-		PSPELL pBuff = GetSpellByID(GetCharInfo2()->Buff[i].SpellID);
+		PSPELL pBuff = GetSpellByID(GetPcProfile()->Buff[i].SpellID);
 		if (!pBuff)
 			continue;
 		if (IsSPAEffect(pBuff, spa))
 			return true;
 	}
 	for (int i = 0; i < NUM_SHORT_BUFFS; i++) {
-		PSPELL pBuff = GetSpellByID(GetCharInfo2()->Buff[i].SpellID);
+		PSPELL pBuff = GetSpellByID(GetPcProfile()->Buff[i].SpellID);
 		if (!pBuff)
 			continue;
 		if (IsSPAEffect(pBuff, spa))

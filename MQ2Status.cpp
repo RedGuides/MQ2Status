@@ -46,9 +46,8 @@
 //	Convert the finditem and findbankitem to not use macro code
 //	Clean up redundant code
 
-#include "../MQ2Plugin.h"
+#include <mq/Plugin.h>
 #include "StatusFunctions.h"
-
 
 PreSetup("MQ2Status");
 PLUGIN_VERSION(1.9);
