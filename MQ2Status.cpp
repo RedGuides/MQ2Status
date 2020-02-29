@@ -32,7 +32,7 @@ const int MAX_ARGS = 20;
 
 bool atob(char* pChar);
 std::string ConnectedToReportOutput();
-bool FindPlugin(char* pChar);
+bool FindPlugin(const char* szPluginName);
 bool HaveAlias(const std::string& aliasName);
 bool IHaveSpa(int spa);
 bool IsDefined(char* szLine);
@@ -813,12 +813,12 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 	}
 }
 
-bool FindPlugin(char* pChar)
+bool FindPlugin(const char* szPluginName)
 {
-	if (!strlen(pChar)) return false;
+	if (!strlen(szPluginName)) return false;
 	MQPLUGIN* pPlugin = pPlugins;
 	while (pPlugin) {
-		if (!_stricmp(pChar, pPlugin->szFilename)) {
+		if (!_stricmp(szPluginName, pPlugin->szFilename)) {
 			return true;
 		}
 		pPlugin = pPlugin->pNext;
@@ -844,10 +844,9 @@ bool HaveAlias(const std::string& aliasName)
 	return true;
 }
 
-void ReverseString(char* szLine) {
-	std::string temp2 = szLine;
-	std::reverse(temp2.rbegin(), temp2.rend());
-	sprintf_s(szLine, MAX_STRING, temp2.c_str());
+void ReverseString(char* szLine)
+{
+	std::reverse(szLine, szLine + strlen(szLine));
 }
 
 void PutCommas(char* szLine)
@@ -863,7 +862,7 @@ void PutCommas(char* szLine)
 		temp[j] = szLine[i];
 		j++;
 	}
-	sprintf_s(szLine, MAX_STRING, temp);
+	strcpy_s(szLine, MAX_STRING, temp);
 	ReverseString(szLine);
 }
 
@@ -885,16 +884,17 @@ inline float PercentMana(SPAWNINFO*& pSpawn)
 
 int GetSubscriptionLevel()
 {
-	if (EQADDR_SUBSCRIPTIONTYPE && *EQADDR_SUBSCRIPTIONTYPE) {
+	if (EQADDR_SUBSCRIPTIONTYPE) {
 		if (DWORD dwsubtype = *(DWORD*)EQADDR_SUBSCRIPTIONTYPE) {
 			BYTE subtype = *(BYTE*)dwsubtype;
 			return subtype;
 		}
 	}
-	return false;
+	return 0;
 }
 
-bool IHaveSpa(int spa) {
+bool IHaveSpa(int spa)
+{
 	for (int i = 0; i < NUM_LONG_BUFFS; i++) {
 		PSPELL pBuff = GetSpellByID(GetCharInfo2()->Buff[i].SpellID);
 		if (!pBuff)
@@ -943,23 +943,23 @@ bool VerifyINI(char* Section, char* Key, char* Default) {
 void DoINIThings() {
 	// We are going to Check the ini status, and if there is no ini
 	// We are going to write these defaults
-	bShowPlugin =	    VerifyINI("ShowPlugin", "Plugin", "on");
-	bShowWarrior =	    VerifyINI("ShowPlugin", "Warrior", "on");
-	bShowCleric =	    VerifyINI("ShowPlugin", "Cleric", "on");
-	bShowPaladin =	    VerifyINI("ShowPlugin", "Paladin", "on");
-	bShowRanger	=	    VerifyINI("ShowPlugin", "Ranger", "on");
-	bShowShadowknight =	VerifyINI("ShowPlugin", "Shadowknight", "on");
-	bShowDruid =		VerifyINI("ShowPlugin", "Druid", "on");
-	bShowMonk =	        VerifyINI("ShowPlugin", "Monk", "on");
-	bShowBard =	        VerifyINI("ShowPlugin", "Bard", "on");
-	bShowRogue =	    VerifyINI("ShowPlugin", "Rogue", "on");
-	bShowShaman =	    VerifyINI("ShowPlugin", "Shaman", "on");
-	bShowNecromancer =	VerifyINI("ShowPlugin", "Necromancer", "on");
-	bShowWizard =	    VerifyINI("ShowPlugin", "Wizard", "on");
-	bShowMage =	        VerifyINI("ShowPlugin", "Magician", "on");
-	bShowEnchanter =	VerifyINI("ShowPlugin", "Enchanter", "on");
-	bShowBeastlord =	VerifyINI("ShowPlugin", "Beastlord", "on");
-	bShowBerserker =	VerifyINI("ShowPlugin", "Berserker", "on");
+	bShowPlugin =       VerifyINI("ShowPlugin", "Plugin", "on");
+	bShowWarrior =      VerifyINI("ShowPlugin", "Warrior", "on");
+	bShowCleric =       VerifyINI("ShowPlugin", "Cleric", "on");
+	bShowPaladin =      VerifyINI("ShowPlugin", "Paladin", "on");
+	bShowRanger =       VerifyINI("ShowPlugin", "Ranger", "on");
+	bShowShadowknight = VerifyINI("ShowPlugin", "Shadowknight", "on");
+	bShowDruid =        VerifyINI("ShowPlugin", "Druid", "on");
+	bShowMonk =         VerifyINI("ShowPlugin", "Monk", "on");
+	bShowBard =         VerifyINI("ShowPlugin", "Bard", "on");
+	bShowRogue =        VerifyINI("ShowPlugin", "Rogue", "on");
+	bShowShaman =       VerifyINI("ShowPlugin", "Shaman", "on");
+	bShowNecromancer =  VerifyINI("ShowPlugin", "Necromancer", "on");
+	bShowWizard =       VerifyINI("ShowPlugin", "Wizard", "on");
+	bShowMage =         VerifyINI("ShowPlugin", "Magician", "on");
+	bShowEnchanter =    VerifyINI("ShowPlugin", "Enchanter", "on");
+	bShowBeastlord =    VerifyINI("ShowPlugin", "Beastlord", "on");
+	bShowBerserker =    VerifyINI("ShowPlugin", "Berserker", "on");
 }
 
 bool atob(char* pChar)
