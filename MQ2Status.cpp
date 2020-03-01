@@ -37,9 +37,9 @@ bool HaveAlias(const std::string& aliasName);
 bool IHaveSpa(int spa);
 bool IsDefined(char* szLine);
 bool VerifyINI(char* Section, char* Key, char* Default);
-inline float PercentHealth(SPAWNINFO*& pSpawn);
-inline float PercentEndurance(SPAWNINFO*& pSpawn);
-inline float PercentMana(SPAWNINFO*& pSpawn);
+inline float PercentHealth(SPAWNINFO* pSpawn);
+inline float PercentEndurance(SPAWNINFO* pSpawn);
+inline float PercentMana(SPAWNINFO* pSpawn);
 int GetSubscriptionLevel();
 void DoINIThings();
 void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption, char* INIsection);
@@ -866,17 +866,17 @@ void PutCommas(char* szLine)
 	ReverseString(szLine);
 }
 
-inline float PercentHealth(SPAWNINFO*& pSpawn)
+inline float PercentHealth(SPAWNINFO* pSpawn)
 {
 	return ((float)pSpawn->HPCurrent / (float)pSpawn->HPMax) * 100.0f;
 }
 
-inline float PercentEndurance(SPAWNINFO*& pSpawn)
+inline float PercentEndurance(SPAWNINFO* pSpawn)
 {
 	return ((float)pSpawn->GetCurrentEndurance() / (float)pSpawn->GetMaxEndurance()) * 100.0f;
 }
 
-inline float PercentMana(SPAWNINFO*& pSpawn)
+inline float PercentMana(SPAWNINFO* pSpawn)
 {
 	if (pSpawn->GetMaxMana() <= 0) return 100.0f;
 	return ((float)pSpawn->GetCurrentMana() / (float)pSpawn->GetMaxMana()) * 100.0f;
