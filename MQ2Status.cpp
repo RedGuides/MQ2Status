@@ -729,18 +729,21 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 		//Am I running a macro.
 		if (gMacroStack && strlen(gszMacroName)) { // FIX ME :: Likely need help in fixing this section.
-			char temp[MAX_STRING] = "Macro:";
+			char temp[MAX_STRING] = "";
 			std::string green = GetColorCode('g', false);
 			std::string white = GetColorCode('w', false);
+			std::string orange = GetColorCode('o', false);
+			strcat_s(temp, orange.c_str());
+			strcat_s(temp, "Macro: ");
 			//Is the currently running macro "kiss"Assist? Where any macro with the word "kiss" will be found for people running custom KA's or older KA's etc.
 			if (strstr(gszMacroName, "kiss")) {
 				if (IsDefined("Role")) {
 					strcat_s(temp, green.c_str());
 					strcat_s(temp, gszMacroName);
-					strcat_s(temp, white.c_str());
+					strcat_s(temp, orange.c_str());
 					strcat_s(temp, " Role: ");
 					strcat_s(temp, green.c_str());
-					char theRole[64] = "${Role}";//Get the value of the Role variable
+					char theRole[64] = "${Role} ";//Get the value of the Role variable
 					ParseMacroData(theRole, 64);
 					strcat_s(temp, theRole);
 					strcat_s(temp, white.c_str());
@@ -751,10 +754,10 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				if (IsDefined("assistname")) {
 					strcat_s(temp, green.c_str());
 					strcat_s(temp, gszMacroName);
-					strcat_s(temp, white.c_str());
+					strcat_s(temp, orange.c_str());
 					strcat_s(temp, " Assisting: ");
 					//Get the value of the Role variable
-					char theRole[64] = "${assistname}";
+					char theRole[64] = "${assistname} ";
 					ParseMacroData(theRole, 64);
 					strcat_s(temp, theRole);
 					strcat_s(temp, white.c_str());
@@ -763,19 +766,18 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			else {
 				stringBuffer += GetColorCode('o', false) + "Macro: " + GetColorCode('g', false) + gszMacroName + GetColorCode('w', false);
 			}
+
+			stringBuffer += (const char*)temp;
 			if (PMACROBLOCK pBlock = GetCurrentMacroBlock()) {
 				if (pBlock->Paused) {
-					stringBuffer += GetColorCode('r', false) + "***PAUSED***" + GetColorCode('w', false);
+					stringBuffer += GetColorCode('r', false) + "***PAUSED*** " + GetColorCode('w', false);
 				}
 			}
-			else {
-				if (!classPlugin) {
-					stringBuffer += GetColorCode('o', false) + "Macro: " + GetColorCode('g', false) + "FALSE! " + GetColorCode('w', false);
-				}
+		}
+		else {
+			if (!classPlugin) {
+				stringBuffer += GetColorCode('o', false) + "Macro: " + GetColorCode('g', false) + "FALSE! " + GetColorCode('w', false);
 			}
-
-			//strcat_s(buffer, temp);
-			stringBuffer += (const char*)temp;
 		}
 
 		if (pMercInfo) {
@@ -798,6 +800,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		}
 			// Am I Invis?
 		if (int amHidden = pCharInfo->pSpawn->HideMode) {
+			stringBuffer += GetColorCode('o', false) + "Hidden:" + GetColorCode('w', false) + " ";
 			if (IHaveSpa(12) || IHaveSpa(314)) {
 				stringBuffer += GetColorCode('g', false) + "INVIS" + GetColorCode('w', false) + " ";
 			}
