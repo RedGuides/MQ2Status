@@ -184,23 +184,23 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		WriteChatf("Welcome to MQ2Status");
 		WriteChatf("By \aoChatWithThisName\aw & \agSic\aw Exclusively for \arRedGuides\aw.");
 		WriteChatf("\agValid Status options are:\aw");
-		WriteChatf("/status will output to eqbc: If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
-		WriteChatf("/status \agitem\aw \ayitem name\aw: reports to eqbc how many \ayitem name\aw you have in your inventory.");
-		WriteChatf("/status \agitembank\aw \ayitem name\aw: reports to eqbc how many \ayitem name\aw you have in your bank.");
-		WriteChatf("/status \agstat\aw \ayoption\aw: reports the following options to eqbc: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, and, Money.");
-		WriteChatf("/status \agaa\aw: Reports to eqbc how many \"banked\" AA points you have.");
-		WriteChatf("/status \agmerc\aw: Reports to eqbc mercenary information including class, and role.");
-		WriteChatf("/status \agcampfire\aw: Reports to eqbc campfire information including Active, Duration, and Zone.");
-		WriteChatf("/status \agfellowship\aw : This returns to your mq2window (does not eqbc) information on your fellowship");
-		WriteChatf("/status \agbagspace\aw: Reports to eqbc how many open bagspaces you have.");
+		WriteChatf("\ao/status will output to eqbc/dannet: If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
+		WriteChatf("\ao/status \agitem\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your inventory.");
+		WriteChatf("\ao/status \agitembank\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your bank.");
+		WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options to eqbc: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, and, Money.");
+		WriteChatf("\ao/status \agaa\aw: Reports how many \"banked\" AA points you have.");
+		WriteChatf("\ao/status \agmerc\aw: Reports mercenary information including class, and role.");
+		WriteChatf("\ao/status \agcampfire\aw: Reports campfire information including Active, Duration, and Zone.");
+		WriteChatf("\ao/status \agfellowship\aw: This returns to your mq2window (does not eqbc/dannet) information on your fellowship");
+		WriteChatf("\ao/status \agbagspace\aw: Reports how many open bagspaces you have.");
 #if !defined(ROF2EMU)
-		WriteChatf("/status \agsub\aw: Reports to eqbc our subscription level, and if we are gold, how many days are left.");
+		WriteChatf("\ao/status \agsub\aw: Reports to eqbc our subscription level, and if we are gold, how many days are left.");
 #endif
-		WriteChatf("/status \agxp\aw: Reports to eqbc our level, Current XP %%, Banked AA, and our AAXP %%.");
-		WriteChatf("/status \agaaxp\aw: Reports to eqbc our Spent AA, our AAXP %%, and our Banked AA.");
-		WriteChatf("/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
-		WriteChatf("/status \agparcel\aw: Reports our \"Parcel\" status.");
-		WriteChatf("/status \aginvis\aw: Reports our Invis and IVU status, so we can check we are \"Double Invis\".");
+		WriteChatf("\ao/status \agxp\aw: Reports to eqbc our level, Current XP %%, Banked AA, and our AAXP %%.");
+		WriteChatf("\ao/status \agaaxp\aw: Reports to eqbc our Spent AA, our AAXP %%, and our Banked AA.");
+		WriteChatf("\ao/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
+		WriteChatf("\ao/status \agparcel\aw: Reports our \"Parcel\" status.");
+		WriteChatf("\ao/status \aginvis\aw: Reports our Invis and IVU status, so we can check we are \"Double Invis\".");
 		return;
 	}
 
@@ -263,7 +263,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		GetArg(Arg, szLine, 2);
 		if (!strlen(Arg)) {
 			WriteChatf("\arPlease provide a valid MQ2Status stat\aw");
-			WriteChatf("\arThese are currently: hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, money, and mana.\aw");
+			WriteChatf("\aoThese are currently: \aghstr, hsta, hint, hwis, hagi, hdex, hcha, hps, endurance, money, and mana.\aw");
 		}
 		else {
 			bool bFound = true;
@@ -310,7 +310,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += LabeledText("Plat", szmyPlat);
 			}
 			else {
-				WriteChatf("\arThat was not a valid stat, please use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, or money for this option!\aw");
+				WriteChatf("\arThat was not a valid stat, \agplease use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, or money for this option!\aw");
 				bFound = false;
 			}
 			if (bFound) {
@@ -606,7 +606,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			stringBuffer += GetColorCode('t', false) + "We do not have any parcels!" + GetColorCode('x', false);
 			break;
 		case ePS_OverParcelsLimit:
-			stringBuffer += GetColorCode('p', false) + "We have a PARCEL OVERLOAD!" + GetColorCode('x', false);
+			stringBuffer += GetColorCode('r', false) + "We have a PARCEL OVERLOAD!" + GetColorCode('x', false);
 			break;
 		default:
 			break;
@@ -739,8 +739,10 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (strstr(gszMacroName, "kiss")) {
 				if (IsDefined("Role")) {
 					strcat_s(temp, green.c_str());
+					strcat_s(temp, " ");
 					strcat_s(temp, gszMacroName);
 					strcat_s(temp, orange.c_str());
+					strcat_s(temp, " ");
 					strcat_s(temp, " Role: ");
 					strcat_s(temp, green.c_str());
 					char theRole[64] = "${Role} ";//Get the value of the Role variable
@@ -748,12 +750,15 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					strcat_s(temp, theRole);
 					strcat_s(temp, white.c_str());
 				}
+				stringBuffer += (const char*)temp;
 			}
 			// IHC Mercs do not use "Roles" everyone is Assist - this will return who they are assisting
 			else if (strstr(gszMacroName, "IHC")) {
 				if (IsDefined("assistname")) {
 					strcat_s(temp, green.c_str());
+					strcat_s(temp, " ");
 					strcat_s(temp, gszMacroName);
+					strcat_s(temp, " ");
 					strcat_s(temp, orange.c_str());
 					strcat_s(temp, " Assisting: ");
 					//Get the value of the Role variable
@@ -762,12 +767,12 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					strcat_s(temp, theRole);
 					strcat_s(temp, white.c_str());
 				}
+				stringBuffer += (const char*)temp;
 			}
 			else {
-				stringBuffer += GetColorCode('o', false) + "Macro: " + GetColorCode('g', false) + gszMacroName + GetColorCode('w', false);
+				stringBuffer += GetColorCode('o', false) + "Macro: " + GetColorCode('g', false) + gszMacroName + " " + GetColorCode('w', false);
 			}
 
-			stringBuffer += (const char*)temp;
 			if (PMACROBLOCK pBlock = GetCurrentMacroBlock()) {
 				if (pBlock->Paused) {
 					stringBuffer += GetColorCode('r', false) + "***PAUSED*** " + GetColorCode('w', false);
@@ -776,7 +781,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		}
 		else {
 			if (!classPlugin) {
-				stringBuffer += GetColorCode('o', false) + "Macro: " + GetColorCode('g', false) + "FALSE! " + GetColorCode('w', false);
+				stringBuffer += GetColorCode('o', false) + "Macro: " + GetColorCode('r', false) + "FALSE! " + GetColorCode('w', false);
 			}
 		}
 
@@ -812,7 +817,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		EzCommand(buffer);
 	}
 	else {
-		WriteChatf("\ap%s\ar is not a valid option. Valid options are stat, item, itembank, merc, aa, fellowship, campfire, bagspace, sub, xp, aaxp, or no argument at all.", Arg);
+		WriteChatf("\ao[MQ2Status] \ap%s\ar is not a valid option. \ag /status help \aw for available options", Arg);
 	}
 }
 
