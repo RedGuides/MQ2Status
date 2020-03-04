@@ -334,13 +334,13 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		switch (GetSubscriptionLevel())
 		{
 		case SUB_GOLD:
-			stringBuffer += GetColorCode('o', false) + "My subscription level is " + GetColorCode('g', false) + "Gold" + " ";
+			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('g', false) + "Gold" + " ";
 			break;
 		case SUB_SILVER:
-			stringBuffer += GetColorCode('o', false) + "My subscription level is " + GetColorCode('r', false) + "Silver" + " ";
+			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Silver" + " ";
 			break;
 		case SUB_BRONZE:
-			stringBuffer += GetColorCode('o', false) + "My subscription level is " + GetColorCode('r', false) + "Bronze" + " ";
+			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Bronze" + " ";
 			break;
 		default:
 			break;
@@ -353,7 +353,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += GetColorCode('o', false) + "& I have a 0 days left or a lifetime subscription.";
 			}
 			else if (pCharInfo->SubscriptionDays) {
-				stringBuffer += LabeledText("& I have", pCharInfo->SubscriptionDays) + " days remaining.";
+				stringBuffer += LabeledText("& I have ", pCharInfo->SubscriptionDays) + " days remaining.";
 			}
 		}
 		strcat_s(buffer, stringBuffer.c_str());
@@ -637,10 +637,10 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 	if (!strlen(szLine)) {
 #if !defined(ROF2EMU) // Subscription doesn't exist in EMU'
 		if (GetSubscriptionLevel() == SUB_SILVER) {
-			stringBuffer += GetColorCode('o', false) + "My subscription level is " + GetColorCode('r', false) + "Silver";
+			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Silver ";
 		}
 		else if (GetSubscriptionLevel() == SUB_BRONZE) {
-			stringBuffer += GetColorCode('o', false) + "My subscription level is " + GetColorCode('r', false) + "Bronze";
+			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Bronze ";
 		}
 #endif
 		if (bShowPlugin) {
