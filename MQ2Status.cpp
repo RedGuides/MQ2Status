@@ -735,38 +735,28 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			std::string orange = GetColorCode('o', false);
 			strcat_s(temp, orange.c_str());
 			strcat_s(temp, "Macro: ");
-			//Is the currently running macro "kiss"Assist? Where any macro with the word "kiss" will be found for people running custom KA's or older KA's etc.
-			if (strstr(gszMacroName, "kiss")) {
-				if (IsDefined("Role")) {
-					strcat_s(temp, green.c_str());
-					strcat_s(temp, " ");
-					strcat_s(temp, gszMacroName);
-					strcat_s(temp, orange.c_str());
-					strcat_s(temp, " ");
-					strcat_s(temp, " Role: ");
-					strcat_s(temp, green.c_str());
-					char theRole[64] = "${Role} ";//Get the value of the Role variable
-					ParseMacroData(theRole, 64);
-					strcat_s(temp, theRole);
-					strcat_s(temp, white.c_str());
-				}
+			strcat_s(temp, green.c_str());
+			strcat_s(temp, " ");
+			strcat_s(temp, gszMacroName);
+			strcat_s(temp, orange.c_str());
+			strcat_s(temp, " ");
+			if (IsDefined("Role")) {
+				strcat_s(temp, " Role: ");
+				strcat_s(temp, green.c_str());
+				char theRole[64] = "${Role} ";//Get the value of the Role variable
+				ParseMacroData(theRole, 64);
+				strcat_s(temp, theRole);
+				strcat_s(temp, white.c_str());
 				stringBuffer += (const char*)temp;
 			}
-			// IHC Mercs do not use "Roles" everyone is Assist - this will return who they are assisting
-			else if (strstr(gszMacroName, "IHC")) {
-				if (IsDefined("assistname")) {
-					strcat_s(temp, green.c_str());
-					strcat_s(temp, " ");
-					strcat_s(temp, gszMacroName);
-					strcat_s(temp, " ");
-					strcat_s(temp, orange.c_str());
-					strcat_s(temp, " Assisting: ");
-					//Get the value of the Role variable
-					char theRole[64] = "${assistname} ";
-					ParseMacroData(theRole, 64);
-					strcat_s(temp, theRole);
-					strcat_s(temp, white.c_str());
-				}
+			// IHC Mercs does not use "Roles" everyone is Assist - this will return who they are assisting
+			else if (IsDefined("assistname")) {
+				strcat_s(temp, " Assisting: ");
+				strcat_s(temp, green.c_str());
+				char theRole[64] = "${assistname} ";
+				ParseMacroData(theRole, 64);
+				strcat_s(temp, theRole);
+				strcat_s(temp, white.c_str());
 				stringBuffer += (const char*)temp;
 			}
 			else {
