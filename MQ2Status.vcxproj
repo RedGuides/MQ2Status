@@ -42,10 +42,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="MQ2Status.cpp" />
-    <ClCompile Include="StatusFunctions.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="StatusFunctions.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
