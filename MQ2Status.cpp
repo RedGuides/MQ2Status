@@ -552,7 +552,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		if (FELLOWSHIPINFO* pFellowship = (FELLOWSHIPINFO*)&pCharInfo->pSpawn->Fellowship) {
 			if (pFellowship->Members > 0) {
 				WriteChatf("FS MoTD: \ag%s\aw", pFellowship->MotD);
-				WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->Leader, pFellowship->Members);
+				WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->FellowshipMember[0].Name, pFellowship->Members);
 				if (unsigned long NumMembers = pFellowship->Members) {
 					for (unsigned int i = 0; i < NumMembers; i++) {
 						if (FELLOWSHIPMEMBER* thisMember = &pFellowship->FellowshipMember[i]) {
@@ -794,7 +794,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 			// Am I Invis?
-		if (int amHidden = pCharInfo->pSpawn->HideMode) {
+		if (pCharInfo->pSpawn->HideMode) {
 			stringBuffer += GetColorCode('o', false) + "Hidden:" + GetColorCode('w', false) + " ";
 			if (IHaveSpa(12) || IHaveSpa(314)) {
 				stringBuffer += GetColorCode('g', false) + "INVIS" + GetColorCode('w', false) + " ";
