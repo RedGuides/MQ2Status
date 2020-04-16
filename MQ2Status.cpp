@@ -552,8 +552,16 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		if (FELLOWSHIPINFO* pFellowship = (FELLOWSHIPINFO*)&pCharInfo->pSpawn->Fellowship) {
 			if (pFellowship->Members > 0) {
 				WriteChatf("FS MoTD: \ag%s\aw", pFellowship->MotD);
+				unsigned long NumMembers = pFellowship->Members;
+				#if defined(ROF2EMU) || defined(UFEMU)
 				WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->Leader, pFellowship->Members);
-				if (unsigned long NumMembers = pFellowship->Members) {
+				#else
+					if (NumMembers)
+					{
+						WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->FellowshipMember[0].Name, NumMembers);
+					}
+				#endif
+				if (NumMembers) {
 					for (unsigned int i = 0; i < NumMembers; i++) {
 						if (FELLOWSHIPMEMBER* thisMember = &pFellowship->FellowshipMember[i]) {
 							std::string ClassDescString;
