@@ -37,6 +37,7 @@ bool HaveAlias(const std::string& aliasName);
 bool IHaveSpa(int spa);
 bool IsDefined(char* szLine);
 bool VerifyINI(char* Section, char* Key, char* Default);
+char* TaskStatus(char* szLine);
 inline float PercentHealth(SPAWNINFO* pSpawn);
 inline float PercentEndurance(SPAWNINFO* pSpawn);
 inline float PercentMana(SPAWNINFO* pSpawn);
@@ -193,6 +194,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		WriteChatf("\ao/status \agcampfire\aw: Reports campfire information including Active, Duration, and Zone.");
 		WriteChatf("\ao/status \agfellowship\aw: This returns to your mq2window (does not eqbc/dannet) information on your fellowship");
 		WriteChatf("\ao/status \agbagspace\aw: Reports how many open bagspaces you have.");
+		WriteChatf("\ao/status \agquest\aw or \agtask\aw \ayQuest name\aw: Reports if you have a quest/task matching \ayQuest name\aw.");
 #if !defined(ROF2EMU)
 		WriteChatf("\ao/status \agsub\aw: Reports to eqbc our subscription level, and if we are gold, how many days are left.");
 #endif
@@ -252,6 +254,37 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				}
 			}
 			stringBuffer += LabeledText(findItem, FindBankItemCountByName(&findItem[0], 0)); // FindBankItemCountByName requires bExact
+			strcat_s(buffer, stringBuffer.c_str());
+			EzCommand(buffer);
+		}
+		return;
+	}
+
+	if (!_stricmp(Arg, "quest") || !_stricmp(Arg, "task")) {
+		GetArg(Arg, szLine, 2);
+		if (!strlen(Arg)) {
+			WriteChatf("\arPlease provide a valid Quest/Task Name to search for\aw");
+		}
+		else {
+			std::string findQuest;
+			for (int i = 2; i < MAX_ARGS; i++) {
+				GetArg(Arg, szLine, i); // grab all params after szLine 1
+				if (strlen(Arg)) {
+					if (i > 2) {
+						findQuest += " ";
+					}
+					findQuest += Arg;
+				}
+				else {
+					break;
+				}
+			}
+			if (_stricmp(TaskStatus(&findQuest[0]), "Not Found")) {
+				stringBuffer += GetColorCode('o', false) + "Quest/Task \"" + GetColorCode('t', true) + findQuest + GetColorCode('o', false) + "\": " + GetColorCode('g', false) + TaskStatus(&findQuest[0]);
+			}
+			else {
+				stringBuffer += GetColorCode('o', false) + "Quest/Task \"" + GetColorCode('t', true) + findQuest + GetColorCode('o', false) + "\": " + GetColorCode('r', false) + TaskStatus(&findQuest[0]);
+			}
 			strcat_s(buffer, stringBuffer.c_str());
 			EzCommand(buffer);
 		}
@@ -1017,8 +1050,77 @@ std::string LabeledText(const std::string& Label, T Value)
 
 std::string GetColorCode(char Color, bool Dark)
 {
-	if (Dark)
-		return bConnectedToDannet ? std::string("\a-") + Color : std::string("-[+") + Color + "+]";
+	if (Dark) {
+		char ColorU = toupper(Color);
+		return bConnectedToDannet ? std::string("\a-") + Color : std::string("[+") + ColorU + "+]";
+	}
 	else
 		return bConnectedToDannet ? std::string("\a") + Color : std::string("[+") + Color + "+]";
+}
+
+char* TaskStatus(char* szLine) // Functionality from dataTask in MQ2Data.cpp
+{
+	if (CTaskManager* tm = ppTaskManager)
+	{
+		CTaskEntry* sharedentry = (CTaskEntry*)&tm->SharedTaskEntries[0];
+		char szTemp[MAX_STRING] = { 0 };
+		strcpy_s(szTemp, szLine);
+		_strlwr_s(szTemp);
+		char* pName = &szTemp[0];
+		bool bExact = false;
+		if (*pName == '=')
+		{
+			bExact = true;
+			pName++;
+		}
+
+		//need to check this first
+		if (sharedentry && sharedentry->TaskID)
+		{
+			if (bExact)
+			{
+				if (!_stricmp(sharedentry->TaskTitle, pName))
+				{
+					return sharedentry->TaskTitle;
+				}
+			}
+			else
+			{
+				char szOut[64] = { 0 };
+				strcpy_s(szOut, sharedentry->TaskTitle);
+				_strlwr_s(szOut);
+				if (strstr(szOut, pName))
+				{
+					//ok we actually do have one, and its always index 0 but 0 can also be a valid
+					//index for solo quests so we need to se it to something else
+					return sharedentry->TaskTitle;
+				}
+			}
+		}
+
+		//lets roll through solo quests if we got this far...
+		for (int i = 0; i < 29; i++)
+		{
+			if (CTaskEntry* entry = &tm->QuestEntries[i])
+			{
+				if (bExact)
+				{
+					if (!_stricmp(entry->TaskTitle, pName))
+					{
+						return entry->TaskTitle;
+					}
+				}
+				else
+				{
+					char szOut[64] = { 0 };
+					strcpy_s(szOut, entry->TaskTitle);
+					_strlwr_s(szOut);
+					if (strstr(szOut, pName)) {
+						return entry->TaskTitle;
+					}
+				}
+			}
+		}
+	}
+	return "Not Found";
 }
