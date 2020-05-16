@@ -37,7 +37,7 @@ bool HaveAlias(const std::string& aliasName);
 bool IHaveSpa(int spa);
 bool IsDefined(char* szLine);
 bool VerifyINI(char* Section, char* Key, char* Default);
-char* TaskStatus(char* szLine);
+const char* TaskStatus(std::string szLine);
 inline float PercentHealth(SPAWNINFO* pSpawn);
 inline float PercentEndurance(SPAWNINFO* pSpawn);
 inline float PercentMana(SPAWNINFO* pSpawn);
@@ -279,12 +279,20 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					break;
 				}
 			}
-			if (_stricmp(TaskStatus(&findQuest[0]), "Not Found")) {
-				stringBuffer += GetColorCode('o', false) + "Quest/Task \"" + GetColorCode('t', true) + findQuest + GetColorCode('o', false) + "\": " + GetColorCode('g', false) + TaskStatus(&findQuest[0]);
+			stringBuffer += GetColorCode('o', false);
+			stringBuffer += "Quest/Task \"";
+			stringBuffer += GetColorCode('t', true);
+			stringBuffer += findQuest;
+			stringBuffer += GetColorCode('o', false);
+			stringBuffer += "\": ";
+			std::string foundQuest = TaskStatus(findQuest); // create new var so we don't re-call TaskStatus for the stricmp check
+			if (_stricmp(foundQuest.c_str(), "NULL")) {
+				stringBuffer += GetColorCode('g', false);
 			}
 			else {
-				stringBuffer += GetColorCode('o', false) + "Quest/Task \"" + GetColorCode('t', true) + findQuest + GetColorCode('o', false) + "\": " + GetColorCode('r', false) + TaskStatus(&findQuest[0]);
+				stringBuffer += GetColorCode('r', false);
 			}
+			stringBuffer += foundQuest;
 			strcat_s(buffer, stringBuffer.c_str());
 			EzCommand(buffer);
 		}
@@ -1056,71 +1064,15 @@ std::string GetColorCode(char Color, bool Dark)
 	}
 	else
 		return bConnectedToDannet ? std::string("\a") + Color : std::string("[+") + Color + "+]";
+
+
 }
 
-char* TaskStatus(char* szLine) // Functionality from dataTask in MQ2Data.cpp
+const char* TaskStatus(std::string szLine)
 {
-	if (CTaskManager* tm = ppTaskManager)
-	{
-		CTaskEntry* sharedentry = (CTaskEntry*)&tm->SharedTaskEntries[0];
-		char szTemp[MAX_STRING] = { 0 };
-		strcpy_s(szTemp, szLine);
-		_strlwr_s(szTemp);
-		char* pName = &szTemp[0];
-		bool bExact = false;
-		if (*pName == '=')
-		{
-			bExact = true;
-			pName++;
-		}
-
-		//need to check this first
-		if (sharedentry && sharedentry->TaskID)
-		{
-			if (bExact)
-			{
-				if (!_stricmp(sharedentry->TaskTitle, pName))
-				{
-					return sharedentry->TaskTitle;
-				}
-			}
-			else
-			{
-				char szOut[64] = { 0 };
-				strcpy_s(szOut, sharedentry->TaskTitle);
-				_strlwr_s(szOut);
-				if (strstr(szOut, pName))
-				{
-					//ok we actually do have one, and its always index 0 but 0 can also be a valid
-					//index for solo quests so we need to se it to something else
-					return sharedentry->TaskTitle;
-				}
-			}
-		}
-
-		//lets roll through solo quests if we got this far...
-		for (int i = 0; i < 29; i++)
-		{
-			if (CTaskEntry* entry = &tm->QuestEntries[i])
-			{
-				if (bExact)
-				{
-					if (!_stricmp(entry->TaskTitle, pName))
-					{
-						return entry->TaskTitle;
-					}
-				}
-				else
-				{
-					char szOut[64] = { 0 };
-					strcpy_s(szOut, entry->TaskTitle);
-					_strlwr_s(szOut);
-					if (strstr(szOut, pName)) {
-						return entry->TaskTitle;
-					}
-				}
-			}
-		}
-	}
-	return "Not Found";
+	// We are parsing macrodata in this function until safe access of the information is available otherwise
+	static char taskTemp[MAX_STRING] = ""; // static so we can return taskTemp;
+	sprintf_s(taskTemp, "${Task[%s]}", szLine.c_str());
+	ParseMacroData(taskTemp, MAX_STRING);
+	return taskTemp;
 }
