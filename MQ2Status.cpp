@@ -282,8 +282,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += GetColorCode('r', false);
 			}
 			stringBuffer += tempTask;
-			strcat_s(buffer, stringBuffer.c_str());
-			EzCommand(buffer);
+			EzCommand(&stringBuffer[0]);
 		}
 		return;
 	}
