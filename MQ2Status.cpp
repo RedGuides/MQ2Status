@@ -37,7 +37,6 @@ bool HaveAlias(const std::string& aliasName);
 bool IHaveSpa(int spa);
 bool IsDefined(char* szLine);
 bool VerifyINI(char* Section, char* Key, char* Default);
-const char* TaskStatus(std::string szLine);
 inline float PercentHealth(SPAWNINFO* pSpawn);
 inline float PercentEndurance(SPAWNINFO* pSpawn);
 inline float PercentMana(SPAWNINFO* pSpawn);
@@ -262,37 +261,27 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 	if (!_stricmp(Arg, "quest") || !_stricmp(Arg, "task")) {
 		GetArg(Arg, szLine, 2);
-		if (!strlen(Arg)) {
-			WriteChatf("\arPlease provide a valid Quest/Task Name to search for\aw");
+		if (Arg[0] == 0) { // if an Argument after quest/task wasn't made, we need to ask for one
+			WriteChatf("\arPlease provide a valid Quest/Task Name to search for.\aw");
 		}
 		else {
-			std::string findQuest;
-			for (int i = 2; i < MAX_ARGS; i++) {
-				GetArg(Arg, szLine, i); // grab all params after szLine 1
-				if (strlen(Arg)) {
-					if (i > 2) {
-						findQuest += " ";
-					}
-					findQuest += Arg;
-				}
-				else {
-					break;
-				}
-			}
+			const char* tempArg = GetNextArg(szLine);
 			stringBuffer += GetColorCode('o', false);
 			stringBuffer += "Quest/Task \"";
 			stringBuffer += GetColorCode('t', true);
-			stringBuffer += findQuest;
+			stringBuffer += tempArg;
 			stringBuffer += GetColorCode('o', false);
 			stringBuffer += "\": ";
-			std::string foundQuest = TaskStatus(findQuest); // create new var so we don't re-call TaskStatus for the stricmp check
-			if (_stricmp(foundQuest.c_str(), "NULL")) {
+			char tempTask[MAX_STRING] = "";
+			sprintf_s(tempTask, "${Task[%s]}", tempArg);
+			ParseMacroData(tempTask, MAX_STRING);
+			if (_stricmp(tempTask, "NULL")) {
 				stringBuffer += GetColorCode('g', false);
 			}
 			else {
 				stringBuffer += GetColorCode('r', false);
 			}
-			stringBuffer += foundQuest;
+			stringBuffer += tempTask;
 			strcat_s(buffer, stringBuffer.c_str());
 			EzCommand(buffer);
 		}
@@ -1066,13 +1055,4 @@ std::string GetColorCode(char Color, bool Dark)
 		return bConnectedToDannet ? std::string("\a") + Color : std::string("[+") + Color + "+]";
 
 
-}
-
-const char* TaskStatus(std::string szLine)
-{
-	// We are parsing macrodata in this function until safe access of the information is available otherwise
-	static char taskTemp[MAX_STRING] = ""; // static so we can return taskTemp;
-	sprintf_s(taskTemp, "${Task[%s]}", szLine.c_str());
-	ParseMacroData(taskTemp, MAX_STRING);
-	return taskTemp;
 }
