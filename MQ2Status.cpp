@@ -70,7 +70,6 @@ enum Subscription {
 void StatusCmd(SPAWNINFO* pChar, char* szLine)
 {
 	std::string stringBuffer = ConnectedToReportOutput();
-	char buffer[MAX_STRING] = { 0 };
 	if (!bConnectedToDannet && !bConnectedToEQBC) return;
 
 	bool classPlugin = false; // Only true if there is a class plugin for this class, and the plugin was loaded.
@@ -226,8 +225,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				}
 			}
 			stringBuffer += LabeledText(findItem, FindItemCountByName(&findItem[0]));
-			strcat_s(buffer, stringBuffer.c_str());
-			EzCommand(buffer);
+			EzCommand(&stringBuffer[0]);
 		}
 		return;
 	}
@@ -253,8 +251,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				}
 			}
 			stringBuffer += LabeledText(findItem, FindBankItemCountByName(&findItem[0], 0)); // FindBankItemCountByName requires bExact
-			strcat_s(buffer, stringBuffer.c_str());
-			EzCommand(buffer);
+			EzCommand(&stringBuffer[0]);
 		}
 		return;
 	}
@@ -343,8 +340,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				bFound = false;
 			}
 			if (bFound) {
-				strcat_s(buffer, stringBuffer.c_str());
-				EzCommand(buffer);
+				EzCommand(&stringBuffer[0]);
 				return;
 			}
 		}
@@ -353,8 +349,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 	if (!_stricmp(Arg, "aa")) {
 		stringBuffer += LabeledText("Available AA Points", pCharInfo2->AAPoints);
-		strcat_s(buffer, stringBuffer.c_str());
-		EzCommand(buffer);
+		EzCommand(&stringBuffer[0]);
 		return;
 	}
 
@@ -522,8 +517,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		else {
 			stringBuffer += GetColorCode('r', false) + "It does not appear we have a merc." + GetColorCode('w', false);
 		}
-		strcat_s(buffer, stringBuffer.c_str());
-		EzCommand(buffer);
+		EzCommand(&stringBuffer[0]);
 		return;
 	}
 
@@ -565,13 +559,11 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				cfStatus += GetColorCode('g', false) + "Active " + GetColorCode('g', false);
 			}
 			stringBuffer += LabeledText("Campfire", cfStatus) + " " + LabeledText("Time Left", cfTimeRemainHMS) + " " + LabeledText("Zone", cfZoneLongName);
-			strcat_s(buffer, stringBuffer.c_str());
-			EzCommand(buffer);
+			EzCommand(&stringBuffer[0]);
 		}
 		else {
 			stringBuffer += GetColorCode('r', false) + " " + "We do not appear to have a campfire in a usable location!" + GetColorCode('w', false);
-			strcat_s(buffer, stringBuffer.c_str());
-			EzCommand(buffer);
+			EzCommand(&stringBuffer[0]);
 		}
 		return;
 	}
@@ -601,8 +593,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 	if (!_stricmp(Arg, "bagspace")) {
 		stringBuffer += LabeledText("Bagspace", GetFreeInventory(4));
-		strcat_s(buffer, stringBuffer.c_str());
-		EzCommand(buffer);
+		EzCommand(&stringBuffer[0]);
 		return;
 	}
 
@@ -612,8 +603,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			LabeledText("XP", floor((pCharInfo->Exp *.001) * 100.0) / 100.0) + " " +
 			LabeledText("Banked AA", pCharInfo2->AAPoints) + " " +
 			LabeledText("AAXP", pCharInfo->AAExp * 0.001);
-		strcat_s(buffer, stringBuffer.c_str());
-		EzCommand(buffer);
+		EzCommand(&stringBuffer[0]);
 		return;
 	}
 
@@ -621,8 +611,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		stringBuffer += LabeledText("Spent AA", pCharInfo2->AAPointsSpent) + " " +
 			LabeledText("AAXP", pCharInfo->AAExp * 0.001) + " " +
 			LabeledText("Banked AA", pCharInfo2->AAPoints);
-		strcat_s(buffer, stringBuffer.c_str());
-		EzCommand(buffer);
+		EzCommand(&stringBuffer[0]);
 		return;
 	}
 
@@ -640,8 +629,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		default:
 			break;
 		}
-		strcat_s(buffer, stringBuffer.c_str());
-		EzCommand(buffer);
+		EzCommand(&stringBuffer[0]);
 		return;
 	}
 
@@ -658,8 +646,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		else {
 			stringBuffer += GetColorCode('r', false) + "IVU";
 		}
-		strcat_s(buffer, stringBuffer.c_str());
-		EzCommand(buffer);
+		EzCommand(&stringBuffer[0]);
 		return;
 	}
 
@@ -832,8 +819,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += GetColorCode('g', false) + "IVU" + GetColorCode('w', false);
 			}
 		}
-		strcat_s(buffer, stringBuffer.c_str());
-		EzCommand(buffer);
+		EzCommand(&stringBuffer[0]);
 	}
 	else {
 		WriteChatf("\ao[MQ2Status] \ap%s\ar is not a valid option. \ag /status help \aw for available options", Arg);
@@ -929,6 +915,7 @@ bool IHaveSpa(int spa)
 		if (IsSPAEffect(pBuff, spa))
 			return true;
 	}
+
 	for (int i = 0; i < NUM_SHORT_BUFFS; i++) {
 		PSPELL pBuff = GetSpellByID(GetCharInfo2()->Buff[i].SpellID);
 		if (!pBuff)
@@ -936,6 +923,7 @@ bool IHaveSpa(int spa)
 		if (IsSPAEffect(pBuff, spa))
 			return true;
 	}
+
 	return false;
 }
 
@@ -948,6 +936,7 @@ PLUGIN_API void InitializePlugin()
 	else {
 		AddCommand("/status", StatusCmd);
 	}
+
 	DoINIThings();
 }
 
@@ -1005,6 +994,7 @@ void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption
 		WriteChatf("\ayTo Change this, type /status %s %s [true, false, 0, 1, on, off].", Arg, Arg2);
 		return;
 	}
+
 	if (IsNumber(Arg3) || !_stricmp(Arg3, "true") || !_stricmp(Arg3, "false") || !_stricmp(Arg3, "on") || !_stricmp(Arg3, "off")) {
 		*theOption = atob(Arg3);
 		WritePrivateProfileString(INIsection, Arg2, *theOption ? "on" : "off", INIFileName);
@@ -1013,6 +1003,7 @@ void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption
 	else {
 		WriteChatf("\ap%s \aris not a valid option for \ag%s %s\aw. \arValid options are: \aytrue, false, 0, 1, on, off.", Arg3, Arg, Arg2);
 	}
+
 	return;
 }
 
@@ -1026,15 +1017,18 @@ std::string ConnectedToReportOutput()
 			}
 		}
 	}
+
 	if (auto hMod = GetModuleHandle("mq2dannet")) {
 		bConnectedToDannet = true;
 		return "/dgtell all ";
 	}
+
 	if (!bConnectedToEQBC && !bConnectedToDannet) {
 		WriteChatf("MQ2Status only works if mq2eqbc or mq2dannet is loaded and connected");
 		WriteChatf("If you would like to use EQBC, please run /plugin mq2eqbc load and then /bccmd connect");
 		WriteChatf("Or if you would like to use Dannet, /plugin mq2dannet load");
 	}
+
 	return {};
 }
 
