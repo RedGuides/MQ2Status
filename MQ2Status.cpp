@@ -380,8 +380,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += LabeledText("& I have ", pCharInfo->SubscriptionDays) + " days remaining.";
 			}
 		}
-		strcat_s(buffer, stringBuffer.c_str());
-		EzCommand(buffer);
+		EzCommand(&stringBuffer[0]);
 		return;
 	}
 #endif
