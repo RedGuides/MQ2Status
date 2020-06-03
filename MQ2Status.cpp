@@ -513,7 +513,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				cfTimeRemainHMS += sHrs + ":" + sMins + ":" + sSecs;
 				if (unsigned long ZoneID = (((PSPAWNINFO)pLocalPlayer)->CampfireZoneID & 0x7FFF)) {
 					if (ZoneID < MAX_ZONES && pWorldData) {
-						if (ZONELIST* pZoneID = ((WORLDDATA*)pWorldData)->ZoneArray[ZoneID]) {
+						if (EQZoneInfo* pZoneID = pWorldData->ZoneArray[ZoneID]) {
 							cfZoneLongName += pZoneID->LongName;
 						}
 						else {
@@ -551,7 +551,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		if (FELLOWSHIPINFO* pFellowship = (FELLOWSHIPINFO*)&pCharInfo->pSpawn->Fellowship) {
 			if (pFellowship->Members > 0) {
 				WriteChatf("FS MoTD: \ag%s\aw", pFellowship->MotD);
-				WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->Leader, pFellowship->Members);
+				WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->FellowshipMember[0], pFellowship->Members);
 				if (unsigned long NumMembers = pFellowship->Members) {
 					for (unsigned int i = 0; i < NumMembers; i++) {
 						if (FELLOWSHIPMEMBER* thisMember = &pFellowship->FellowshipMember[i]) {
