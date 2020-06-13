@@ -46,7 +46,7 @@ void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption
 void PutCommas(char* szLine);
 void ReverseString(char* szLine);
 void StatusCmd(SPAWNINFO* pChar, char* szLine);
-unsigned long AltCurrencyCheck(std::string tempArg);
+long AltCurrencyCheck(std::string tempArg);
 
 template <typename T>
 std::string LabeledText(const std::string& Label, T Value);
@@ -315,9 +315,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		else { // We need to lowercase and be able to do a "find" in case someone puts an "s" on a currency
 			std::string tempArg = GetNextArg(szLine); // convert our arg to string for transform
 			std::transform(tempArg.begin(), tempArg.end(), tempArg.begin(), tolower); // lowercase
-			if (tempArg.find("loyalty") != std::string::npos)
+			if (tempArg.find("loyalty") == 0)
 				stringBuffer += LabeledText("Loyalty Tokens", pCharInfo->LoyaltyRewardBalance); // Using LoyaltyRewardBalance instead of AltCurrency since we can access directly
-			else if (tempArg.find("dbc") != std::string::npos || tempArg.find("daybreak") != std::string::npos) { // DayBreakCurrency
+			else if (tempArg.find("dbc") == 0 || tempArg.find("daybreak") == 0) { // DayBreakCurrency
 				if (CSidlScreenWnd* MarketWnd = (CSidlScreenWnd*)FindMQ2Window("MarketPlaceWnd")) {
 					if (CXWnd* Funds = MarketWnd->GetChildItem("MKPW_AvailableFundsUpper")) {
 						if (Funds) {
@@ -331,7 +331,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					stringBuffer += LabeledText("Daybreak Cash", "Unable to access");
 			}
 			else {
-				unsigned long altCurrency = AltCurrencyCheck(tempArg);
+				long altCurrency = AltCurrencyCheck(tempArg);
 				if (altCurrency != -1)
 					stringBuffer += LabeledText(tempArg, altCurrency);
 				else {
@@ -1113,20 +1113,33 @@ std::string GetColorCode(char Color, bool Dark)
 
 }
 
-unsigned long AltCurrencyCheck(std::string tempArg) {
-	std::vector<std::string> vAltCurrency;
-	vAltCurrency =
-	{ "doubloon", "orux", "phosphene", "phosphite", "faycitum", "chronobine", "silver token", "gold token", "mckenzie", "bayle mark",
+long AltCurrencyCheck(std::string tempArg) {
+	std::vector<std::pair <std::string, int>> vAltCurrency;
+
+	std::string strAltCurrency[] = { "doubloon", "orux", "phosphene", "phosphite", "faycitum", "chronobine", "silver token", "gold token", "mckenzie", "bayle mark",
 	"tokens of reclamation", "brellium", "dream mote", "rebellion chit", "diamond coin", "bronze fiat", "expedient delivery voucher",
 	"velium shard", "crystallized fear", "shadowstone", "dreadstone", "marks of valor", "medals of heroism", "commemorative coin",
 	"fists of bayle", "nobles", "arx energy crystal", "pieces of eight", "remnants of tranquility", "bifurcated coin", "adoption coin",
 	"sathir's trade gem", "ancient sebilisian coin", "bathezid trade gem", "ancient draconic coin", "fetterred ifrit coin",
 	"entwined djinn coin", "crystallized luck", "froststone ducat", "warlord's symbol", "overseer" };
 
-	const int iAltCurrencyStart = 10; //altcurrency enum in eqdata.h starts at 10
+	int iAltCurrencyEnum[] = { ALTCURRENCY_DOUBLOONS, ALTCURRENCY_ORUX, ALTCURRENCY_PHOSPHENES, ALTCURRENCY_PHOSPHITES, ALTCURRENCY_FAYCITES,
+	ALTCURRENCY_CHRONOBINES, ALTCURRENCY_SILVERTOKENS, ALTCURRENCY_GOLDTOKENS, ALTCURRENCY_MCKENZIE, ALTCURRENCY_BAYLE, ALTCURRENCY_RECLAMATION,
+	ALTCURRENCY_BRELLIUM, ALTCURRENCY_MOTES, ALTCURRENCY_REBELLIONCHITS, ALTCURRENCY_DIAMONDCOINS, ALTCURRENCY_BRONZEFIATS, ALTCURRENCY_VOUCHER,
+	ALTCURRENCY_VELIUMSHARDS, ALTCURRENCY_CRYSTALLIZEDFEAR, ALTCURRENCY_SHADOWSTONES, ALTCURRENCY_DREADSTONES, ALTCURRENCY_MARKSOFVALOR, ALTCURRENCY_MEDALSOFHEROISM,
+	ALTCURRENCY_COMMEMORATIVE_COINS, ALTCURRENCY_FISTSOFBAYLE, ALTCURRENCY_NOBLES, ALTCURRENCY_ENERGYCRYSTALS, ALTCURRENCY_PIECESOFEIGHT, ALTCURRENCY_REMNANTSOFTRANQUILITY,
+	ALTCURRENCY_BIFURCATEDCOIN, ALTCURRENCY_ADOPTIVE, ALTCURRENCY_SATHIRSTRADEGEMS, ALTCURRENCY_ANCIENTSEBILISIANCOINS, ALTCURRENCY_BATHEZIDTRADEGEMS,
+	ALTCURRENCY_ANCIENTDRACONICCOIN, ALTCURRENCY_FETTERREDIFRITCOINS, ALTCURRENCY_ENTWINEDDJINNCOINS, ALTCURRENCY_CRYSTALLIZEDLUCK, ALTCURRENCY_FROSTSTONEDUCAT,
+	ALTCURRENCY_WARLORDSSYMBOL, ALTCURRENCY_OVERSEERTETRADRACHM, ALTCURRENCY_LOYALTYTOKENS };
+
+	int n = sizeof(strAltCurrency) / sizeof(strAltCurrency[0]);
+
+	for (int i = 0; i < n; i++)
+		vAltCurrency.push_back(make_pair(strAltCurrency[i], iAltCurrencyEnum[i]));
+
 	for (unsigned int i = 0; i < vAltCurrency.size(); i++) {
-		if (tempArg.find(vAltCurrency.at(i).c_str()) != std::string::npos) {
-			return pPlayerPointManager->GetAltCurrency(i + iAltCurrencyStart);
+		if (tempArg.find(&vAltCurrency[i].first[0]) != std::string::npos) {
+			return pPlayerPointManager->GetAltCurrency(vAltCurrency[i].second);
 		}
 	}
 	return -1;
