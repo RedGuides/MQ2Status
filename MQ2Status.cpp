@@ -186,21 +186,25 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		WriteChatf("\ao/status will output to eqbc/dannet: If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
 		WriteChatf("\ao/status \agitem\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your inventory.");
 		WriteChatf("\ao/status \agitembank\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your bank.");
-		WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options to eqbc: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, and, Money.");
+		WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options to eqbc: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, Weight, and, Money.");
 		WriteChatf("\ao/status \agaa\aw: Reports how many \"banked\" AA points you have.");
+		WriteChatf("\ao/status \aglogin\aw: Reports your login account name.");
 		WriteChatf("\ao/status \agmerc\aw: Reports mercenary information including class, and role.");
 		WriteChatf("\ao/status \agcampfire\aw: Reports campfire information including Active, Duration, and Zone.");
 		WriteChatf("\ao/status \agfellowship\aw: This returns to your mq2window (does not eqbc/dannet) information on your fellowship");
 		WriteChatf("\ao/status \agbagspace\aw: Reports how many open bagspaces you have.");
+		WriteChatf("\ao/status \agcurrency\aw: Reports how many of an alt currency you have.");
+		WriteChatf("\ao/status \agkrono\aw: Reports how many krono we have.");
 		WriteChatf("\ao/status \agquest\aw or \agtask\aw \ayQuest name\aw: Reports if you have a quest/task matching \ayQuest name\aw.");
-#if !defined(ROF2EMU)
+		#if !defined(ROF2EMU)
 		WriteChatf("\ao/status \agsub\aw: Reports to eqbc our subscription level, and if we are gold, how many days are left.");
-#endif
+		#endif
 		WriteChatf("\ao/status \agxp\aw: Reports to eqbc our level, Current XP %%, Banked AA, and our AAXP %%.");
 		WriteChatf("\ao/status \agaaxp\aw: Reports to eqbc our Spent AA, our AAXP %%, and our Banked AA.");
 		WriteChatf("\ao/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
 		WriteChatf("\ao/status \agparcel\aw: Reports our \"Parcel\" status.");
 		WriteChatf("\ao/status \aginvis\aw: Reports our Invis and IVU status, so we can check we are \"Double Invis\".");
+		WriteChatf("\ao/status \agzone\aw: Reports what zone we are in.");
 		return;
 	}
 
@@ -256,6 +260,24 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		return;
 	}
 
+	if (!_stricmp(Arg, "krono")) {
+		stringBuffer += LabeledText("Krono", pCharInfo->Krono);
+		EzCommand(&stringBuffer[0]);
+		return;
+	}
+
+	if (!_stricmp(Arg, "login")) {
+		stringBuffer += LabeledText("Login Name", GetLoginName());
+		EzCommand(&stringBuffer[0]);
+		return;
+	}
+
+	if (!_stricmp(Arg, "zone")) {
+		stringBuffer += LabeledText("Zone", GetFullZone(pCharInfo->zoneId));
+		EzCommand(&stringBuffer[0]);
+		return;
+	}
+
 	if (!_stricmp(Arg, "quest") || !_stricmp(Arg, "task")) {
 		GetArg(Arg, szLine, 2);
 		if (Arg[0] == 0) { // if an Argument after quest/task wasn't made, we need to ask for one
@@ -284,12 +306,126 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		return;
 	}
 
+	if (!_stricmp(Arg, "currency")) {
+		GetArg(Arg, szLine, 2);
+		if (Arg[0] == 0) { // if an Argument after currency wasn't made, we need to ask for one
+			WriteChatf("\arPlease provide a valid Currency Name to search for.\aw");
+		}
+		else { // We need to lowercase and be able to do a "find" in case someone puts an "s" on a currency
+			std::string tempArg = GetNextArg(szLine); // convert our arg to string for transform
+			std::transform(tempArg.begin(), tempArg.end(), tempArg.begin(), tolower); // lowercase
+			if (tempArg.find("doubloon") != std::string::npos)
+				stringBuffer += LabeledText("Doubloons", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_DOUBLOONS));
+			else if (tempArg.find("orux") != std::string::npos)
+				stringBuffer += LabeledText("Orux", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_ORUX));
+			else if (tempArg.find("phosphene") != std::string::npos)
+				stringBuffer += LabeledText("Phosphenes", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_PHOSPHENES));
+			else if (tempArg.find("phosphite") != std::string::npos)
+				stringBuffer += LabeledText("Phostphites", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_PHOSPHITES));
+			else if (tempArg.find("faycitum") != std::string::npos)
+				stringBuffer += LabeledText("Faycitum", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_FAYCITES));
+			else if (tempArg.find("chronobine") != std::string::npos)
+				stringBuffer += LabeledText("Chronobines", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_CHRONOBINES));
+			else if (tempArg.find("silver Token") != std::string::npos)
+				stringBuffer += LabeledText("Silver Tokens", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_SILVERTOKENS));
+			else if (tempArg.find("gold Token") != std::string::npos)
+				stringBuffer += LabeledText("Gold Tokens", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_GOLDTOKENS));
+			else if (tempArg.find("mckenzie") != std::string::npos)
+				stringBuffer += LabeledText("McKenzie's Special Brew", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_MCKENZIE));
+			else if (tempArg.find("bayle mark") != std::string::npos)
+				stringBuffer += LabeledText("Bayle Marks", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_BAYLE));
+			else if (tempArg.find("tokens of Reclamation") != std::string::npos)
+				stringBuffer += LabeledText("Tokens of Reclamation", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_RECLAMATION));
+			else if (tempArg.find("brellium token") != std::string::npos)
+				stringBuffer += LabeledText("Brellium Tokens", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_BRELLIUM));
+			else if (tempArg.find("dream mote") != std::string::npos)
+				stringBuffer += LabeledText("Dream Motes", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_MOTES));
+			else if (tempArg.find("rebellion chit") != std::string::npos)
+				stringBuffer += LabeledText("Rebellin Chits", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_REBELLIONCHITS));
+			else if (tempArg.find("diamond coin") != std::string::npos)
+				stringBuffer += LabeledText("Diamond Coins", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_DIAMONDCOINS));
+			else if (tempArg.find("bronze fiat") != std::string::npos)
+				stringBuffer += LabeledText("Bronze Fiats", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_BRONZEFIATS));
+			else if (tempArg.find("expedient delivery vouchers") != std::string::npos)
+				stringBuffer += LabeledText("Expedient Delivery Vouchers", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_VOUCHER));
+			else if (tempArg.find("velium shard") != std::string::npos)
+				stringBuffer += LabeledText("Velium Shards", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_VELIUMSHARDS));
+			else if (tempArg.find("crystallized fear") != std::string::npos)
+				stringBuffer += LabeledText("Crystallized Fear", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_CRYSTALLIZEDFEAR));
+			else if (tempArg.find("shadowstone") != std::string::npos)
+				stringBuffer += LabeledText("Shadowstones", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_SHADOWSTONES));
+			else if (tempArg.find("dreadstone") != std::string::npos)
+				stringBuffer += LabeledText("Dreadstones", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_DREADSTONES));
+			else if (tempArg.find("marks of valor") != std::string::npos)
+				stringBuffer += LabeledText("Marks of Valor", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_MARKSOFVALOR));
+			else if (tempArg.find("medals of heroism") != std::string::npos)
+				stringBuffer += LabeledText("Medals of Heroism", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_MEDALSOFHEROISM));
+			else if (tempArg.find("commemorative coin") != std::string::npos)
+				stringBuffer += LabeledText("Commemorative Coins", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_COMMEMORATIVE_COINS));
+			else if (tempArg.find("fists of bayle") != std::string::npos)
+				stringBuffer += LabeledText("Fists of Bayle", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_FISTSOFBAYLE));
+			else if (tempArg.find("nobles") != std::string::npos)
+				stringBuffer += LabeledText("Nobles", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_NOBLES));
+			else if (tempArg.find("arx energy crystal") != std::string::npos)
+				stringBuffer += LabeledText("Arx Energy Crystals", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_ENERGYCRYSTALS));
+			else if (tempArg.find("pieces of eight") != std::string::npos)
+				stringBuffer += LabeledText("Pieces of Eight", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_PIECESOFEIGHT));
+			else if (tempArg.find("remnants of tranquility") != std::string::npos)
+				stringBuffer += LabeledText("Remnants of Tranquility", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_REMNANTSOFTRANQUILITY));
+			else if (tempArg.find("bifurcated coin") != std::string::npos)
+				stringBuffer += LabeledText("Bifurcated Coin", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_BIFURCATEDCOIN));
+			else if (tempArg.find("adoptive coin") != std::string::npos)
+				stringBuffer += LabeledText("Adoptive Coins", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_ADOPTIVE));
+			else if (tempArg.find("sathir's trade gem") != std::string::npos)
+				stringBuffer += LabeledText("Sathir's Trade Gems", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_SATHIRSTRADEGEMS));
+			else if (tempArg.find("ancient sebilisian coin") != std::string::npos)
+				stringBuffer += LabeledText("Ancient Sebilisian Coins", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_ANCIENTSEBILISIANCOINS));
+			else if (tempArg.find("bathezid trade gem") != std::string::npos)
+				stringBuffer += LabeledText("Bathezid Trade Gems", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_BATHEZIDTRADEGEMS));
+			else if (tempArg.find("ancient draconic coin") != std::string::npos)
+				stringBuffer += LabeledText("Ancient Draconic Coin", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_ANCIENTDRACONICCOIN));
+			else if (tempArg.find("fetterred ifrit coin") != std::string::npos)
+				stringBuffer += LabeledText("Fetterred Ifrit Coins", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_FETTERREDIFRITCOINS));
+			else if (tempArg.find("entwined djinn coin") != std::string::npos)
+				stringBuffer += LabeledText(tempArg, pPlayerPointManager->GetAltCurrency(ALTCURRENCY_ENTWINEDDJINNCOINS));
+			else if (tempArg.find("crystallized luck") != std::string::npos)
+				stringBuffer += LabeledText("Crystallized Luck", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_CRYSTALLIZEDLUCK));
+			else if (tempArg.find("froststone ducat") != std::string::npos)
+				stringBuffer += LabeledText("Froststone Ducat", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_FROSTSTONEDUCAT));
+			else if (tempArg.find("warlord's symbol") != std::string::npos)
+				stringBuffer += LabeledText("Warlord's Symbol", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_WARLORDSSYMBOL));
+			else if (tempArg.find("overseer") != std::string::npos)
+				stringBuffer += LabeledText("Overseer Tetradrachm", pPlayerPointManager->GetAltCurrency(ALTCURRENCY_OVERSEERTETRADRACHM));
+			else if (tempArg.find("loyalty") != std::string::npos)
+				stringBuffer += LabeledText("Loyalty Tokens", pCharInfo->LoyaltyRewardBalance); // Using LoyaltyRewardBalance instead of AltCurrency
+			else if (tempArg.find("dbc") != std::string::npos || tempArg.find("daybreak") != std::string::npos) { // DayBreakCurrency
+				if (CSidlScreenWnd* MarketWnd = (CSidlScreenWnd*)FindMQ2Window("MarketPlaceWnd")) {
+					if (CXWnd* Funds = MarketWnd->GetChildItem("MKPW_AvailableFundsUpper")) {
+						if (Funds) {
+							char szCash[64] = { 0 };
+							GetCXStr(Funds->CGetWindowText(), szCash, 64);
+							stringBuffer += LabeledText("Daybreak Cash", szCash);
+						}
+					}
+				}
+				else
+					stringBuffer += LabeledText("Daybreak Cash", "Unable to access");
+			}
+			else {
+				WriteChatf("\arThat was not a valid currency.");
+				return; // we don't want to fall to the ezcommand
+			}
+			EzCommand(&stringBuffer[0]);
+		}
+		return;
+	}
+
 	if (!_stricmp(Arg, "stat")) {
 		SPAWNINFO* me = GetCharInfo()->pSpawn;
 		GetArg(Arg, szLine, 2);
 		if (!strlen(Arg)) {
 			WriteChatf("\arPlease provide a valid MQ2Status stat\aw");
-			WriteChatf("\aoThese are currently: \aghstr, hsta, hint, hwis, hagi, hdex, hcha, hps, endurance, money, and mana.\aw");
+			WriteChatf("\aoThese are currently: \aghstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, weight, and money.\aw");
 		}
 		else {
 			bool bFound = true;
@@ -335,8 +471,13 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				PutCommas(szmyPlat);
 				stringBuffer += LabeledText("Plat", szmyPlat);
 			}
+			else if (!_stricmp(Arg, "weight")) {
+				stringBuffer += LabeledText("Current Weight", pCharInfo->CurrWeight) +
+					LabeledText(" Max Weight", pCharInfo->STR) +
+					LabeledText(" Remaining", (long)(pCharInfo->STR - pCharInfo->CurrWeight));
+			}
 			else {
-				WriteChatf("\arThat was not a valid stat, \agplease use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, or money for this option!\aw");
+				WriteChatf("\arThat was not a valid stat, \agplease use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, weight, or money for this option!\aw");
 				bFound = false;
 			}
 			if (bFound) {
