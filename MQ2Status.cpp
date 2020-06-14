@@ -1113,24 +1113,52 @@ std::string GetColorCode(char Color, bool Dark)
 
 }
 
+const std::map<std::string, int>  mAltCurrency = {
+
+	{ "doubloon", ALTCURRENCY_DOUBLOONS },
+	{ "orux", ALTCURRENCY_ORUX },
+	{ "phosphene", ALTCURRENCY_PHOSPHENES },
+	{ "phosphite", ALTCURRENCY_PHOSPHITES },
+	{ "faycitum", ALTCURRENCY_FAYCITES },
+	{ "chronobine", ALTCURRENCY_CHRONOBINES },
+	{ "silver token", ALTCURRENCY_SILVERTOKENS },
+	{ "gold token", ALTCURRENCY_GOLDTOKENS },
+	{ "mckenzie", ALTCURRENCY_MCKENZIE },
+	{ "bayle mark", ALTCURRENCY_BAYLE },
+	{ "tokens of reclamation", ALTCURRENCY_RECLAMATION },
+	{ "brellium", ALTCURRENCY_BRELLIUM },
+	{ "dream mote", ALTCURRENCY_MOTES },
+	{ "rebellion chit", ALTCURRENCY_REBELLIONCHITS },
+	{ "diamond coin", ALTCURRENCY_DIAMONDCOINS },
+	{ "bronze fiat", ALTCURRENCY_BRONZEFIATS },
+	{ "expedient delivery voucher", ALTCURRENCY_VOUCHER },
+	{ "velium shard", ALTCURRENCY_VELIUMSHARDS },
+	{ "crystallized fear", ALTCURRENCY_CRYSTALLIZEDFEAR },
+	{ "shadowstone", ALTCURRENCY_SHADOWSTONES },
+	{ "dreadstone", ALTCURRENCY_DREADSTONES },
+	{ "marks of valor", ALTCURRENCY_MARKSOFVALOR },
+	{ "medals of heroism", ALTCURRENCY_MEDALSOFHEROISM },
+	{ "commemorative coin", ALTCURRENCY_COMMEMORATIVE_COINS },
+	{ "fists of bayle", ALTCURRENCY_FISTSOFBAYLE },
+	{ "nobles", ALTCURRENCY_NOBLES },
+	{ "arx energy crystal", ALTCURRENCY_ENERGYCRYSTALS },
+	{ "pieces of eight",ALTCURRENCY_PIECESOFEIGHT },
+	{ "remnants of tranquility", ALTCURRENCY_REMNANTSOFTRANQUILITY },
+	{ "bifurcated coin", ALTCURRENCY_BIFURCATEDCOIN },
+	{ "adoption coin", ALTCURRENCY_ADOPTIVE },
+	{ "sathir's trade gem", ALTCURRENCY_SATHIRSTRADEGEMS },
+	{ "ancient sebilisian coin", ALTCURRENCY_ANCIENTSEBILISIANCOINS },
+	{ "bathezid trade gem", ALTCURRENCY_BATHEZIDTRADEGEMS },
+	{ "ancient draconic coin", ALTCURRENCY_ANCIENTDRACONICCOIN },
+	{ "fetterred ifrit coin", ALTCURRENCY_FETTERREDIFRITCOINS },
+	{ "entwined djinn coin", ALTCURRENCY_ENTWINEDDJINNCOINS },
+	{ "crystallized luck", ALTCURRENCY_CRYSTALLIZEDLUCK },
+	{ "froststone ducat", ALTCURRENCY_FROSTSTONEDUCAT },
+	{ "warlord's symbol", ALTCURRENCY_WARLORDSSYMBOL },
+	{ "overseer", ALTCURRENCY_OVERSEERTETRADRACHM }
+};
+
 int AltCurrencyCheck(std::string tempArg) {
-
-	std::map<std::string, int>  mAltCurrency = {
-
-		{ "doubloon", ALTCURRENCY_DOUBLOONS }, { "orux", ALTCURRENCY_ORUX }, { "phosphene", ALTCURRENCY_PHOSPHENES }, { "phosphite", ALTCURRENCY_PHOSPHITES },
-		{ "faycitum", ALTCURRENCY_FAYCITES }, { "chronobine", ALTCURRENCY_CHRONOBINES }, { "silver token", ALTCURRENCY_SILVERTOKENS }, { "gold token", ALTCURRENCY_GOLDTOKENS },
-		{ "mckenzie", ALTCURRENCY_MCKENZIE }, { "bayle mark", ALTCURRENCY_BAYLE }, { "tokens of reclamation", ALTCURRENCY_RECLAMATION }, { "brellium", ALTCURRENCY_BRELLIUM },
-		{ "dream mote", ALTCURRENCY_MOTES }, { "rebellion chit", ALTCURRENCY_REBELLIONCHITS }, { "diamond coin", ALTCURRENCY_DIAMONDCOINS }, { "bronze fiat", ALTCURRENCY_BRONZEFIATS },
-		{ "expedient delivery voucher", ALTCURRENCY_VOUCHER }, { "velium shard", ALTCURRENCY_VELIUMSHARDS }, { "crystallized fear", ALTCURRENCY_CRYSTALLIZEDFEAR },
-		{ "shadowstone", ALTCURRENCY_SHADOWSTONES }, { "dreadstone", ALTCURRENCY_DREADSTONES }, { "marks of valor", ALTCURRENCY_MARKSOFVALOR },
-		{ "medals of heroism", ALTCURRENCY_MEDALSOFHEROISM }, { "commemorative coin", ALTCURRENCY_COMMEMORATIVE_COINS }, { "fists of bayle", ALTCURRENCY_FISTSOFBAYLE },
-		{ "nobles", ALTCURRENCY_NOBLES }, { "arx energy crystal", ALTCURRENCY_ENERGYCRYSTALS }, { "pieces of eight",ALTCURRENCY_PIECESOFEIGHT },
-		{ "remnants of tranquility", ALTCURRENCY_REMNANTSOFTRANQUILITY }, { "bifurcated coin", ALTCURRENCY_BIFURCATEDCOIN }, { "adoption coin", ALTCURRENCY_ADOPTIVE },
-		{ "sathir's trade gem", ALTCURRENCY_SATHIRSTRADEGEMS }, { "ancient sebilisian coin", ALTCURRENCY_ANCIENTSEBILISIANCOINS }, { "bathezid trade gem", ALTCURRENCY_BATHEZIDTRADEGEMS },
-		{ "ancient draconic coin", ALTCURRENCY_ANCIENTDRACONICCOIN }, { "fetterred ifrit coin", ALTCURRENCY_FETTERREDIFRITCOINS }, { "entwined djinn coin", ALTCURRENCY_ENTWINEDDJINNCOINS },
-		{ "crystallized luck", ALTCURRENCY_CRYSTALLIZEDLUCK }, { "froststone ducat", ALTCURRENCY_FROSTSTONEDUCAT }, { "warlord's symbol", ALTCURRENCY_WARLORDSSYMBOL },
-		{ "overseer", ALTCURRENCY_OVERSEERTETRADRACHM }
-	};
 
 	for (auto& key_val : mAltCurrency) {
 		if (tempArg.find(key_val.first) != std::string::npos) {
