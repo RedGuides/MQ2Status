@@ -46,7 +46,7 @@ void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption
 void PutCommas(char* szLine);
 void ReverseString(char* szLine);
 void StatusCmd(SPAWNINFO* pChar, char* szLine);
-long AltCurrencyCheck(std::string tempArg);
+int AltCurrencyCheck(std::string tempArg);
 
 template <typename T>
 std::string LabeledText(const std::string& Label, T Value);
@@ -331,7 +331,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					stringBuffer += LabeledText("Daybreak Cash", "Unable to access");
 			}
 			else {
-				long altCurrency = AltCurrencyCheck(tempArg);
+				int altCurrency = AltCurrencyCheck(tempArg);
 				if (altCurrency != -1)
 					stringBuffer += LabeledText(tempArg, altCurrency);
 				else {
@@ -1113,33 +1113,28 @@ std::string GetColorCode(char Color, bool Dark)
 
 }
 
-long AltCurrencyCheck(std::string tempArg) {
-	std::vector<std::pair <std::string, int>> vAltCurrency;
+int AltCurrencyCheck(std::string tempArg) {
 
-	std::string strAltCurrency[] = { "doubloon", "orux", "phosphene", "phosphite", "faycitum", "chronobine", "silver token", "gold token", "mckenzie", "bayle mark",
-	"tokens of reclamation", "brellium", "dream mote", "rebellion chit", "diamond coin", "bronze fiat", "expedient delivery voucher",
-	"velium shard", "crystallized fear", "shadowstone", "dreadstone", "marks of valor", "medals of heroism", "commemorative coin",
-	"fists of bayle", "nobles", "arx energy crystal", "pieces of eight", "remnants of tranquility", "bifurcated coin", "adoption coin",
-	"sathir's trade gem", "ancient sebilisian coin", "bathezid trade gem", "ancient draconic coin", "fetterred ifrit coin",
-	"entwined djinn coin", "crystallized luck", "froststone ducat", "warlord's symbol", "overseer" };
+	std::map<std::string, int>  mAltCurrency = {
 
-	int iAltCurrencyEnum[] = { ALTCURRENCY_DOUBLOONS, ALTCURRENCY_ORUX, ALTCURRENCY_PHOSPHENES, ALTCURRENCY_PHOSPHITES, ALTCURRENCY_FAYCITES,
-	ALTCURRENCY_CHRONOBINES, ALTCURRENCY_SILVERTOKENS, ALTCURRENCY_GOLDTOKENS, ALTCURRENCY_MCKENZIE, ALTCURRENCY_BAYLE, ALTCURRENCY_RECLAMATION,
-	ALTCURRENCY_BRELLIUM, ALTCURRENCY_MOTES, ALTCURRENCY_REBELLIONCHITS, ALTCURRENCY_DIAMONDCOINS, ALTCURRENCY_BRONZEFIATS, ALTCURRENCY_VOUCHER,
-	ALTCURRENCY_VELIUMSHARDS, ALTCURRENCY_CRYSTALLIZEDFEAR, ALTCURRENCY_SHADOWSTONES, ALTCURRENCY_DREADSTONES, ALTCURRENCY_MARKSOFVALOR, ALTCURRENCY_MEDALSOFHEROISM,
-	ALTCURRENCY_COMMEMORATIVE_COINS, ALTCURRENCY_FISTSOFBAYLE, ALTCURRENCY_NOBLES, ALTCURRENCY_ENERGYCRYSTALS, ALTCURRENCY_PIECESOFEIGHT, ALTCURRENCY_REMNANTSOFTRANQUILITY,
-	ALTCURRENCY_BIFURCATEDCOIN, ALTCURRENCY_ADOPTIVE, ALTCURRENCY_SATHIRSTRADEGEMS, ALTCURRENCY_ANCIENTSEBILISIANCOINS, ALTCURRENCY_BATHEZIDTRADEGEMS,
-	ALTCURRENCY_ANCIENTDRACONICCOIN, ALTCURRENCY_FETTERREDIFRITCOINS, ALTCURRENCY_ENTWINEDDJINNCOINS, ALTCURRENCY_CRYSTALLIZEDLUCK, ALTCURRENCY_FROSTSTONEDUCAT,
-	ALTCURRENCY_WARLORDSSYMBOL, ALTCURRENCY_OVERSEERTETRADRACHM, ALTCURRENCY_LOYALTYTOKENS };
+		{ "doubloon", ALTCURRENCY_DOUBLOONS }, { "orux", ALTCURRENCY_ORUX }, { "phosphene", ALTCURRENCY_PHOSPHENES }, { "phosphite", ALTCURRENCY_PHOSPHITES },
+		{ "faycitum", ALTCURRENCY_FAYCITES }, { "chronobine", ALTCURRENCY_CHRONOBINES }, { "silver token", ALTCURRENCY_SILVERTOKENS }, { "gold token", ALTCURRENCY_GOLDTOKENS },
+		{ "mckenzie", ALTCURRENCY_MCKENZIE }, { "bayle mark", ALTCURRENCY_BAYLE }, { "tokens of reclamation", ALTCURRENCY_RECLAMATION }, { "brellium", ALTCURRENCY_BRELLIUM },
+		{ "dream mote", ALTCURRENCY_MOTES }, { "rebellion chit", ALTCURRENCY_REBELLIONCHITS }, { "diamond coin", ALTCURRENCY_DIAMONDCOINS }, { "bronze fiat", ALTCURRENCY_BRONZEFIATS },
+		{ "expedient delivery voucher", ALTCURRENCY_VOUCHER }, { "velium shard", ALTCURRENCY_VELIUMSHARDS }, { "crystallized fear", ALTCURRENCY_CRYSTALLIZEDFEAR },
+		{ "shadowstone", ALTCURRENCY_SHADOWSTONES }, { "dreadstone", ALTCURRENCY_DREADSTONES }, { "marks of valor", ALTCURRENCY_MARKSOFVALOR },
+		{ "medals of heroism", ALTCURRENCY_MEDALSOFHEROISM }, { "commemorative coin", ALTCURRENCY_COMMEMORATIVE_COINS }, { "fists of bayle", ALTCURRENCY_FISTSOFBAYLE },
+		{ "nobles", ALTCURRENCY_NOBLES }, { "arx energy crystal", ALTCURRENCY_ENERGYCRYSTALS }, { "pieces of eight",ALTCURRENCY_PIECESOFEIGHT },
+		{ "remnants of tranquility", ALTCURRENCY_REMNANTSOFTRANQUILITY }, { "bifurcated coin", ALTCURRENCY_BIFURCATEDCOIN }, { "adoption coin", ALTCURRENCY_ADOPTIVE },
+		{ "sathir's trade gem", ALTCURRENCY_SATHIRSTRADEGEMS }, { "ancient sebilisian coin", ALTCURRENCY_ANCIENTSEBILISIANCOINS }, { "bathezid trade gem", ALTCURRENCY_BATHEZIDTRADEGEMS },
+		{ "ancient draconic coin", ALTCURRENCY_ANCIENTDRACONICCOIN }, { "fetterred ifrit coin", ALTCURRENCY_FETTERREDIFRITCOINS }, { "entwined djinn coin", ALTCURRENCY_ENTWINEDDJINNCOINS },
+		{ "crystallized luck", ALTCURRENCY_CRYSTALLIZEDLUCK }, { "froststone ducat", ALTCURRENCY_FROSTSTONEDUCAT }, { "warlord's symbol", ALTCURRENCY_WARLORDSSYMBOL },
+		{ "overseer", ALTCURRENCY_OVERSEERTETRADRACHM }
+	};
 
-	int n = sizeof(strAltCurrency) / sizeof(strAltCurrency[0]);
-
-	for (int i = 0; i < n; i++)
-		vAltCurrency.push_back(make_pair(strAltCurrency[i], iAltCurrencyEnum[i]));
-
-	for (unsigned int i = 0; i < vAltCurrency.size(); i++) {
-		if (tempArg.find(&vAltCurrency[i].first[0]) != std::string::npos) {
-			return pPlayerPointManager->GetAltCurrency(vAltCurrency[i].second);
+	for (auto& key_val : mAltCurrency) {
+		if (tempArg.find(key_val.first) != std::string::npos) {
+			return pPlayerPointManager->GetAltCurrency(key_val.second);
 		}
 	}
 	return -1;
