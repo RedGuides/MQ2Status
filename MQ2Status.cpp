@@ -315,6 +315,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		else { // We need to lowercase and be able to do a "find" in case someone puts an "s" on a currency
 			std::string tempArg = GetNextArg(szLine); // convert our arg to string for transform
 			std::transform(tempArg.begin(), tempArg.end(), tempArg.begin(), tolower); // lowercase
+#if !defined (ROF2EMU)
 			if (tempArg.find("loyalty") == 0)
 				stringBuffer += LabeledText("Loyalty Tokens", pCharInfo->LoyaltyRewardBalance); // Using LoyaltyRewardBalance instead of AltCurrency since we can access directly
 			else if (tempArg.find("dbc") == 0 || tempArg.find("daybreak") == 0) { // DayBreakCurrency
@@ -331,6 +332,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					stringBuffer += LabeledText("Daybreak Cash", "Unable to access");
 			}
 			else {
+#endif !defined (ROF2EMU)
 				int altCurrency = AltCurrencyCheck(tempArg);
 				if (altCurrency != -1)
 					stringBuffer += LabeledText(tempArg, altCurrency);
