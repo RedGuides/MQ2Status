@@ -339,7 +339,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				else {
 					stringBuffer += LabeledText(tempArg, "Is not a valid currency");
 				}
+#if !defined (ROF2EMU)
 			}
+#endif !defined (ROF2EMU)
 		}
 		EzCommand(&stringBuffer[0]);
 		return;
