@@ -1154,7 +1154,7 @@ const std::map<std::string, int>  mAltCurrency = {
 	{ "ancient sebilisian coin", ALTCURRENCY_ANCIENTSEBILISIANCOINS },
 	{ "bathezid trade gem", ALTCURRENCY_BATHEZIDTRADEGEMS },
 	{ "ancient draconic coin", ALTCURRENCY_ANCIENTDRACONICCOIN },
-	{ "fetterred ifrit coin", ALTCURRENCY_FETTERREDIFRITCOINS },
+	{ "fettered ifrit coin", ALTCURRENCY_FETTERREDIFRITCOINS },
 	{ "entwined djinn coin", ALTCURRENCY_ENTWINEDDJINNCOINS },
 	{ "crystallized luck", ALTCURRENCY_CRYSTALLIZEDLUCK },
 	{ "froststone ducat", ALTCURRENCY_FROSTSTONEDUCAT },
