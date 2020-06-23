@@ -187,6 +187,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		WriteChatf("\ao/status will output to eqbc/dannet: If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
 		WriteChatf("\ao/status \agitem\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your inventory.");
 		WriteChatf("\ao/status \agitembank\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your bank.");
+		WriteChatf("\ao/status \agitemall\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your bank + inventory combined.");
 		WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options to eqbc: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, Weight, and, Money.");
 		WriteChatf("\ao/status \agaa\aw: Reports how many \"banked\" AA points you have.");
 		WriteChatf("\ao/status \aglogin\aw: Reports your login account name.");
@@ -216,19 +217,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 		}
 		else {
-			std::string findItem;
-			for (int i = 2; i < MAX_ARGS; i++) {
-				GetArg(Arg, szLine, i); // grab all params after szLine 1
-				if (strlen(Arg)) {
-					if (i > 2) {
-						findItem += " ";
-					}
-					findItem += Arg;
-				}
-				else {
-					break;
-				}
-			}
+			std::string findItem = GetNextArg(szLine);
 			stringBuffer += LabeledText(findItem, FindItemCountByName(&findItem[0]));
 			EzCommand(&stringBuffer[0]);
 		}
@@ -242,20 +231,22 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 		}
 		else {
-			std::string findItem;
-			for (int i = 2; i < MAX_ARGS; i++) {
-				GetArg(Arg, szLine, i); // grab all params after szLine 1
-				if (strlen(Arg)) {
-					if (i > 2) {
-						findItem += " ";
-					}
-					findItem += Arg;
-				}
-				else {
-					break;
-				}
-			}
+			std::string findItem = GetNextArg(szLine);
 			stringBuffer += LabeledText(findItem, FindBankItemCountByName(&findItem[0], 0)); // FindBankItemCountByName requires bExact
+			EzCommand(&stringBuffer[0]);
+		}
+		return;
+	}
+
+	if (!_stricmp(Arg, "itemall")) {
+		GetArg(Arg, szLine, 2);
+		if (!strlen(Arg)) {
+			WriteChatf("\arPlease provide a valid Item to search for\aw");
+			WriteChatf("\arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
+		}
+		else {
+			std::string findItem = GetNextArg(szLine);
+			stringBuffer += LabeledText(findItem, FindItemCountByName(&findItem[0]) + FindBankItemCountByName(&findItem[0], 0)); // FindItemCountByName
 			EzCommand(&stringBuffer[0]);
 		}
 		return;
