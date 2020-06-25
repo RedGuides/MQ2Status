@@ -217,8 +217,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 		}
 		else {
-			std::string findItem = GetNextArg(szLine);
-			stringBuffer += LabeledText(findItem, FindItemCountByName(&findItem[0]));
+			char* findItem = GetNextArg(szLine);
+			stringBuffer += LabeledText(findItem, FindItemCountByName(findItem));
 			EzCommand(&stringBuffer[0]);
 		}
 		return;
@@ -231,8 +231,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 		}
 		else {
-			std::string findItem = GetNextArg(szLine);
-			stringBuffer += LabeledText(findItem, FindBankItemCountByName(&findItem[0], 0)); // FindBankItemCountByName requires bExact
+			char* findItem = GetNextArg(szLine);
+			stringBuffer += LabeledText(findItem, FindBankItemCountByName(findItem, 0)); // FindBankItemCountByName requires bExact
 			EzCommand(&stringBuffer[0]);
 		}
 		return;
@@ -245,8 +245,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 		}
 		else {
-			std::string findItem = GetNextArg(szLine);
-			stringBuffer += LabeledText(findItem, FindItemCountByName(&findItem[0]) + FindBankItemCountByName(&findItem[0], 0)); // FindItemCountByName
+			char* findItem = GetNextArg(szLine);
+			stringBuffer += LabeledText(findItem, FindItemCountByName(findItem) + FindBankItemCountByName(findItem, 0)); // FindItemCountByName
 			EzCommand(&stringBuffer[0]);
 		}
 		return;
