@@ -807,6 +807,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			std::string green = GetColorCode('g', false);
 			std::string white = GetColorCode('w', false);
 			std::string orange = GetColorCode('o', false);
+			std::string red = GetColorCode('r', false);
 			strcat_s(temp, orange.c_str());
 			strcat_s(temp, "Macro: ");
 			strcat_s(temp, green.c_str());
@@ -840,6 +841,18 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (PMACROBLOCK pBlock = GetCurrentMacroBlock()) {
 				if (pBlock->Paused) {
 					stringBuffer += GetColorCode('r', false) + "***PAUSED*** " + GetColorCode('w', false);
+				}
+
+				// KissAssist has a "BackOff" that uses ${DPSPaused}
+				// Users would like to know when this is on doing a /status
+				if (IsDefined("DPSPaused")) {
+					char dpsPaused[64] = "${DPSPaused}";
+					ParseMacroData(dpsPaused, 64);
+					if (atoi(dpsPaused) > 0) {
+						stringBuffer += GetColorCode('r', false);
+						stringBuffer += " ***BACKEDOFF!*** ";
+						stringBuffer += GetColorCode('w', false);
+					}
 				}
 			}
 		}
