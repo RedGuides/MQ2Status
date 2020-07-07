@@ -204,6 +204,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		WriteChatf("\ao/status \agxp\aw: Reports to eqbc our level, Current XP %%, Banked AA, and our AAXP %%.");
 		WriteChatf("\ao/status \agaaxp\aw: Reports to eqbc our Spent AA, our AAXP %%, and our Banked AA.");
 		WriteChatf("\ao/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
+		WriteChatf("\ao/status \agtribute\aw: Displays if your current Tribute Status is On or Off and the current Favor");
+		WriteChatf("\ao/status \aggtribute\aw: or \agguildtribute\aw: Displays if your current Guild Tribute Status is On or Off and the current Guild Favor");
 		WriteChatf("\ao/status \agparcel\aw: Reports our \"Parcel\" status.");
 		WriteChatf("\ao/status \aginvis\aw: Reports our Invis and IVU status, so we can check we are \"Double Invis\".");
 		WriteChatf("\ao/status \agzone\aw: Reports what zone we are in.");
@@ -402,6 +404,38 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				EzCommand(&stringBuffer[0]);
 				return;
 			}
+		}
+		return;
+	}
+
+	if (!_stricmp(Arg, "tribute")) {
+		stringBuffer += LabeledText("Tribute Status", *pTributeActive ? "On" : "Off");
+		char prettyFavor[21] = { 0 };
+		sprintf_s(prettyFavor, "%lld", pCharInfo->CurrFavor);
+		PrettifyNumber(prettyFavor, sizeof(prettyFavor));
+		stringBuffer += LabeledText(" Favor", prettyFavor);
+		EzCommand(&stringBuffer[0]);
+		return;
+	}
+
+	// We don't appear to have a way to access the inforamtion direclty so I'm accessing the tribute window
+	if (!_stricmp(Arg, "gtribute") || !_stricmp(Arg, "guildtribute")) {
+		if (CXWnd* TributeBenefitWnd = FindMQ2Window("TributeBenefitWnd")) {
+			if (CLabelWnd* GuildTributeStatus = (CLabelWnd*)TributeBenefitWnd->GetChildItem("TBWG_ActivateButton")) {
+				char szBuffer[64] = { 0 };
+				if (GetCXStr(GuildTributeStatus->CGetWindowText(), szBuffer, 64) && szBuffer[0] != 0) {
+					stringBuffer += LabeledText("Guild Tribute Status", !_stricmp(szBuffer, "Deactivate") ? "On" : "Off");
+				}
+			}
+
+			if (CLabelWnd* GuildTributePoints = (CLabelWnd*)TributeBenefitWnd->GetChildItem("TBWG_GuildPoolLabel")) {
+				char szBuffer[64] = { 0 };
+				if (GetCXStr(GuildTributePoints->CGetWindowText(), szBuffer, 64) && szBuffer[0] != 0) {
+					stringBuffer += LabeledText(" Guild Favor", szBuffer);
+				}
+
+			}
+			EzCommand(&stringBuffer[0]);
 		}
 		return;
 	}
