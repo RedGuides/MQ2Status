@@ -376,14 +376,14 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					LabeledText("Health Pct", PercentHealth(me));
 			}
 			else if (!_stricmp(Arg, "mana")) {
-				stringBuffer += LabeledText("Current Mana", me->GetCurrentMana()) + " " +
-					LabeledText("Current Mana", me->GetMaxMana()) + " " +
-					LabeledText("Mana Pct", PercentMana(me));
+				stringBuffer += LabeledText("Current Mana", me->GetCurrentMana()) +
+					LabeledText(" Max Mana", me->GetMaxMana()) +
+					LabeledText(" Mana Pct", PercentMana(me));
 			}
 			else if (!_stricmp(Arg, "endurance")) {
-				stringBuffer += LabeledText("Current Endurance", me->GetCurrentEndurance()) + " " +
-					LabeledText("Current Endurance", me->GetMaxEndurance()) + " " +
-					LabeledText("Endurance Pct", PercentEndurance(me));
+				stringBuffer += LabeledText("Current Endurance", me->GetCurrentEndurance()) +
+					LabeledText(" Max Endurance", me->GetMaxEndurance()) +
+					LabeledText(" Endurance Pct", PercentEndurance(me));
 			}
 			else if (!_stricmp(Arg, "money") || !_stricmp(Arg, "plat")) {
 				char szmyPlat[MAX_STRING] = "";
@@ -418,7 +418,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		return;
 	}
 
-	// We don't appear to have a way to access the inforamtion direclty so I'm accessing the tribute window
+	// We don't appear to have a way to access the information directly so I'm accessing the tribute window
 	if (!_stricmp(Arg, "gtribute") || !_stricmp(Arg, "guildtribute")) {
 		if (CXWnd* TributeBenefitWnd = FindMQ2Window("TributeBenefitWnd")) {
 			if (CLabelWnd* GuildTributeStatus = (CLabelWnd*)TributeBenefitWnd->GetChildItem("TBWG_ActivateButton")) {
