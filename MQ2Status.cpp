@@ -192,6 +192,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		WriteChatf("\ao/status \agaa\aw: Reports how many \"banked\" AA points you have.");
 		WriteChatf("\ao/status \aglogin\aw: Reports your login account name.");
 		WriteChatf("\ao/status \agmerc\aw: Reports mercenary information including class, and role.");
+		WriteChatf("\ao/status \agmacro\aw: Reports what macro you currently have running.");
 		WriteChatf("\ao/status \agcampfire\aw: Reports campfire information including Active, Duration, and Zone.");
 		WriteChatf("\ao/status \agfellowship\aw: This returns to your mq2window (does not eqbc/dannet) information on your fellowship");
 		WriteChatf("\ao/status \agbagspace\aw: Reports how many open bagspaces you have.");
@@ -451,13 +452,13 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		switch (GetSubscriptionLevel())
 		{
 		case SUB_GOLD:
-			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('g', false) + "Gold" + " ";
+			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('g', false) + "Gold ";
 			break;
 		case SUB_SILVER:
-			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Silver" + " ";
+			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Silver ";
 			break;
 		case SUB_BRONZE:
-			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Bronze" + " ";
+			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Bronze ";
 			break;
 		default:
 			break;
@@ -470,13 +471,25 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += GetColorCode('o', false) + "& I have a 0 days left or a lifetime subscription.";
 			}
 			else if (pCharInfo->SubscriptionDays) {
-				stringBuffer += LabeledText("& I have ", pCharInfo->SubscriptionDays) + " days remaining.";
+				stringBuffer += LabeledText("Days Remaining", pCharInfo->SubscriptionDays);
 			}
 		}
 		EzCommand(&stringBuffer[0]);
 		return;
 	}
 #endif
+
+	if (!_stricmp(Arg, "macro")) {
+
+		if (gMacroStack && strlen(gszMacroName)) {
+			stringBuffer += LabeledText("Macro", gszMacroName);
+		}
+		else {
+			stringBuffer += LabeledText("Macro", "NULL");
+		}
+		EzCommand(&stringBuffer[0]);
+		return;
+	}
 
 	if (!_stricmp(Arg, "merc")) {
 		if (pMercInfo) {
