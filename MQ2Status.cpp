@@ -836,6 +836,26 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					}
 				}
 				break;
+			case Shaman:
+				if (bShowShaman) {
+					if (FindPlugin("MQ2Shaman")) {
+						classPlugin = true;
+					}
+					else {
+						notLoaded = true;
+					}
+				}
+				break;
+			case Enchanter:
+				if (bShowEnchanter) {
+					if (FindPlugin("MQ2Enchanter")) {
+						classPlugin = true;
+					}
+					else {
+						notLoaded = true;
+					}
+				}
+				break;
 			default:
 				break;
 			}
