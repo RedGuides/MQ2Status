@@ -866,17 +866,17 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 				if (FindMQ2DataType("CWTN")) {
 					// Possible way to do this without Parsing Macro Data?
-					char theMode[64] = "${CWTN.Mode}"; // What mode are we in?
-					char cwtnPaused[64] = "${CWTN.Paused}"; // is the plugin paused
+					constexpr int MAX_CWTN_OUTPUT_BUFFER = 24;
+					char theMode[MAX_CWTN_OUTPUT_BUFFER] = "${CWTN.Mode}"; // What mode are we in?
+					char cwtnPaused[MAX_CWTN_OUTPUT_BUFFER] = "${CWTN.Paused}"; // is the plugin paused
 
 					stringBuffer += "Mode: ";
 					stringBuffer += GetColorCode('g', false);
-					ParseMacroData(theMode, 64);
-					strcat_s(theMode, " ");
+					ParseMacroData(theMode, MAX_CWTN_OUTPUT_BUFFER);
 					stringBuffer += theMode;
 
-					ParseMacroData(cwtnPaused, 64);
-					if (!_stricmp(cwtnPaused, "True")) {
+					ParseMacroData(cwtnPaused, MAX_CWTN_OUTPUT_BUFFER);
+					if (!strcmp(cwtnPaused, "TRUE")) {
 						stringBuffer += GetColorCode('r', false);
 						stringBuffer += " ***PAUSED*** ";
 					}
