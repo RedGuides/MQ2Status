@@ -862,9 +862,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 			if (classPlugin) {
 				stringBuffer += GetColorCode('o', false) + "Class Plugin: " + GetColorCode('g', false) + "Loaded! " + GetColorCode('w', false);
-				stringBuffer += GetColorCode('o', false);
 
 				if (FindMQ2DataType("CWTN")) {
+					stringBuffer += GetColorCode('o', false);
 					// Possible way to do this without Parsing Macro Data?
 					constexpr int MAX_CWTN_OUTPUT_BUFFER = 24;
 					char theMode[MAX_CWTN_OUTPUT_BUFFER] = "${CWTN.Mode}"; // What mode are we in?
