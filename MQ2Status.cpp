@@ -486,10 +486,10 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 	if (!_stricmp(Arg, "macro")) {
 
 		if (gMacroStack && strlen(gszMacroName)) {
-			stringBuffer += LabeledText("Macro", gszMacroName);
+			stringBuffer += LabeledText(" Macro", gszMacroName);
 		}
 		else {
-			stringBuffer += LabeledText("Macro", "NULL");
+			stringBuffer += LabeledText(" Macro", "NULL");
 		}
 		EzCommand(&stringBuffer[0]);
 		return;
@@ -878,6 +878,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					stringBuffer += GetColorCode('g', false);
 					ParseMacroData(theMode, MAX_CWTN_OUTPUT_BUFFER);
 					stringBuffer += theMode;
+					stringBuffer += " ";
 
 					ParseMacroData(cwtnPaused, MAX_CWTN_OUTPUT_BUFFER);
 					if (!strcmp(cwtnPaused, "TRUE")) {
