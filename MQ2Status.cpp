@@ -701,7 +701,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 	}
 
 	if (!_stricmp(Arg, "bagspace")) {
-		stringBuffer += LabeledText("Bagspace", GetFreeInventory(4));
+		stringBuffer += LabeledText("Bagspace", GetFreeInventory(1));
 		EzCommand(&stringBuffer[0]);
 		return;
 	}
