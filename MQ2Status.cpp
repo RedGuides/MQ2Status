@@ -350,11 +350,11 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\ao[MQ2Status] \arExamples: Baking, Fishing, Jewelry Making, etc.\aw");
 		}
 		else {
+			char* skillname = GetNextArg(szLine);
 			for (int iSkillNum = 0; iSkillNum < NUM_SKILLS; iSkillNum++) {
-				if (!_stricmp(GetNextArg(szLine), szSkills[iSkillNum])) {
+				if (!_stricmp(skillname, szSkills[iSkillNum])) {
 					if (pCharInfo2->Skill[iSkillNum]) {
-						stringBuffer += LabeledText(Arg, GetAdjustedSkill(iSkillNum));
-						EzCommand(&stringBuffer[0]);
+						stringBuffer += LabeledText(skillname, GetAdjustedSkill(iSkillNum));
 					}
 				}
 			}
