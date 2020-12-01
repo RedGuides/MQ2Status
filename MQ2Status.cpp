@@ -345,11 +345,17 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 	if (!_stricmp(Arg, "skill")) {
 		GetArg(Arg, szLine, 2);
-		for (int iSkillNum = 0; iSkillNum < NUM_SKILLS; iSkillNum++) {
-			if (!_stricmp(Arg, szSkills[iSkillNum])) {
-				if (pCharInfo2->Skill[iSkillNum]) {
-					stringBuffer += LabeledText(Arg, GetAdjustedSkill(iSkillNum));
-					EzCommand(&stringBuffer[0]);
+		if (!strlen(Arg)) {
+			WriteChatf("\ao[MQ2Status] \arPlease provide a valid skill to search for.\aw");
+			WriteChatf("\ao[MQ2Status] \arExamples: Baking, Fishing, Jewelry Making, etc.\aw");
+		}
+		else {
+			for (int iSkillNum = 0; iSkillNum < NUM_SKILLS; iSkillNum++) {
+				if (!_stricmp(GetNextArg(szLine), szSkills[iSkillNum])) {
+					if (pCharInfo2->Skill[iSkillNum]) {
+						stringBuffer += LabeledText(Arg, GetAdjustedSkill(iSkillNum));
+						EzCommand(&stringBuffer[0]);
+					}
 				}
 			}
 		}
