@@ -355,6 +355,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				if (!_stricmp(skillname, szSkills[iSkillNum])) {
 					if (pCharInfo2->Skill[iSkillNum]) {
 						stringBuffer += LabeledText(skillname, GetAdjustedSkill(iSkillNum));
+						EzCommand(&stringBuffer[0]);
 					}
 				}
 			}
