@@ -204,6 +204,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		WriteChatf("\ao/status \agparcel\aw: Reports our \"Parcel\" status.");
 		WriteChatf("\ao/status \agquest\aw or \agtask\aw \ayQuest name\aw: Reports if you have a quest/task matching \ayQuest name\aw.");
 		WriteChatf("\ao/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
+		WriteChatf("\ao/status \agskill\aw \ayskill name\aw: reports out your current skill value for \ay skill name\aw.");
 		WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options to eqbc: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, Weight.");
 		#if !defined(ROF2EMU)
 		WriteChatf("\ao/status \agsub\aw: Reports to eqbc our subscription level, and if we are gold, how many days are left.");
@@ -339,6 +340,26 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 #endif !defined (ROF2EMU)
 		}
 		EzCommand(&stringBuffer[0]);
+		return;
+	}
+
+	if (!_stricmp(Arg, "skill")) {
+		GetArg(Arg, szLine, 2);
+		if (!strlen(Arg)) {
+			WriteChatf("\ao[MQ2Status] \arPlease provide a valid skill to search for.\aw");
+			WriteChatf("\ao[MQ2Status] \arExamples: Baking, Fishing, Jewelry Making, etc.\aw");
+		}
+		else {
+			char* skillname = GetNextArg(szLine);
+			for (int iSkillNum = 0; iSkillNum < NUM_SKILLS; iSkillNum++) {
+				if (!_stricmp(skillname, szSkills[iSkillNum])) {
+					if (pCharInfo2->Skill[iSkillNum]) {
+						stringBuffer += LabeledText(skillname, GetAdjustedSkill(iSkillNum));
+						EzCommand(&stringBuffer[0]);
+					}
+				}
+			}
+		}
 		return;
 	}
 
