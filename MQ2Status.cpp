@@ -465,6 +465,15 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					break;
 			}
 		}
+		else if (!_stricmp(Arg, "powersource")) {
+			if (PCONTENTS powersource = FindItemBySlot(21)) { // should be enum in main for item slot.
+				stringBuffer += LabeledText(powersource->Item2->Name, (powersource->Power * 100) / powersource->Item2->MaxPower);
+				stringBuffer += GetColorCode('o', true) + "%";
+			}
+			else {
+				stringBuffer += GetColorCode('r', false) + "No Powersource Equipped.";
+			}
+		}
 		else if (!_stricmp(Arg, "quest") || !_stricmp(Arg, "task")) {
 			GetArg(Arg, szLine, 2);
 			if (Arg[0] == 0) { // if an Argument after quest/task wasn't made, we need to ask for one
