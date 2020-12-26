@@ -75,7 +75,6 @@ BEGIN
 #endif
             VALUE "FileVersion", "2.0"
             VALUE "InternalName", "MQ2Status.dll"
-            VALUE "LegalCopyright", "Licensed under the GNU GPL v2"
             VALUE "OriginalFilename", "MQ2Status.dll"
             VALUE "ProductName", "MQ2Status"
             VALUE "ProductVersion", "2.0"
