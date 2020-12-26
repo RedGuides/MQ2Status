@@ -83,7 +83,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 	GetArg(Arg2, szLine, 2);
 	GetArg(Arg3, szLine, 3);
 	PCHARINFO pCharInfo = GetCharInfo();
-	PCHARINFO2 pCharInfo2 = GetPcProfile();
+	PcProfile* pCharInfo2 = GetPcProfile();
 	if (strlen(szLine)) {
 		if (!_stricmp(Arg, "aa")) {
 			stringBuffer += LabeledText("Available AA Points", pCharInfo2->AAPoints);
@@ -112,7 +112,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					cfTimeRemainHMS += sHrs + ":" + sMins + ":" + sSecs;
 					if (unsigned long ZoneID = (((PSPAWNINFO)pLocalPlayer)->CampfireZoneID & 0x7FFF)) {
 						if (ZoneID < MAX_ZONES && pWorldData) {
-							if (ZONELIST* pZoneID = ((WORLDDATA*)pWorldData)->ZoneArray[ZoneID]) {
+							if (EQZoneInfo* pZoneID = ((EQWorldData*)pWorldData)->ZoneArray[ZoneID]) {
 								cfZoneLongName += pZoneID->LongName;
 							}
 							else {
@@ -154,9 +154,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					if (CSidlScreenWnd* MarketWnd = (CSidlScreenWnd*)FindMQ2Window("MarketPlaceWnd")) {
 						if (CXWnd* Funds = MarketWnd->GetChildItem("MKPW_AvailableFundsUpper")) {
 							if (Funds) {
-								char szCash[64] = { 0 };
-								GetCXStr(Funds->CGetWindowText(), szCash, 64);
-								stringBuffer += LabeledText("Daybreak Cash", szCash);
+								stringBuffer += LabeledText("Daybreak Cash", Funds->GetWindowText());
 							}
 						}
 					}
@@ -234,16 +232,16 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		else if (!_stricmp(Arg, "gtribute") || !_stricmp(Arg, "guildtribute")) {
 			if (CXWnd* TributeBenefitWnd = FindMQ2Window("TributeBenefitWnd")) {
 				if (CLabelWnd* GuildTributeStatus = (CLabelWnd*)TributeBenefitWnd->GetChildItem("TBWG_ActivateButton")) {
-					char szBuffer[64] = { 0 };
-					if (GetCXStr(GuildTributeStatus->CGetWindowText(), szBuffer, 64) && szBuffer[0] != 0) {
-						stringBuffer += LabeledText("Guild Tribute Status", !_stricmp(szBuffer, "Deactivate") ? "On" : "Off");
+					std::string strGuildTributeStatus = GuildTributeStatus->GetWindowText().c_str();
+					if (!strGuildTributeStatus.empty()) {
+						stringBuffer += LabeledText("Guild Tribute Status", !ci_equals(strGuildTributeStatus, "Deactivate") ? "On" : "Off");
 					}
 				}
 
 				if (CLabelWnd* GuildTributePoints = (CLabelWnd*)TributeBenefitWnd->GetChildItem("TBWG_GuildPoolLabel")) {
-					char szBuffer[64] = { 0 };
-					if (GetCXStr(GuildTributePoints->CGetWindowText(), szBuffer, 64) && szBuffer[0] != 0) {
-						stringBuffer += LabeledText(" Guild Favor", szBuffer);
+					std::string strGuildTributePoints = GuildTributePoints->GetWindowText().c_str();
+					if (!strGuildTributePoints.empty()) {
+						stringBuffer += LabeledText(" Guild Favor", strGuildTributePoints);
 					}
 
 				}
@@ -760,7 +758,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				break;
 			case Shaman:
 				if (bShowShaman) {
-					if (FindPlugin("MQ2Shaman")) {
+					if (IsPluginLoaded("MQ2Shaman")) {
 						classPlugin = true;
 					}
 					else {
@@ -770,7 +768,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				break;
 			case Enchanter:
 				if (bShowEnchanter) {
-					if (FindPlugin("MQ2Enchanter")) {
+					if (IsPluginLoaded("MQ2Enchanter")) {
 						classPlugin = true;
 					}
 					else {
