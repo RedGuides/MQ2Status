@@ -154,7 +154,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					if (CSidlScreenWnd* MarketWnd = (CSidlScreenWnd*)FindMQ2Window("MarketPlaceWnd")) {
 						if (CXWnd* Funds = MarketWnd->GetChildItem("MKPW_AvailableFundsUpper")) {
 							if (Funds) {
-								stringBuffer += LabeledText("Daybreak Cash", Funds->GetWindowText());
+								stringBuffer += LabeledText("Daybreak Cash", Funds->GetWindowText().c_str());
 							}
 						}
 					}
