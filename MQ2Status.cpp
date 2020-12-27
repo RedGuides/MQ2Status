@@ -50,7 +50,7 @@ int AltCurrencyCheck(std::string tempArg);
 
 template <typename T>
 std::string LabeledText(const std::string& Label, T Value);
-std::string stringBuffer = { 0 };
+std::string stringBuffer;
 std::string GetColorCode(char Color, bool Dark);
 
 template <typename T>
