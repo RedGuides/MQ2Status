@@ -49,7 +49,7 @@ int AltCurrencyCheck(std::string tempArg);
 
 template <typename T>
 std::string LabeledText(const std::string& Label, T Value);
-std::string stringBuffer = { 0 };
+std::string stringBuffer;
 std::string GetColorCode(char Color, bool Dark);
 
 template <typename T>
@@ -460,6 +460,15 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					break;
 				default:
 					break;
+			}
+		}
+		else if (!_stricmp(Arg, "powersource")) {
+			if (PCONTENTS powersource = FindItemBySlot(21)) { // should be enum in main for item slot.
+				stringBuffer += LabeledText(powersource->Item2->Name, (powersource->Power * 100) / powersource->Item2->MaxPower);
+				stringBuffer += GetColorCode('o', true) + "%";
+			}
+			else {
+				stringBuffer += GetColorCode('r', false) + "No Powersource Equipped.";
 			}
 		}
 		else if (!_stricmp(Arg, "quest") || !_stricmp(Arg, "task")) {
