@@ -463,8 +463,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "powersource")) {
-			if (PCONTENTS powersource = FindItemBySlot(21)) { // should be enum in main for item slot.
-				stringBuffer += LabeledText(powersource->Item2->Name, (powersource->Power * 100) / powersource->Item2->MaxPower);
+			if (auto powersource = GetPcProfile()->GetInventorySlot(InvSlot_PowerSource)) {
+				stringBuffer += LabeledText(powersource->GetName(), (powersource->Power * 100) / powersource->GetItemDefinition()->MaxPower);
 				stringBuffer += GetColorCode('o', true) + "%";
 			}
 			else {
