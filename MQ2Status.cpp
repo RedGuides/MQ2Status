@@ -175,24 +175,16 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) { // We only have this WriteChatf and not reporting to eqbc/dannet
-			std::string ClassNameStr;
-			if (FELLOWSHIPINFO* pFellowship = (FELLOWSHIPINFO*)&pCharInfo->pSpawn->Fellowship) {
-				if (pFellowship->Members > 0) {
-					WriteChatf("FS MoTD: \ag%s\aw", pFellowship->MotD);
-					WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", pFellowship->FellowshipMember[0].Name, pFellowship->Members);
-					if (unsigned long NumMembers = pFellowship->Members) {
-						for (unsigned int i = 0; i < NumMembers; i++) {
-							if (FELLOWSHIPMEMBER* thisMember = &pFellowship->FellowshipMember[i]) {
-								std::string ClassDescString;
-								ClassDescString += GetClassDesc(thisMember->Class);
-								WriteChatf("\ag%s\aw - \ay%lu\aw - \ap%s\aw ", thisMember->Name, thisMember->Level, ClassDescString.c_str());
-							}
-						}
-					}
+			SFellowship& fellowship = pLocalPlayer->Fellowship;
+			if (fellowship.Members > 0) {
+				WriteChatf("FS MoTD: \ag%s\aw", fellowship.MotD);
+				WriteChatf("FS Leader is: \ag%s\aw , We have: \ay%lu\aw members", fellowship.FellowshipMember[0].Name, fellowship.Members);
+				for (int i = 0; i < fellowship.Members; i++) {
+					SFellowshipMember& thisMember = fellowship.FellowshipMember[i];
+					WriteChatf("\ag%s\aw - \ay%lu\aw - \ap%s\aw ", thisMember.Name, thisMember.Level, GetClassDesc(thisMember.Class));
 				}
-				else {
-					WriteChatf("\arIt does not appear we are in a fellowship.\aw");
-				}
+			} else {
+				WriteChatf("\arIt does not appear we are in a fellowship.\aw");
 			}
 		}
 		else if (!_stricmp(Arg, "help")) {
@@ -311,130 +303,128 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "merc")) {
-			if (pMercInfo) {
-				if (pMercInfo->HaveMerc == 1) {
-					switch (pMercInfo->MercState)
-					{
-						case 0:
-							stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('r', false) + "Dead! " + GetColorCode('w', false);
-							break;
-						case 1:
-							stringBuffer += GetColorCode('o', false) + "Mercenary State: " + GetColorCode('r', false) + "Suspended! " + GetColorCode('w', false);
-							break;
-						case 5:
-							stringBuffer += GetColorCode('o', false) + "Mercenary State: " + GetColorCode('g', false) + "Alive! " + GetColorCode('w', false);
+			if (pMercManager && pMercManager->HasMercenary()) {
+				switch (pMercManager->GetMercenaryState())
+				{
+					case MercenaryState_Dead:
+						stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('r', false) + "Dead! " + GetColorCode('w', false);
+						break;
+					case MercenaryState_Suspended:
+						stringBuffer += GetColorCode('o', false) + "Mercenary State: " + GetColorCode('r', false) + "Suspended! " + GetColorCode('w', false);
+						break;
+					case MercenaryState_Active:
+						stringBuffer += GetColorCode('o', false) + "Mercenary State: " + GetColorCode('g', false) + "Alive! " + GetColorCode('w', false);
 
-							{
-								DWORD mercStance = pMercInfo->ActiveStance;
-								if (PSPAWNINFO myMerc = (PSPAWNINFO)GetSpawnByID(pMercInfo->MercSpawnId)) {
-									switch (myMerc->GetClass()) {
-										case Cleric:
-											stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('g', false) + "Cleric " + GetColorCode('w', false);
-											{
-												switch (mercStance) {
-													case 0:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Balanced " + GetColorCode('w', false);
-														//status Balanced
-														break;
-													case 1:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Efficient" + GetColorCode('w', false);
-														//status Efficient
-														break;
-													case 2:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Reactive " + GetColorCode('w', false);
-														//status Reactive
-														break;
-													case 3:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Passive " + GetColorCode('w', false);
-														//status Passive
-														break;
-													default:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Unknown " + GetColorCode('w', false);
-														break;
-												}
+						{
+							int mercStance = pMercManager->currentMercenary.GetCurrentStanceId();
+							if (PSPAWNINFO myMerc = (PSPAWNINFO)GetSpawnByID(pMercManager->mercenarySpawnId)) {
+								switch (myMerc->GetClass()) {
+									case Cleric:
+										stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('g', false) + "Cleric " + GetColorCode('w', false);
+										{
+											switch (mercStance) {
+												case 0:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Balanced " + GetColorCode('w', false);
+													//status Balanced
+													break;
+												case 1:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Efficient" + GetColorCode('w', false);
+													//status Efficient
+													break;
+												case 2:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Reactive " + GetColorCode('w', false);
+													//status Reactive
+													break;
+												case 3:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Passive " + GetColorCode('w', false);
+													//status Passive
+													break;
+												default:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Unknown " + GetColorCode('w', false);
+													break;
 											}
-											break;
-										case Warrior:
-											stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('g', false) + "Warrior " + GetColorCode('w', false);
-											{
-												switch (mercStance) {
-													case 0:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Aggressive " + GetColorCode('w', false);
-														//status Aggressive
-														break;
-													case 1:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Assist " + GetColorCode('w', false);
-														//status Assist
-														break;
-													case 2:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Passive " + GetColorCode('w', false);
-														//status Passive
-														break;
-													default:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Unknown " + GetColorCode('w', false);
-														break;
-												}
+										}
+										break;
+									case Warrior:
+										stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('g', false) + "Warrior " + GetColorCode('w', false);
+										{
+											switch (mercStance) {
+												case 0:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Aggressive " + GetColorCode('w', false);
+													//status Aggressive
+													break;
+												case 1:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Assist " + GetColorCode('w', false);
+													//status Assist
+													break;
+												case 2:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Passive " + GetColorCode('w', false);
+													//status Passive
+													break;
+												default:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Unknown " + GetColorCode('w', false);
+													break;
 											}
-											break;
-										case Wizard:
-											stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('g', false) + "Wizard " + GetColorCode('w', false);
-											{
-												switch (mercStance) {
-													case 0:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Passive " + GetColorCode('w', false);
-														//status Passive
-														break;
-													case 1:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Balanced " + GetColorCode('w', false);
-														//status Balanced
-														break;
-													case 2:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Burn " + GetColorCode('w', false);
-														//status Burn
-														break;
-													case 3:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Burn AE " + GetColorCode('w', false);
-														//status Burn AE
-														break;
-													default:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Unknown " + GetColorCode('w', false);
-														break;
-												}
+										}
+										break;
+									case Wizard:
+										stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('g', false) + "Wizard " + GetColorCode('w', false);
+										{
+											switch (mercStance) {
+												case 0:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Passive " + GetColorCode('w', false);
+													//status Passive
+													break;
+												case 1:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Balanced " + GetColorCode('w', false);
+													//status Balanced
+													break;
+												case 2:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Burn " + GetColorCode('w', false);
+													//status Burn
+													break;
+												case 3:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Burn AE " + GetColorCode('w', false);
+													//status Burn AE
+													break;
+												default:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Unknown " + GetColorCode('w', false);
+													break;
 											}
-											break;
-										case Rogue:
-											stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('g', false) + "Rogue " + GetColorCode('w', false);
-											{
-												switch (mercStance) {
-													case 0:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Passive " + GetColorCode('w', false);
-														//status Passive
-														break;
-													case 1:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Balanced " + GetColorCode('w', false);
-														//status Balanced
-														break;
-													case 2:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Burn " + GetColorCode('w', false);
-														//status Burn
-														break;
-													default:
-														stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Unknown " + GetColorCode('w', false);
-														break;
-												}
+										}
+										break;
+									case Rogue:
+										stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('g', false) + "Rogue " + GetColorCode('w', false);
+										{
+											switch (mercStance) {
+												case 0:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Passive " + GetColorCode('w', false);
+													//status Passive
+													break;
+												case 1:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Balanced " + GetColorCode('w', false);
+													//status Balanced
+													break;
+												case 2:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Burn " + GetColorCode('w', false);
+													//status Burn
+													break;
+												default:
+													stringBuffer += GetColorCode('o', false) + "Stance: " + GetColorCode('g', false) + "Unknown " + GetColorCode('w', false);
+													break;
 											}
-											break;
-										default:
-											stringBuffer += GetColorCode('g', false) + "Unknown Class " + GetColorCode('w', false);
-											break;
-									}
+										}
+										break;
+									default:
+										stringBuffer += GetColorCode('g', false) + "Unknown Class " + GetColorCode('w', false);
+										break;
 								}
 							}
-							break;
-						default:
-							stringBuffer += GetColorCode('g', false) + "Unknown" + GetColorCode('w', false);
-							break;
-					}
+						}
+						break;
+					default:
+						stringBuffer += GetColorCode('g', false) + "Unknown" + GetColorCode('w', false);
+						break;
 				}
 			}
 			else {
@@ -878,17 +868,17 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 
-		if (pMercInfo) {
-			if (pMercInfo->HaveMerc == 1) {
-				switch (pMercInfo->MercState)
+		if (pMercManager) {
+			if (pMercManager->HasMercenary()) {
+				switch (pMercManager->currentMercenary.suspendedState)
 				{
-				case 0:
+				case MercenaryState_Dead:
 					//stringBuffer += GetColorCode('o', false) + "Mercenary State:" + GetColorCode('g', false) + " DEAD " + GetColorCode('w', false);
 					break;
-				case 1:
+				case MercenaryState_Suspended:
 					//stringBuffer += GetColorCode('o', false) + "Mercenary State:" + GetColorCode('g', false) + " SUSPENDED " + GetColorCode('w', false);
 					break;
-				case 5:
+				case MercenaryState_Active:
 					stringBuffer += GetColorCode('o', false) + " Mercenary State:" + GetColorCode('g', false) + " ALIVE! " + GetColorCode('w', false);
 					break;
 				default:
