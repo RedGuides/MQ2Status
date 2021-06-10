@@ -611,6 +611,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					stringBuffer += LabeledText(" Max HPs", me->HPMax);
 					stringBuffer += LabeledText(" Health Pct", PercentHealth(me));
 				}
+				else if (!_stricmp(Arg, "luck")) {
+					stringBuffer += LabeledText("Luck", pCharInfo->LCK);
+				}
 				else if (!_stricmp(Arg, "mana")) {
 					stringBuffer += LabeledText("Current Mana", me->GetCurrentMana());
 					stringBuffer += LabeledText(" Max Mana", me->GetMaxMana());
@@ -698,6 +701,16 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 #endif
 		if (bShowPlugin) {
 			switch (GetCharInfo2()->Class) {
+				case Bard:
+					if (bShowBard) {
+						if (FindPlugin("MQ2Bard")) {
+							classPlugin = true;
+						}
+						else {
+							notLoaded = true;
+						}
+					}
+					break;
 			case Berserker:
 				if (bShowBerserker) {
 					if (FindPlugin("MQ2BerZerker")) {
@@ -781,6 +794,66 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			case Enchanter:
 				if (bShowEnchanter) {
 					if (FindPlugin("MQ2Enchanter")) {
+						classPlugin = true;
+					}
+					else {
+						notLoaded = true;
+					}
+				}
+				break;
+			case Necromancer:
+				if (bShowNecromancer) {
+					if (FindPlugin("MQ2Necro")) {
+						classPlugin = true;
+					}
+					else {
+						notLoaded = true;
+					}
+				}
+				break;
+			case Paladin:
+				if (bShowPaladin) {
+					if (FindPlugin("MQ2Paladin")) {
+						classPlugin = true;
+					}
+					else {
+						notLoaded = true;
+					}
+				}
+				break;
+			case Mage:
+				if (bShowMage) {
+					if (FindPlugin("MQ2Mage")) {
+						classPlugin = true;
+					}
+					else {
+						notLoaded = true;
+					}
+				}
+				break;
+			case Druid:
+				if (bShowDruid) {
+					if (FindPlugin("MQ2Druid")) {
+						classPlugin = true;
+					}
+					else {
+						notLoaded = true;
+					}
+				}
+				break;
+			case Ranger:
+				if (bShowRanger) {
+					if (FindPlugin("MQ2Ranger")) {
+						classPlugin = true;
+					}
+					else {
+						notLoaded = true;
+					}
+				}
+				break;
+			case Wizard:
+				if (bShowWizard) {
+					if (FindPlugin("MQ2Wizard")) {
 						classPlugin = true;
 					}
 					else {
