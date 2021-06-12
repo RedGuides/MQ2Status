@@ -690,7 +690,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			switch (GetPcProfile()->Class) {
 				case Bard:
 					if (bShowBard) {
-						if (FindPlugin("MQ2Bard")) {
+						if (IsPluginLoaded("MQ2Bard")) {
 							classPlugin = true;
 						}
 						else {
@@ -790,7 +790,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				break;
 			case Necromancer:
 				if (bShowNecromancer) {
-					if (FindPlugin("MQ2Necro")) {
+					if (IsPluginLoaded("MQ2Necro")) {
 						classPlugin = true;
 					}
 					else {
@@ -800,7 +800,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				break;
 			case Paladin:
 				if (bShowPaladin) {
-					if (FindPlugin("MQ2Paladin")) {
+					if (IsPluginLoaded("MQ2Paladin")) {
 						classPlugin = true;
 					}
 					else {
@@ -810,7 +810,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				break;
 			case Mage:
 				if (bShowMage) {
-					if (FindPlugin("MQ2Mage")) {
+					if (IsPluginLoaded("MQ2Mage")) {
 						classPlugin = true;
 					}
 					else {
@@ -820,7 +820,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				break;
 			case Druid:
 				if (bShowDruid) {
-					if (FindPlugin("MQ2Druid")) {
+					if (IsPluginLoaded("MQ2Druid")) {
 						classPlugin = true;
 					}
 					else {
@@ -830,7 +830,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				break;
 			case Ranger:
 				if (bShowRanger) {
-					if (FindPlugin("MQ2Ranger")) {
+					if (IsPluginLoaded("MQ2Ranger")) {
 						classPlugin = true;
 					}
 					else {
@@ -840,7 +840,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				break;
 			case Wizard:
 				if (bShowWizard) {
-					if (FindPlugin("MQ2Wizard")) {
+					if (IsPluginLoaded("MQ2Wizard")) {
 						classPlugin = true;
 					}
 					else {
