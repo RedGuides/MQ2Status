@@ -88,6 +88,67 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		if (!_stricmp(Arg, "aa")) {
 			stringBuffer += LabeledText("Available AA Points", pCharInfo2->AAPoints);
 		}
+		else if (!_stricmp(Arg, "achieve") || !_stricmp(Arg, "achievement")) {
+			AchievementManager& achievemanager = AchievementManager::Instance();
+			char* fullArgument = GetNextArg(szLine);
+
+			int id = 0;
+			// if there is no second argument, we're going to give them the total completed achievement score
+			if (fullArgument[0] == 0) {
+				stringBuffer += LabeledText("Score", achievemanager.completedAchievementScore);
+				stringBuffer += GetColorCode('g', false) + " Points";
+			}
+			else {
+				const Achievement* Achieve = nullptr;
+				if (IsNumber(fullArgument)) {
+					id = atoi(fullArgument);
+					Achieve = GetAchievementById(id);
+				}
+				else {
+					Achieve = GetAchievementByName(fullArgument);
+					if (Achieve) {
+						id = Achieve->id;
+					}
+				}
+				// get the achievement by the ID number just collected
+				const eqlib::Achievement* AchieveByID = GetAchievementById(id);
+
+				if (AchieveByID != nullptr) {
+					// is this achievement complete?
+					const bool bComplete = IsAchievementComplete(AchieveByID);
+					stringBuffer += LabeledText("Achieve", AchieveByID->name.c_str());
+					stringBuffer += LabeledText(" Status", (bComplete ? " Completed" : " \arIncomplete\ax"));
+
+					// if the achievement is not complete, output what we're missing from it.
+					if (!bComplete) {
+						// Get incomplete components
+						// we need to get achievementindex by ID
+						int achievementIndex = achievemanager.GetAchievementIndexById(id);
+						// we need to get the individual achievement/component info
+						const SingleAchievementAndComponentsInfo* info = achievemanager.GetAchievementClientInfoByIndex(achievementIndex);
+
+						if (!info)
+							// debug
+							stringBuffer += GetColorCode('R', false) + "We don't appear to have that information available.";
+						else {
+							// we want to go through these achievements and check their completion status
+							for (int i = 0; i < Achieve->componentsByType[AchievementComponentCompletion].GetCount(); i++) {
+								const AchievementComponent& component = Achieve->componentsByType[AchievementComponentCompletion][i];
+								// if it is not set, then we are missing it.
+								if (!info->IsComponentComplete(AchievementComponentCompletion, i)) {
+									stringBuffer += LabeledText(" Missing", component.description.c_str());
+								}
+							}
+						}
+					}
+				}
+				else {
+					WriteChatf("\ao[MQ2Status] \arPlease provide a valid Achievement by name or ID to search for.");
+					WriteChatf("\ao[MQ2Status] \arExample: \agNorrathian Explorer\ar or \ag100000050\ar.");
+					WriteChatf("\ao[MQ2Status] \arKeep in mind achievements, by name will report the first achievement it finds with that name.");
+				}
+			}
+		}
 		else if (!_stricmp(Arg, "aaxp")) {
 			stringBuffer += LabeledText("Assigned AA", pCharInfo2->AAPointsAssigned[0]);
 			stringBuffer += LabeledText(" Spent AA", pCharInfo2->AAPointsSpent);
@@ -138,6 +199,64 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 			else {
 				stringBuffer += GetColorCode('r', false) + " " + "We do not appear to have a campfire in a usable location!" + GetColorCode('w', false);
+			}
+		}
+		else if (!_stricmp(Arg, "collected") || !_stricmp(Arg, "collection")) {
+			GetArg(Arg, szLine, 2);
+			if (Arg[0] == 0) {
+				WriteChatf("\ao[MQ2Status] \arPlease provide a valid \agCollection Item\ag to search for.\aw");
+				WriteChatf("\ao[MQ2Status] \arExamples: \agKromzek Bracer\ar, \agLucky Clover\ar, \agAir-Infused Opal\ar, etc.\aw");
+			}
+			else {
+				char* collectionItem = GetNextArg(szLine);
+				// start an achievement manager
+				AchievementManager& achievemanager = AchievementManager::Instance();
+				// We need this bool so we can output if there was invalid component search
+				bool bFoundComponent = false;
+				// we need to check all the categories for "Collections"
+				// most of them are just ##09 for collections, but there are at least 2 that are not, so we should check everything
+				for (const AchievementCategory& achievecat : achievemanager.categories) {
+					// if we found a category with collections in the name
+					if (string_equals(achievecat.name, "Collections")) {
+						// We need to check the children of this category
+						for (int i = 0; i < achievecat.GetAchievementCount(); ++i) {
+							int id = achievecat.GetAchievementId(i);
+							// we need to get achievementindex by ID
+							int achievementIndex = achievemanager.GetAchievementIndexById(id);
+							// we need to get the actual achievement by the index we just got
+							const Achievement* Achieve = achievemanager.GetAchievementByIndex(achievementIndex);
+							// we need to get the individual achievement/component info
+							const SingleAchievementAndComponentsInfo* info = achievemanager.GetAchievementClientInfoByIndex(achievementIndex);
+
+							if (!info)
+								// debug
+								stringBuffer += GetColorCode('R', false) + "We don't appear to have that information available.";
+							else {
+								// we want to go through these achievements and check their completion status
+								for (int i = 0; i < Achieve->componentsByType[AchievementComponentCompletion].GetCount(); i++) {
+									const AchievementComponent& component = Achieve->componentsByType[AchievementComponentCompletion][i];
+									if (ci_equals(collectionItem, component.description)) {
+										bFoundComponent = true;
+										// if it is not set, then we are missing it.
+										if (!info->IsComponentComplete(AchievementComponentCompletion, i)) {
+											stringBuffer += LabeledText(component.description.c_str(), "\arMissing\ax");
+										}
+										else {
+											stringBuffer += LabeledText(component.description.c_str(), "Collected");
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				// if we didn't find what we're checking for in any achievement, output it was invalid
+				if (!bFoundComponent) {
+					WriteChatf("\ao[MQ2Status] \arNo such collection item: \ay%s\ax.", collectionItem);
+					WriteChatf("\ao[MQ2Status] \arPlease provide a valid \agCollection Item\ar to search for.");
+					WriteChatf("\ao[MQ2Status] \arExamples: \agKromzek Bracer\ar, \agLucky Clover\ar, \agAir-Infused Opal\ar, etc.");
+				}
 			}
 		}
 		else if (!_stricmp(Arg, "currency")) {
@@ -194,9 +313,11 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\agValid Status options are:\aw");
 			WriteChatf("\ao/status will output to eqbc/dannet: If we have a CWTN Class Plugin loaded, if we have a macro, if our macro is kiss - it will say what our role is, if we are paused, if we are hidden, and if we have a merc that is alive.");
 			WriteChatf("\ao/status \agaa\aw: Reports how many \"banked\" AA points you have.");
-			WriteChatf("\ao/status \agaaxp\aw: Reports to eqbc our Spent AA, our AAXP %%, and our Banked AA.");
+			WriteChatf("\ao/status \agaaxp\aw: Reports our Spent AA, our AAXP %%, and our Banked AA.");
+			WriteChatf("\ao/status \agachievement\aw: Reports the status of an achievement by name, or id.");
 			WriteChatf("\ao/status \agbagspace\aw: Reports how many open bagspaces you have.");
 			WriteChatf("\ao/status \agcampfire\aw: Reports campfire information including Active, Duration, and Zone.");
+			WriteChatf("\ao/status \agcollection\aw: Reports if we have collected an item by name.");
 			WriteChatf("\ao/status \agcurrency\aw: Reports how many of an alt currency you have.");
 			WriteChatf("\ao/status \agfellowship\aw: This returns to your mq2window (does not eqbc/dannet) information on your fellowship");
 			WriteChatf("\ao/status \aggtribute\aw: or \agguildtribute\aw: Displays if your current Guild Tribute Status is On or Off and the current Guild Favor");
@@ -213,12 +334,12 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\ao/status \agquest\aw or \agtask\aw \ayQuest name\aw: Reports if you have a quest/task matching \ayQuest name\aw.");
 			WriteChatf("\ao/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
 			WriteChatf("\ao/status \agskill\aw \ayskill name\aw: reports out your current skill value for \ay skill name\aw.");
-			WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options to eqbc: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, Luck, Weight.");
+			WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, Luck, Weight.");
 #if !defined(ROF2EMU)
-			WriteChatf("\ao/status \agsub\aw: Reports to eqbc our subscription level, and if we are gold, how many days are left.");
+			WriteChatf("\ao/status \agsub\aw: Reports our subscription level, and if we are gold, how many days are left.");
 #endif
 			WriteChatf("\ao/status \agtribute\aw: Displays if your current Tribute Status is On or Off and the current Favor");
-			WriteChatf("\ao/status \agxp\aw: Reports to eqbc our level, Current XP %%, Banked AA, and our AAXP %%.");
+			WriteChatf("\ao/status \agxp\aw: Reports our level, Current XP %%, Banked AA, and our AAXP %%.");
 			WriteChatf("\ao/status \agzone\aw: Reports what zone we are in.");
 		}
 		// We don't appear to have a way to access the information directly so I'm accessing the tribute window
