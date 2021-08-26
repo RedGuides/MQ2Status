@@ -294,6 +294,30 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 #endif !defined (ROF2EMU)
 			}
 		}
+		else if (!_stricmp(Arg, "evolve") || !_stricmp(Arg, "evolving")) {
+			if (!strlen(Arg)) {
+				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to check your evolving status on\aw");
+				WriteChatf("\ao[MQ2Status] \arExamples: Threadbare Weighted Tabard, Djarn's Tarnished Amethyst Ring, Wrathful Harasser's Earring of Rallos Zek, etc.\aw");
+			}
+			else {
+				char* findItem = GetNextArg(szLine);
+				if (ItemClient* myItem = FindItemByName(findItem)) {
+					if (IsEvolvingItem(myItem)) {
+						stringBuffer += LabeledText("Item", myItem->GetName());
+						stringBuffer += LabeledText(" Level", myItem->pEvolutionData->EvolvingCurrentLevel);
+						stringBuffer += LabeledText(" Max", myItem->pEvolutionData->EvolvingMaxLevel);
+						stringBuffer += LabeledText(" Pct", myItem->pEvolutionData->EvolvingExpPct);
+					}
+					else {
+						WriteChatf("\ao[MQ2Status] \ag%s \aris not an evolving item. Please provide a valid Item to check your evolving status on\aw", myItem->GetName());
+					}
+				}
+				else {
+					WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to check your evolving status on\aw");
+					WriteChatf("\ao[MQ2Status] \arExamples: Threadbare Weighted Tabard, Djarn's Tarnished Amethyst Ring, Wrathful Harasser's Earring of Rallos Zek, etc.\aw");
+				}
+			}
+		}
 		else if (!_stricmp(Arg, "fellow") || !_stricmp(Arg, "fellowship")) { // We only have this WriteChatf and not reporting to eqbc/dannet
 			SFellowship& fellowship = pLocalPlayer->Fellowship;
 			if (fellowship.Members > 0) {
@@ -319,6 +343,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\ao/status \agcampfire\aw: Reports campfire information including Active, Duration, and Zone.");
 			WriteChatf("\ao/status \agcollection\aw: Reports if we have collected an item by name.");
 			WriteChatf("\ao/status \agcurrency\aw: Reports how many of an alt currency you have.");
+			WriteChatf("\ao/status \agevolve / evolving\aw: Reports the evolution status of an item by name.");
 			WriteChatf("\ao/status \agfellowship\aw: This returns to your mq2window (does not eqbc/dannet) information on your fellowship");
 			WriteChatf("\ao/status \aggtribute\aw: or \agguildtribute\aw: Displays if your current Guild Tribute Status is On or Off and the current Guild Favor");
 			WriteChatf("\ao/status \aginvis\aw: Reports our Invis and IVU status, so we can check we are \"Double Invis\".");
