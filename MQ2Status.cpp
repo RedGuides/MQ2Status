@@ -331,6 +331,38 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\arIt does not appear we are in a fellowship.\aw");
 			}
 		}
+		else if (!_stricmp(Arg, "hunger") || !_stricmp(Arg, "thirst")) {
+			// this would be better suited as a function in main/core to return itemcountbytype
+			// TODO: Remove lambda when code is in main/core
+			auto itemcountbytype = [](int type) {
+				int count = 0;
+				PcProfile* pChar2 = GetPcProfile();
+				for (int i = InvSlot_FirstWornItem; i < InvSlot_Max; i++) {
+					// check top level slots
+					if (ItemClient* pItem = pChar2->GetInventorySlot(i)) {
+						if (pItem->GetItemClass() == type) {
+							count += pItem->GetItemCount();
+						}
+
+						if (!pItem->IsContainer())
+							continue;
+
+						// check inside the container
+						for (ItemClient* pPackItem : pItem->GetHeldItems()) {
+							if (pPackItem && pPackItem->GetItemClass() == type) {
+								count += pPackItem->GetItemCount();
+							}
+						}
+					}
+				}
+				return count;
+			};
+
+			stringBuffer += LabeledText("Hunger", pCharInfo2->hungerlevel);
+			stringBuffer += LabeledText(" Food", itemcountbytype(ItemClass_Food));
+			stringBuffer += LabeledText(" Thirst", pCharInfo2->thirstlevel);
+			stringBuffer += LabeledText(" Drink", itemcountbytype(ItemClass_Drink));
+		}
 		else if (!_stricmp(Arg, "help")) {
 			WriteChatf("Welcome to MQ2Status");
 			WriteChatf("By \aoChatWithThisName\aw & \agSic\aw Exclusively for \arRedGuides\aw.");
@@ -345,7 +377,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\ao/status \agcurrency\aw: Reports how many of an alt currency you have.");
 			WriteChatf("\ao/status \agevolve / evolving\aw: Reports the evolution status of an item by name.");
 			WriteChatf("\ao/status \agfellowship\aw: This returns to your mq2window (does not eqbc/dannet) information on your fellowship");
-			WriteChatf("\ao/status \aggtribute\aw: or \agguildtribute\aw: Displays if your current Guild Tribute Status is On or Off and the current Guild Favor");
+			WriteChatf("\ao/status \aghunger / thirst\aw: Reports your hunger, how many food items you have, your thirst, and how many drink items you have.");
+			WriteChatf("\ao/status \aggtribute\aw: or \agguildtribute\aw: Displays if your current Guild Tribute Status is On or Off and the current Guild Favor.");
 			WriteChatf("\ao/status \aginvis\aw: Reports our Invis and IVU status, so we can check we are \"Double Invis\".");
 			WriteChatf("\ao/status \agitem\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your inventory.");
 			WriteChatf("\ao/status \agitembank\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your bank.");
