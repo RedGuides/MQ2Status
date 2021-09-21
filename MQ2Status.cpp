@@ -67,6 +67,31 @@ enum Subscription {
 	SUB_GOLD
 };
 
+// TODO remove once an appropriate function is in main/core.
+int ItemCountByType(int type) {
+	PcProfile* pcProfile = GetPcProfile();
+	int count = 0;
+	for (int i = InvSlot_FirstWornItem; i < InvSlot_Max; i++) {
+		// check top level slots
+		if (ItemClient* pItem = pcProfile->GetInventorySlot(i)) {
+			if (pItem->GetItemClass() == type) {
+				count += pItem->GetItemCount();
+			}
+
+			if (!pItem->IsContainer())
+				continue;
+
+			// check inside the container
+			for (ItemClient* pPackItem : pItem->GetHeldItems()) {
+				if (pPackItem && pPackItem->GetItemClass() == type) {
+					count += pPackItem->GetItemCount();
+				}
+			}
+		}
+	}
+	return count;
+};
+
 void StatusCmd(SPAWNINFO* pChar, char* szLine)
 {
 	std::string stringBuffer = ConnectedToReportOutput();
@@ -332,36 +357,10 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "hunger") || !_stricmp(Arg, "thirst")) {
-			// this would be better suited as a function in main/core to return itemcountbytype
-			// TODO: Remove lambda when code is in main/core
-			auto itemcountbytype = [](int type) {
-				int count = 0;
-				PcProfile* pChar2 = GetPcProfile();
-				for (int i = InvSlot_FirstWornItem; i < InvSlot_Max; i++) {
-					// check top level slots
-					if (ItemClient* pItem = pChar2->GetInventorySlot(i)) {
-						if (pItem->GetItemClass() == type) {
-							count += pItem->GetItemCount();
-						}
-
-						if (!pItem->IsContainer())
-							continue;
-
-						// check inside the container
-						for (ItemClient* pPackItem : pItem->GetHeldItems()) {
-							if (pPackItem && pPackItem->GetItemClass() == type) {
-								count += pPackItem->GetItemCount();
-							}
-						}
-					}
-				}
-				return count;
-			};
-
 			stringBuffer += LabeledText("Hunger", pCharInfo2->hungerlevel);
-			stringBuffer += LabeledText(" Food", itemcountbytype(ItemClass_Food));
+			stringBuffer += LabeledText(" Food", ItemCountByType(ItemClass_Food));
 			stringBuffer += LabeledText(" Thirst", pCharInfo2->thirstlevel);
-			stringBuffer += LabeledText(" Drink", itemcountbytype(ItemClass_Drink));
+			stringBuffer += LabeledText(" Drink", ItemCountByType(ItemClass_Drink));
 		}
 		else if (!_stricmp(Arg, "help")) {
 			WriteChatf("Welcome to MQ2Status");
