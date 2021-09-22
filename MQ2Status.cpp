@@ -1245,7 +1245,7 @@ PLUGIN_API void InitializePlugin()
 			EzCommand("/timed 10 /plugin MQ2Status Unload");
 	}
 	else {
-		AddCommand("/status", StatusCmd);
+		AddCommand("/status", StatusCmd, false, true, true);
 	}
 
 	DoINIThings();
