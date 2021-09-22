@@ -842,7 +842,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		else if (!_stricmp(Arg, "xp")) {
 			SPAWNINFO* pMe = (SPAWNINFO*)pLocalPlayer;
 			stringBuffer += LabeledText("Level", (int)pMe->Level);
-			stringBuffer += LabeledText(" XP", floor((pCharInfo->Exp * .001) * 100.0) / 100.0);
+			stringBuffer += LabeledText(" XP", pCharInfo->Exp / 1000.0f);
 			stringBuffer += LabeledText(" Banked AA", pCharInfo2->AAPoints);
 			stringBuffer += LabeledText(" AAXP", pCharInfo->AAExp * 0.001);
 		}
