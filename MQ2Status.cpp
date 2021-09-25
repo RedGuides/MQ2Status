@@ -67,6 +67,31 @@ enum Subscription {
 	SUB_GOLD
 };
 
+// TODO remove once an appropriate function is in main/core.
+int ItemCountByType(int type) {
+	PcProfile* pcProfile = GetPcProfile();
+	int count = 0;
+	for (int i = InvSlot_FirstWornItem; i < InvSlot_Max; i++) {
+		// check top level slots
+		if (ItemClient* pItem = pcProfile->GetInventorySlot(i)) {
+			if (pItem->GetItemClass() == type) {
+				count += pItem->GetItemCount();
+			}
+
+			if (!pItem->IsContainer())
+				continue;
+
+			// check inside the container
+			for (ItemClient* pPackItem : pItem->GetHeldItems()) {
+				if (pPackItem && pPackItem->GetItemClass() == type) {
+					count += pPackItem->GetItemCount();
+				}
+			}
+		}
+	}
+	return count;
+};
+
 void StatusCmd(SPAWNINFO* pChar, char* szLine)
 {
 	std::string stringBuffer = ConnectedToReportOutput();
@@ -331,6 +356,12 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\arIt does not appear we are in a fellowship.\aw");
 			}
 		}
+		else if (!_stricmp(Arg, "hunger") || !_stricmp(Arg, "thirst")) {
+			stringBuffer += LabeledText("Hunger", pCharInfo2->hungerlevel);
+			stringBuffer += LabeledText(" Food", ItemCountByType(ItemClass_Food));
+			stringBuffer += LabeledText(" Thirst", pCharInfo2->thirstlevel);
+			stringBuffer += LabeledText(" Drink", ItemCountByType(ItemClass_Drink));
+		}
 		else if (!_stricmp(Arg, "help")) {
 			WriteChatf("Welcome to MQ2Status");
 			WriteChatf("By \aoChatWithThisName\aw & \agSic\aw Exclusively for \arRedGuides\aw.");
@@ -345,7 +376,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\ao/status \agcurrency\aw: Reports how many of an alt currency you have.");
 			WriteChatf("\ao/status \agevolve / evolving\aw: Reports the evolution status of an item by name.");
 			WriteChatf("\ao/status \agfellowship\aw: This returns to your mq2window (does not eqbc/dannet) information on your fellowship");
-			WriteChatf("\ao/status \aggtribute\aw: or \agguildtribute\aw: Displays if your current Guild Tribute Status is On or Off and the current Guild Favor");
+			WriteChatf("\ao/status \aghunger / thirst\aw: Reports your hunger, how many food items you have, your thirst, and how many drink items you have.");
+			WriteChatf("\ao/status \aggtribute\aw: or \agguildtribute\aw: Displays if your current Guild Tribute Status is On or Off and the current Guild Favor.");
 			WriteChatf("\ao/status \aginvis\aw: Reports our Invis and IVU status, so we can check we are \"Double Invis\".");
 			WriteChatf("\ao/status \agitem\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your inventory.");
 			WriteChatf("\ao/status \agitembank\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your bank.");
@@ -810,7 +842,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		else if (!_stricmp(Arg, "xp")) {
 			SPAWNINFO* pMe = (SPAWNINFO*)pLocalPlayer;
 			stringBuffer += LabeledText("Level", (int)pMe->Level);
-			stringBuffer += LabeledText(" XP", floor((pCharInfo->Exp * .001) * 100.0) / 100.0);
+			stringBuffer += LabeledText(" XP", pCharInfo->Exp / 1000.0f);
 			stringBuffer += LabeledText(" Banked AA", pCharInfo2->AAPoints);
 			stringBuffer += LabeledText(" AAXP", pCharInfo->AAExp * 0.001);
 		}
@@ -1213,7 +1245,7 @@ PLUGIN_API void InitializePlugin()
 			EzCommand("/timed 10 /plugin MQ2Status Unload");
 	}
 	else {
-		AddCommand("/status", StatusCmd);
+		AddCommand("/status", StatusCmd, false, true, true);
 	}
 
 	DoINIThings();
