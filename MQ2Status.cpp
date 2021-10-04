@@ -1228,7 +1228,7 @@ bool IHaveSpa(int spa)
 	}
 
 	for (int i = 0; i < NUM_SHORT_BUFFS; i++) {
-		PSPELL pBuff = GetSpellByID(GetPcProfile()->Buff[i].SpellID);
+		PSPELL pBuff = GetSpellByID(GetPcProfile()->ShortBuff[i].SpellID);
 		if (!pBuff)
 			continue;
 		if (IsSPAEffect(pBuff, spa))
