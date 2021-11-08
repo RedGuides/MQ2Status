@@ -1271,7 +1271,6 @@ void MQ2StatusImGuiSettingsPanel()
 	ImGui::SameLine();
 	mq::imgui::HelpMarker("Sets if you want to display CWTN Class Plugins in your /status results.");
 
-
 	if (bShowPlugin) {
 		ImGui::Indent();
 		ImGui::Columns(2);
