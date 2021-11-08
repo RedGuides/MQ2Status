@@ -3,7 +3,7 @@
 //	/status help - returns help information for the / commands
 */
 #include <mq/Plugin.h>
-#include <sstream>
+#include <mq/imgui/ImGuiUtils.h>
 
 PreSetup("MQ2Status");
 PLUGIN_VERSION(2.0);
@@ -1238,6 +1238,55 @@ bool IHaveSpa(int spa)
 	return false;
 }
 
+struct PluginCheckbox {
+	const char* name;
+	bool* value;
+};
+
+static PluginCheckbox checkboxes[] = {
+	{ "Bard", &bShowBard },
+	{ "Beastlord", &bShowBeastlord },
+	{ "Berserker", &bShowBerserker },
+	{ "Cleric", &bShowCleric },
+	{ "Druid", &bShowDruid },
+	{ "Enchanter", &bShowEnchanter },
+	{ "Magician", &bShowMage },
+	{ "Monk", &bShowMonk },
+	{ "Necro", &bShowNecromancer },
+	{ "Paladin", &bShowPaladin },
+	{ "Ranger", &bShowRanger },
+	{ "Rogue", &bShowRogue },
+	{ "Shadowknight", &bShowShadowknight },
+	{ "Shaman", &bShowShaman },
+	{ "Warrior", &bShowWarrior },
+	{ "Wizard", &bShowWizard },
+};
+
+void MQ2StatusImGuiSettingsPanel()
+{
+	if (ImGui::Checkbox("Show Class Plugins", &bShowPlugin))
+	{
+		WritePrivateProfileBool("ShowPlugin", "Plugin", bShowPlugin, INIFileName);
+	}
+	ImGui::SameLine();
+	mq::imgui::HelpMarker("Sets if you want to display CWTN Class Plugins in your /status results.");
+
+
+	if (bShowPlugin) {
+		ImGui::Indent();
+		ImGui::Columns(2);
+		for (PluginCheckbox& cb : checkboxes)
+		{
+			if (ImGui::Checkbox(cb.name, cb.value))
+			{
+				WritePrivateProfileBool("ShowPlugin", cb.name, *cb.value, INIFileName);
+			}
+			ImGui::NextColumn();
+		}
+		ImGui::Columns(1);
+	}
+}
+
 PLUGIN_API void InitializePlugin()
 {
 	if (HaveAlias("/status")) {
@@ -1249,11 +1298,13 @@ PLUGIN_API void InitializePlugin()
 	}
 
 	DoINIThings();
+	AddSettingsPanel("plugins/Status", MQ2StatusImGuiSettingsPanel);
 }
 
 PLUGIN_API void ShutdownPlugin()
 {
 	RemoveCommand("/status");
+	RemoveSettingsPanel("plugins/Status");
 }
 
 bool VerifyINI(char* Section, char* Key, char* Default) {
