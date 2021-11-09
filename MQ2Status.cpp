@@ -1243,7 +1243,7 @@ struct PluginCheckbox {
 	bool* value;
 };
 
-static PluginCheckbox checkboxes[] = {
+static const PluginCheckbox checkboxes[] = {
 	{ "Bard", &bShowBard },
 	{ "Beastlord", &bShowBeastlord },
 	{ "Berserker", &bShowBerserker },
@@ -1274,7 +1274,7 @@ void MQ2StatusImGuiSettingsPanel()
 	if (bShowPlugin) {
 		ImGui::Indent();
 		ImGui::Columns(2);
-		for (PluginCheckbox& cb : checkboxes)
+		for (const PluginCheckbox& cb : checkboxes)
 		{
 			if (ImGui::Checkbox(cb.name, cb.value))
 			{
