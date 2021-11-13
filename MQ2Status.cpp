@@ -470,7 +470,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status item id 10037\"\aw.");
 			}
 			else if (ci_equals(Arg, "id")) {
-				IDCheck(szLine, "item");
+				stringBuffer += ItemCountStatusByID(szLine, "item");
 			}
 			else {
 				char* findItem = GetNextArg(szLine);
@@ -485,7 +485,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itemall id 10037\"\aw.");
 			}
 			else if (ci_equals(Arg, "id")) {
-				stringBuffer += IDCheck(szLine, "itemall");
+				stringBuffer += ItemCountStatusByID(szLine, "itemall");
 			}
 			else {
 				char* findItem = GetNextArg(szLine);
@@ -500,7 +500,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itembank id 10037\"\aw.");
 			}
 			else if (ci_equals(Arg, "id")) {
-				IDCheck(szLine, "itembank");
+				stringBuffer += ItemCountStatusByID(szLine, "itembank");
 			}
 			else {
 				char* findItem = GetNextArg(szLine);
