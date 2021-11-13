@@ -443,7 +443,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 			else if (ci_equals(Arg, "id")) {
 				const char* findItemIDname = GetNextArg(szLine, 2);
-				int iItemID = atoi(findItemIDname);
+				int iItemID = GetIntFromString(findItemIDname, 0);
 				ItemClient* findItemName = FindItemByID(iItemID);
 				if (findItemName) {
 					findItemIDname = findItemName->GetName();
@@ -471,7 +471,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 			else if (ci_equals(Arg, "id")) {
 				const char* findItemIDname = GetNextArg(szLine, 2);
-				int iItemID = atoi(findItemIDname);
+				int iItemID = GetIntFromString(findItemIDname, 0);
 				ItemClient* findItemName = FindItemByID(iItemID);
 				if (findItemName) {
 					findItemIDname = findItemName->GetName();
@@ -499,7 +499,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 			else if (ci_equals(Arg, "id")) {
 				const char* findItemIDname = GetNextArg(szLine, 2);
-				int iItemID = atoi(findItemIDname);
+				int iItemID = GetIntFromString(findItemIDname, 0);
 				ItemClient* findItemName = FindItemByID(iItemID);
 				if (findItemName) {
 					findItemIDname = findItemName->GetName();
