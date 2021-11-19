@@ -93,7 +93,13 @@ int ItemCountByType(int type) {
 };
 
 
-std::string ItemCountStatusByID(const char* Arg, const char* type)
+const enum eItemCountStatusType {
+	Item,
+	ItemAll,
+	ItemBank
+};
+
+std::string ItemCountStatusByID(const char* Arg, const int type)
 {
 	std::string output;
 	const char* findItemIDname = GetNextArg(Arg, 2);
@@ -105,12 +111,19 @@ std::string ItemCountStatusByID(const char* Arg, const char* type)
 	}
 
 	if (iItemID) {
-		if (!_stricmp(Arg, "item"))
-			output = LabeledText(findItemIDname, FindItemCountByID(iItemID));
-		else if (!_stricmp(type, "itemall"))
-			output = LabeledText(findItemIDname, FindItemCountByID(iItemID) + FindBankItemCountByID(iItemID));
-		else if (!_stricmp(type, "itembank"))
-			output = LabeledText(findItemIDname, FindBankItemCountByID(iItemID));
+		switch (type) {
+			case eItemCountStatusType::Item:
+				output = LabeledText(findItemIDname, FindItemCountByID(iItemID));
+				break;
+			case eItemCountStatusType::ItemAll:
+				output = LabeledText(findItemIDname, FindItemCountByID(iItemID) + FindBankItemCountByID(iItemID));
+				break;
+			case eItemCountStatusType::ItemBank:
+				output = LabeledText(findItemIDname, FindBankItemCountByID(iItemID));
+				break;
+			default:
+				break;
+		}
 	}
 	else {
 		WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item ID to search for.\aw");
@@ -470,7 +483,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status item id 10037\"\aw.");
 			}
 			else if (ci_equals(Arg, "id")) {
-				stringBuffer += ItemCountStatusByID(szLine, "item");
+				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::Item);
 			}
 			else {
 				char* findItem = GetNextArg(szLine);
@@ -485,7 +498,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itemall id 10037\"\aw.");
 			}
 			else if (ci_equals(Arg, "id")) {
-				stringBuffer += ItemCountStatusByID(szLine, "itemall");
+				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemAll);
 			}
 			else {
 				char* findItem = GetNextArg(szLine);
@@ -500,7 +513,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itembank id 10037\"\aw.");
 			}
 			else if (ci_equals(Arg, "id")) {
-				stringBuffer += ItemCountStatusByID(szLine, "itembank");
+				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemBank);
 			}
 			else {
 				char* findItem = GetNextArg(szLine);
