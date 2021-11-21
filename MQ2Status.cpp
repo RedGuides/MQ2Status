@@ -92,6 +92,47 @@ int ItemCountByType(int type) {
 	return count;
 };
 
+
+const enum eItemCountStatusType {
+	Item,
+	ItemAll,
+	ItemBank
+};
+
+std::string ItemCountStatusByID(const char* Arg, const int type)
+{
+	std::string output;
+	const char* findItemIDname = GetNextArg(Arg, 2);
+	int iItemID = GetIntFromString(findItemIDname, 0);
+	ItemClient* findItemName = FindItemByID(iItemID);
+
+	if (findItemName) {
+		findItemIDname = findItemName->GetName();
+	}
+
+	if (iItemID) {
+		switch (type) {
+			case eItemCountStatusType::Item:
+				output = LabeledText(findItemIDname, FindItemCountByID(iItemID));
+				break;
+			case eItemCountStatusType::ItemAll:
+				output = LabeledText(findItemIDname, FindItemCountByID(iItemID) + FindBankItemCountByID(iItemID));
+				break;
+			case eItemCountStatusType::ItemBank:
+				output = LabeledText(findItemIDname, FindBankItemCountByID(iItemID));
+				break;
+			default:
+				break;
+		}
+	}
+	else {
+		WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item ID to search for.\aw");
+		WriteChatf("\ao[MQ2Status] \arExample: \ay\"/status itembank id 10037\"\aw.");
+	}
+
+	return output;
+}
+
 void StatusCmd(SPAWNINFO* pChar, char* szLine)
 {
 	std::string stringBuffer = ConnectedToReportOutput();
@@ -382,6 +423,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\ao/status \agitem\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your inventory.");
 			WriteChatf("\ao/status \agitembank\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your bank.");
 			WriteChatf("\ao/status \agitemall\aw \ayitem name\aw: reports how many \ayitem name\aw you have in your bank + inventory combined.");
+			WriteChatf("\ao/status \agitem \ap/\ag itemall \ap/\ag itembank \awsearching can also use \ayID #\aw. \arExample: \ay\"/status itembank id 10037\"");
 			WriteChatf("\ao/status \agkrono\aw: Reports how many krono we have.");
 			WriteChatf("\ao/status \aglogin\aw: Reports your login account name.");
 			WriteChatf("\ao/status \agmerc\aw: Reports mercenary information including class, and role.");
@@ -438,6 +480,10 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (!strlen(Arg)) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
+				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status item id 10037\"\aw.");
+			}
+			else if (ci_equals(Arg, "id")) {
+				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::Item);
 			}
 			else {
 				char* findItem = GetNextArg(szLine);
@@ -449,10 +495,14 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (!strlen(Arg)) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
+				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itemall id 10037\"\aw.");
+			}
+			else if (ci_equals(Arg, "id")) {
+				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemAll);
 			}
 			else {
 				char* findItem = GetNextArg(szLine);
-				stringBuffer += LabeledText(findItem, FindItemCountByName(findItem) + FindBankItemCountByName(findItem, 0)); // FindItemCountByName
+				stringBuffer += LabeledText(findItem, FindItemCountByName(findItem) + FindBankItemCountByName(findItem, 0)); // FindBankItemCountByName requires bExact
 			}
 		}
 		else if (!_stricmp(Arg, "itembank")) {
@@ -460,6 +510,10 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (!strlen(Arg)) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
+				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itembank id 10037\"\aw.");
+			}
+			else if (ci_equals(Arg, "id")) {
+				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemBank);
 			}
 			else {
 				char* findItem = GetNextArg(szLine);
