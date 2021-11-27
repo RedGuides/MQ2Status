@@ -183,7 +183,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					// is this achievement complete?
 					const bool bComplete = IsAchievementComplete(AchieveByID);
 					stringBuffer += LabeledText("Achieve", AchieveByID->name.c_str());
-					stringBuffer += LabeledText(" Status", (bComplete ? " Completed" : " \arIncomplete\ax"));
+					stringBuffer += LabeledText(" Status", (bComplete ? " Completed" : GetColorCode('r', false) + " Incomplete"));
 
 					// if the achievement is not complete, output what we're missing from it.
 					if (!bComplete) {
@@ -195,7 +195,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 						if (!info)
 							// debug
-							stringBuffer += GetColorCode('R', false) + "We don't appear to have that information available.";
+							stringBuffer += GetColorCode('r', false) + "We don't appear to have that information available.";
 						else {
 							// we want to go through these achievements and check their completion status
 							for (int i = 0; i < Achieve->componentsByType[AchievementComponentCompletion].GetCount(); i++) {
