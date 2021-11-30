@@ -1507,7 +1507,9 @@ const std::map<std::string, int>  mAltCurrency = {
 	{ "warlord's symbol", ALTCURRENCY_WARLORDSSYMBOL },
 	{ "overseer", ALTCURRENCY_OVERSEERTETRADRACHM },
 	{ "warforged emblem", ALTCURRENCY_WARFORGEDEMBLEM },
-	{ "restless mark", ALTCURRENCY_RESTLESSMARK }
+	{ "restless mark", ALTCURRENCY_RESTLESSMARK },
+	{ "scarlet marks", ALTCURRENCY_SCARLETMARKS },
+	{ "medals of conflict", ALTCURRENCY_MEDALSOFCONFLICT },
 };
 
 int AltCurrencyCheck(std::string tempArg) {
