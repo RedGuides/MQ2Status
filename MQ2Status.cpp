@@ -193,10 +193,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 						// we need to get the individual achievement/component info
 						const SingleAchievementAndComponentsInfo* info = achievemanager.GetAchievementClientInfoByIndex(achievementIndex);
 
-						if (!info)
-							// debug
-							stringBuffer += GetColorCode('r', false) + "We don't appear to have that information available.";
-						else {
+						if (info) {
 							// we want to go through these achievements and check their completion status
 							for (int i = 0; i < Achieve->componentsByType[AchievementComponentCompletion].GetCount(); i++) {
 								const AchievementComponent& component = Achieve->componentsByType[AchievementComponentCompletion][i];
@@ -294,10 +291,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 							// we need to get the individual achievement/component info
 							const SingleAchievementAndComponentsInfo* info = achievemanager.GetAchievementClientInfoByIndex(achievementIndex);
 
-							if (!info)
-								// debug
-								stringBuffer += GetColorCode('R', false) + "We don't appear to have that information available.";
-							else {
+							if (info) {
 								// we want to go through these achievements and check their completion status
 								for (int i = 0; i < Achieve->componentsByType[AchievementComponentCompletion].GetCount(); i++) {
 									const AchievementComponent& component = Achieve->componentsByType[AchievementComponentCompletion][i];
