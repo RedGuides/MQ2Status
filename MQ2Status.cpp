@@ -1203,7 +1203,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += GetColorCode('g', false) + " IVU" + GetColorCode('w', false);
 			}
 		}
-		EzCommand(&stringBuffer[0]);
+		if (!stringBuffer.empty())
+			EzCommand(&stringBuffer[0]);
 	}
 }
 
