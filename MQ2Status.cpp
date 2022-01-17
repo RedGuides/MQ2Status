@@ -209,6 +209,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					WriteChatf("\ao[MQ2Status] \arPlease provide a valid Achievement by name or ID to search for.");
 					WriteChatf("\ao[MQ2Status] \arExample: \agNorrathian Explorer\ar or \ag100000050\ar.");
 					WriteChatf("\ao[MQ2Status] \arKeep in mind achievements, by name will report the first achievement it finds with that name.");
+					stringBuffer.clear();
 				}
 			}
 		}
@@ -269,6 +270,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (Arg[0] == 0) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid \agCollection Item\ag to search for.\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: \agKromzek Bracer\ar, \agLucky Clover\ar, \agAir-Infused Opal\ar, etc.\aw");
+				stringBuffer.clear();
 			}
 			else {
 				char* collectionItem = GetNextArg(szLine);
@@ -323,6 +325,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			GetArg(Arg, szLine, 2);
 			if (Arg[0] == 0) { // if an Argument after currency wasn't made, we need to ask for one
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Currency Name to search for.\aw");
+				stringBuffer.clear();
 			}
 			else { // We need to lowercase and be able to do a "find" in case someone puts an "s" on a currency
 				std::string tempArg = GetNextArg(szLine); // convert our arg to string for transform
@@ -475,6 +478,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status item id 10037\"\aw.");
+				stringBuffer.clear();
 			}
 			else if (ci_equals(Arg, "id")) {
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::Item);
@@ -490,6 +494,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itemall id 10037\"\aw.");
+				stringBuffer.clear();
 			}
 			else if (ci_equals(Arg, "id")) {
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemAll);
@@ -505,6 +510,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itembank id 10037\"\aw.");
+				stringBuffer.clear();
 			}
 			else if (ci_equals(Arg, "id")) {
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemBank);
@@ -692,6 +698,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			GetArg(Arg, szLine, 2);
 			if (Arg[0] == 0) { // if an Argument after quest/task wasn't made, we need to ask for one
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Quest/Task Name to search for.\aw");
+				stringBuffer.clear();
 			}
 			else {
 				const char* tempArg = GetNextArg(szLine);
@@ -771,6 +778,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \ayImportant!\aw To display an individual plugin, you will need \agShow Plugin On\aw as well as the individual class plugin set to on.");
 				WriteChatf("\ao[MQ2Status] \arExamples: \agShow\ay Plugin, \agShow\ay Warrior, \agShow\ay Cleric, \agShow\ay Paladin, \agShow\ay Ranger, \agShow\ay Shadowknight, \agShow\ay Druid, \agShow\ay Monk, \agShow\ay Bard\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: \agShow\ay Rogue, \agShow\ay Shaman, \agShow\ay Necromancer, \agShow\ay Wizard, \agShow\ay Magician, \agShow\ay Enchanter, \agShow\ay Beastlord, \agShow\ay Berserker\aw");
+				stringBuffer.clear();
 			}
 		}
 		else if (!_stricmp(Arg, "skill")) {
@@ -778,6 +786,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (!strlen(Arg)) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid skill to search for.\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Baking, Fishing, Jewelry Making, etc.\aw");
+				stringBuffer.clear();
 			}
 			else {
 				char* skillname = GetNextArg(szLine);
@@ -796,9 +805,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (!strlen(Arg)) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid MQ2Status stat\aw");
 				WriteChatf("\ao[MQ2Status] \aoThese are currently: \aghstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, and weight.\aw");
+				stringBuffer.clear();
 			}
 			else {
-				bool bFound = true;
 				if (!_stricmp(Arg, "hstr")) {
 					stringBuffer += LabeledText("HSTR", pCharInfo->HeroicSTRBonus);
 				}
@@ -844,10 +853,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					stringBuffer += LabeledText(" Remaining", (long)(pCharInfo->STR - pCharInfo->CurrWeight));
 				}
 				else {
-					WriteChatf("\arThat was not a valid stat, \agplease use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, or weight for this option!\aw");
-					bFound = false;
-				}
-				if (bFound) {
+					WriteChatf("\ao[MQ2Status] \arThat was not a valid stat, \agplease use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, or weight for this option!\aw");
+					stringBuffer.clear();
 				}
 			}
 		}
@@ -1338,7 +1345,7 @@ PLUGIN_API void InitializePlugin()
 {
 	if (HaveAlias("/status")) {
 		WriteChatf("\ar[\a-tMQ2Status\ar]\ao:: \arIt appears you already have an Alias for \ap/status\ar please type \"\ay/alias /status delete\ar\" then reload this plugin.");
-			EzCommand("/timed 10 /plugin MQ2Status Unload");
+		EzCommand("/timed 10 /plugin MQ2Status Unload");
 	}
 	else {
 		AddCommand("/status", StatusCmd, false, true, true);
