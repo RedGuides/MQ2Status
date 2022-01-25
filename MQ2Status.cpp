@@ -92,8 +92,7 @@ int ItemCountByType(int type) {
 	return count;
 };
 
-
-const enum eItemCountStatusType {
+enum eItemCountStatusType {
 	Item,
 	ItemAll,
 	ItemBank
