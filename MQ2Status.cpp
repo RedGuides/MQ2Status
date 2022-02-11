@@ -134,7 +134,7 @@ std::string ItemCountStatusByID(const char* Arg, const int type)
 
 void StatusCmd(SPAWNINFO* pChar, char* szLine)
 {
-	std::string stringBuffer = ConnectedToReportOutput();
+	std::string stringBuffer;
 	if (!bConnectedToDannet && !bConnectedToEQBC) return;
 
 	bool classPlugin = false; // Only true if there is a class plugin for this class, and the plugin was loaded.
@@ -208,7 +208,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					WriteChatf("\ao[MQ2Status] \arPlease provide a valid Achievement by name or ID to search for.");
 					WriteChatf("\ao[MQ2Status] \arExample: \agNorrathian Explorer\ar or \ag100000050\ar.");
 					WriteChatf("\ao[MQ2Status] \arKeep in mind achievements, by name will report the first achievement it finds with that name.");
-					stringBuffer.clear();
 				}
 			}
 		}
@@ -269,7 +268,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (Arg[0] == 0) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid \agCollection Item\ag to search for.\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: \agKromzek Bracer\ar, \agLucky Clover\ar, \agAir-Infused Opal\ar, etc.\aw");
-				stringBuffer.clear();
 			}
 			else {
 				char* collectionItem = GetNextArg(szLine);
@@ -324,7 +322,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			GetArg(Arg, szLine, 2);
 			if (Arg[0] == 0) { // if an Argument after currency wasn't made, we need to ask for one
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Currency Name to search for.\aw");
-				stringBuffer.clear();
 			}
 			else { // We need to lowercase and be able to do a "find" in case someone puts an "s" on a currency
 				std::string tempArg = GetNextArg(szLine); // convert our arg to string for transform
@@ -477,7 +474,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status item id 10037\"\aw.");
-				stringBuffer.clear();
 			}
 			else if (ci_equals(Arg, "id")) {
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::Item);
@@ -493,7 +489,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itemall id 10037\"\aw.");
-				stringBuffer.clear();
 			}
 			else if (ci_equals(Arg, "id")) {
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemAll);
@@ -509,7 +504,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itembank id 10037\"\aw.");
-				stringBuffer.clear();
 			}
 			else if (ci_equals(Arg, "id")) {
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemBank);
@@ -697,7 +691,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			GetArg(Arg, szLine, 2);
 			if (Arg[0] == 0) { // if an Argument after quest/task wasn't made, we need to ask for one
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Quest/Task Name to search for.\aw");
-				stringBuffer.clear();
 			}
 			else {
 				const char* tempArg = GetNextArg(szLine);
@@ -777,7 +770,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \ayImportant!\aw To display an individual plugin, you will need \agShow Plugin On\aw as well as the individual class plugin set to on.");
 				WriteChatf("\ao[MQ2Status] \arExamples: \agShow\ay Plugin, \agShow\ay Warrior, \agShow\ay Cleric, \agShow\ay Paladin, \agShow\ay Ranger, \agShow\ay Shadowknight, \agShow\ay Druid, \agShow\ay Monk, \agShow\ay Bard\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: \agShow\ay Rogue, \agShow\ay Shaman, \agShow\ay Necromancer, \agShow\ay Wizard, \agShow\ay Magician, \agShow\ay Enchanter, \agShow\ay Beastlord, \agShow\ay Berserker\aw");
-				stringBuffer.clear();
 			}
 		}
 		else if (!_stricmp(Arg, "skill")) {
@@ -785,7 +777,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (!strlen(Arg)) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid skill to search for.\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Baking, Fishing, Jewelry Making, etc.\aw");
-				stringBuffer.clear();
 			}
 			else {
 				char* skillname = GetNextArg(szLine);
@@ -804,7 +795,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (!strlen(Arg)) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid MQ2Status stat\aw");
 				WriteChatf("\ao[MQ2Status] \aoThese are currently: \aghstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, and weight.\aw");
-				stringBuffer.clear();
 			}
 			else {
 				if (!_stricmp(Arg, "hstr")) {
@@ -853,7 +843,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				}
 				else {
 					WriteChatf("\ao[MQ2Status] \arThat was not a valid stat, \agplease use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, or weight for this option!\aw");
-					stringBuffer.clear();
 				}
 			}
 		}
@@ -905,10 +894,12 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		}
 		else {
 			WriteChatf("\ao[MQ2Status] \ap%s\ar is not a valid option. \ag /status help \aw for available options", Arg);
-			stringBuffer.clear(); // this clears out the /bc or /dgtell all
 		}
-		if (!stringBuffer.empty())
+
+		if (!stringBuffer.empty()) {
+			stringBuffer = ConnectedToReportOutput() + stringBuffer;
 			EzCommand(&stringBuffer[0]);
+		}
 	}
 	else {
 #if !defined(ROF2EMU) // Subscription doesn't exist in EMU'
@@ -1202,8 +1193,11 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += GetColorCode('g', false) + " IVU" + GetColorCode('w', false);
 			}
 		}
-		if (!stringBuffer.empty())
+
+		if (!stringBuffer.empty()) {
+			stringBuffer = ConnectedToReportOutput() + stringBuffer;
 			EzCommand(&stringBuffer[0]);
+		}
 	}
 }
 
