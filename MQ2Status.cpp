@@ -92,8 +92,7 @@ int ItemCountByType(int type) {
 	return count;
 };
 
-
-const enum eItemCountStatusType {
+enum eItemCountStatusType {
 	Item,
 	ItemAll,
 	ItemBank
@@ -135,7 +134,7 @@ std::string ItemCountStatusByID(const char* Arg, const int type)
 
 void StatusCmd(SPAWNINFO* pChar, char* szLine)
 {
-	std::string stringBuffer = ConnectedToReportOutput();
+	std::string stringBuffer;
 	if (!bConnectedToDannet && !bConnectedToEQBC) return;
 
 	bool classPlugin = false; // Only true if there is a class plugin for this class, and the plugin was loaded.
@@ -798,7 +797,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \aoThese are currently: \aghstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, and weight.\aw");
 			}
 			else {
-				bool bFound = true;
 				if (!_stricmp(Arg, "hstr")) {
 					stringBuffer += LabeledText("HSTR", pCharInfo->HeroicSTRBonus);
 				}
@@ -844,10 +842,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					stringBuffer += LabeledText(" Remaining", (long)(pCharInfo->STR - pCharInfo->CurrWeight));
 				}
 				else {
-					WriteChatf("\arThat was not a valid stat, \agplease use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, or weight for this option!\aw");
-					bFound = false;
-				}
-				if (bFound) {
+					WriteChatf("\ao[MQ2Status] \arThat was not a valid stat, \agplease use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, or weight for this option!\aw");
 				}
 			}
 		}
@@ -899,10 +894,12 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		}
 		else {
 			WriteChatf("\ao[MQ2Status] \ap%s\ar is not a valid option. \ag /status help \aw for available options", Arg);
-			stringBuffer.clear(); // this clears out the /bc or /dgtell all
 		}
-		if (!stringBuffer.empty())
+
+		if (!stringBuffer.empty()) {
+			stringBuffer = ConnectedToReportOutput() + stringBuffer;
 			EzCommand(&stringBuffer[0]);
+		}
 	}
 	else {
 #if !defined(ROF2EMU) // Subscription doesn't exist in EMU'
@@ -1196,7 +1193,11 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += GetColorCode('g', false) + " IVU" + GetColorCode('w', false);
 			}
 		}
-		EzCommand(&stringBuffer[0]);
+
+		if (!stringBuffer.empty()) {
+			stringBuffer = ConnectedToReportOutput() + stringBuffer;
+			EzCommand(&stringBuffer[0]);
+		}
 	}
 }
 
@@ -1338,7 +1339,7 @@ PLUGIN_API void InitializePlugin()
 {
 	if (HaveAlias("/status")) {
 		WriteChatf("\ar[\a-tMQ2Status\ar]\ao:: \arIt appears you already have an Alias for \ap/status\ar please type \"\ay/alias /status delete\ar\" then reload this plugin.");
-			EzCommand("/timed 10 /plugin MQ2Status Unload");
+		EzCommand("/timed 10 /plugin MQ2Status Unload");
 	}
 	else {
 		AddCommand("/status", StatusCmd, false, true, true);
