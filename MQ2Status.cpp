@@ -134,6 +134,7 @@ std::string ItemCountStatusByID(const char* Arg, const int type)
 
 void StatusCmd(SPAWNINFO* pChar, char* szLine)
 {
+	std::string outputcmd = ConnectedToReportOutput();
 	std::string stringBuffer;
 	if (!bConnectedToDannet && !bConnectedToEQBC) return;
 
@@ -897,7 +898,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		}
 
 		if (!stringBuffer.empty()) {
-			stringBuffer = ConnectedToReportOutput() + stringBuffer;
+			stringBuffer = outputcmd + stringBuffer;
 			EzCommand(&stringBuffer[0]);
 		}
 	}
@@ -1193,9 +1194,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += GetColorCode('g', false) + " IVU" + GetColorCode('w', false);
 			}
 		}
-
 		if (!stringBuffer.empty()) {
-			stringBuffer = ConnectedToReportOutput() + stringBuffer;
+			stringBuffer = outputcmd + stringBuffer;
 			EzCommand(&stringBuffer[0]);
 		}
 	}
