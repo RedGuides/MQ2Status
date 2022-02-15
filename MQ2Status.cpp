@@ -1258,7 +1258,7 @@ inline float PercentMana(SPAWNINFO* pSpawn)
 int GetSubscriptionLevel()
 {
 	if (EQADDR_SUBSCRIPTIONTYPE) {
-		if (uintptr_t dwsubtype = *(DWORD*)EQADDR_SUBSCRIPTIONTYPE) {
+		if (uintptr_t dwsubtype = *(uintptr_t*)EQADDR_SUBSCRIPTIONTYPE) {
 			BYTE subtype = *(BYTE*)dwsubtype;
 			return subtype;
 		}
