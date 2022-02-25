@@ -39,7 +39,6 @@ bool VerifyINI(char* Section, char* Key, char* Default);
 inline float PercentHealth(SPAWNINFO* pSpawn);
 inline float PercentEndurance(SPAWNINFO* pSpawn);
 inline float PercentMana(SPAWNINFO* pSpawn);
-int GetSubscriptionLevel();
 void DoINIThings();
 void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption, char* INIsection);
 void PutCommas(char* szLine);
@@ -1253,17 +1252,6 @@ inline float PercentMana(SPAWNINFO* pSpawn)
 	//TODO: Verify / Update for EMU
 	if (pSpawn->GetMaxMana() <= 0) return 100.0f;
 	return ((float)pSpawn->GetCurrentMana() / (float)pSpawn->GetMaxMana()) * 100.0f;
-}
-
-int GetSubscriptionLevel()
-{
-	if (EQADDR_SUBSCRIPTIONTYPE) {
-		if (uintptr_t dwsubtype = *(uintptr_t*)EQADDR_SUBSCRIPTIONTYPE) {
-			BYTE subtype = *(BYTE*)dwsubtype;
-			return subtype;
-		}
-	}
-	return 0;
 }
 
 bool IHaveSpa(int spa)
