@@ -1256,16 +1256,8 @@ inline float PercentMana(SPAWNINFO* pSpawn)
 
 bool IHaveSpa(int spa)
 {
-	for (int i = 0; i < NUM_LONG_BUFFS; i++) {
-		PSPELL pBuff = GetSpellByID(GetPcProfile()->Buff[i].SpellID);
-		if (!pBuff)
-			continue;
-		if (IsSPAEffect(pBuff, spa))
-			return true;
-	}
-
-	for (int i = 0; i < NUM_SHORT_BUFFS; i++) {
-		PSPELL pBuff = GetSpellByID(GetPcProfile()->ShortBuff[i].SpellID);
+	for (int i = 0; i < MAX_TOTAL_BUFFS; i++) {
+		PSPELL pBuff = GetSpellByID(GetPcProfile()->GetEffect(i).SpellID);
 		if (!pBuff)
 			continue;
 		if (IsSPAEffect(pBuff, spa))
