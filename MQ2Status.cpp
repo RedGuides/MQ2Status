@@ -427,13 +427,16 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			if (size) {
 				for (const auto& x : mEquipInvSlotName) {
 					if (ci_equals(x.first, slot)) {
+						// did we find a valid gear slot?
+						bFound = true;
 						if (ItemClient* item = FindItemBySlot(x.second)) {
-							bFound = true;
-							// itemtagsize is 512 in FormatItemLink
+							// itemtagsize is 512 in FormatItemLink, so we need this buffer that size as well
 							char buffer[512] = {};
 							FormatItemLink(buffer, 512, item);
 							stringBuffer += LabeledText(x.first, buffer);
-
+						}
+						else {
+							stringBuffer += LabeledText(x.first, " is empty.");
 						}
 					}
 				}
