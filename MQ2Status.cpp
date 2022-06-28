@@ -131,6 +131,36 @@ std::string ItemCountStatusByID(const char* Arg, const int type)
 	return output;
 }
 
+const std::map<std::string, int>  mEquipInvSlotName {
+	{ "Ammo",         eInventorySlot::InvSlot_Ammo },
+	{ "Arms",         eInventorySlot::InvSlot_Arms },
+	{ "Back",         eInventorySlot::InvSlot_Back },
+	{ "Charm",        eInventorySlot::InvSlot_Charm },
+	{ "Chest",        eInventorySlot::InvSlot_Chest },
+	{ "Face",         eInventorySlot::InvSlot_Face },
+	{ "Feet",         eInventorySlot::InvSlot_Feet },
+	{ "Hands",        eInventorySlot::InvSlot_Hands },
+	{ "Head",         eInventorySlot::InvSlot_Head },
+	{ "Left Ear",     eInventorySlot::InvSlot_LeftEar },
+	{ "Left Finger",  eInventorySlot::InvSlot_LeftFingers },
+	{ "Left Ring",    eInventorySlot::InvSlot_LeftFingers },
+	{ "Left Wrist",   eInventorySlot::InvSlot_LeftWrist },
+	{ "Legs",         eInventorySlot::InvSlot_Legs },
+	{ "Neck",         eInventorySlot::InvSlot_Neck },
+	{ "Powersource",  eInventorySlot::InvSlot_PowerSource },
+	{ "Primary",      eInventorySlot::InvSlot_Primary },
+	{ "Mainhand",     eInventorySlot::InvSlot_Primary },
+	{ "Range",        eInventorySlot::InvSlot_Range },
+	{ "Right Ear",    eInventorySlot::InvSlot_RightEar },
+	{ "Right Finger", eInventorySlot::InvSlot_RightFingers },
+	{ "Right Ring",   eInventorySlot::InvSlot_RightFingers },
+	{ "Right Wrist",  eInventorySlot::InvSlot_RightWrist },
+	{ "Secondary",    eInventorySlot::InvSlot_Secondary },
+	{ "Offhand",      eInventorySlot::InvSlot_Secondary },
+	{ "Shoulders",    eInventorySlot::InvSlot_Shoulders },
+	{ "Waist",        eInventorySlot::InvSlot_Waist },
+};
+
 void StatusCmd(SPAWNINFO* pChar, char* szLine)
 {
 	std::string outputcmd = ConnectedToReportOutput();
@@ -354,12 +384,12 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "evolve") || !_stricmp(Arg, "evolving")) {
-			if (!strlen(Arg)) {
+			char* findItem = GetNextArg(szLine);
+			if (!strlen(findItem)) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to check your evolving status on\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Threadbare Weighted Tabard, Djarn's Tarnished Amethyst Ring, Wrathful Harasser's Earring of Rallos Zek, etc.\aw");
 			}
 			else {
-				char* findItem = GetNextArg(szLine);
 				if (ItemClient* myItem = FindItemByName(findItem)) {
 					if (IsEvolvingItem(myItem)) {
 						stringBuffer += LabeledText("Item", myItem->GetName());
@@ -388,6 +418,36 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				}
 			} else {
 				WriteChatf("\arIt does not appear we are in a fellowship.\aw");
+			}
+		}
+		else if (!_stricmp(Arg, "gear")) {
+			bool bFound = false;
+			char* slot = GetNextArg(szLine);
+			size_t size = strlen(slot);
+			if (size) {
+				for (const auto& x : mEquipInvSlotName) {
+					if (ci_equals(x.first, slot)) {
+						// did we find a valid gear slot?
+						bFound = true;
+						if (ItemClient* item = FindItemBySlot(x.second)) {
+							// itemtagsize is 512 in FormatItemLink, so we need this buffer that size as well
+							char buffer[512] = {};
+							FormatItemLink(buffer, 512, item);
+							stringBuffer += LabeledText(x.first, buffer);
+						}
+						else {
+							stringBuffer += LabeledText(x.first, " is empty.");
+						}
+					}
+				}
+			}
+
+			// this bool check also covers if !strlen as found would be false
+			if (!bFound) {
+				if (size)
+					WriteChatf("\ao[MQ2Status] \ag%s\ar is invalid.", slot);
+				WriteChatf("\ao[MQ2Status] \arPlease provide a valid gear slot.");
+				WriteChatf("\ao[MQ2Status] \arExamples: primary, secondary, left ring, etc.\aw");
 			}
 		}
 		else if (!_stricmp(Arg, "hunger") || !_stricmp(Arg, "thirst")) {
@@ -454,14 +514,14 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "invis")) {
-			if (IHaveSpa(12) || IHaveSpa(314)) {
+			if (IHaveSpa(eEQSPA::SPA_INVIS) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS)) {
 				stringBuffer += GetColorCode('g', false) + "INVIS" + GetColorCode('x', false) + "::";
 			}
 			else {
 				stringBuffer += GetColorCode('r', false) + "INVIS" + GetColorCode('x', false) + "::";
 			}
 
-			if (IHaveSpa(28) || IHaveSpa(315)) {
+			if (IHaveSpa(eEQSPA::SPA_INVIS_TO_UNDEAD) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS_UNDEAD)) {
 				stringBuffer += GetColorCode('g', false) + "IVU";
 			}
 			else {
@@ -883,7 +943,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			stringBuffer += LabeledText(" Favor", prettyFavor);
 		}
 		else if (!_stricmp(Arg, "xp")) {
-			SPAWNINFO* pMe = (SPAWNINFO*)pLocalPlayer;
+			PlayerClient* pMe = pLocalPlayer;
 			stringBuffer += LabeledText("Level", (int)pMe->Level);
 			stringBuffer += LabeledText(" XP", pCharInfo->Exp / 1000.0f);
 			stringBuffer += LabeledText(" Banked AA", pCharInfo2->AAPoints);
@@ -1186,10 +1246,10 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			// Am I Invis?
 		if (pCharInfo->pSpawn->HideMode) {
 			stringBuffer += GetColorCode('o', false) + " Hidden:" + GetColorCode('w', false);
-			if (IHaveSpa(12) || IHaveSpa(314)) {
+			if (IHaveSpa(eEQSPA::SPA_INVIS) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS)) {
 				stringBuffer += GetColorCode('g', false) + " INVIS" + GetColorCode('w', false);
 			}
-			if (IHaveSpa(28) || IHaveSpa(315)) {
+			if (IHaveSpa(eEQSPA::SPA_INVIS_TO_UNDEAD) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS_UNDEAD)) {
 				stringBuffer += GetColorCode('g', false) + " IVU" + GetColorCode('w', false);
 			}
 		}
