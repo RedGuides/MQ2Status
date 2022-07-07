@@ -514,14 +514,14 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "invis")) {
-			if (IHaveSpa(eEQSPA::SPA_INVIS) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS)) {
+			if (IHaveSpa(eEQSPA::SPA_INVISIBILITY) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS)) {
 				stringBuffer += GetColorCode('g', false) + "INVIS" + GetColorCode('x', false) + "::";
 			}
 			else {
 				stringBuffer += GetColorCode('r', false) + "INVIS" + GetColorCode('x', false) + "::";
 			}
 
-			if (IHaveSpa(eEQSPA::SPA_INVIS_TO_UNDEAD) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS_UNDEAD)) {
+			if (IHaveSpa(eEQSPA::SPA_INVIS_VS_UNDEAD) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS_UNDEAD)) {
 				stringBuffer += GetColorCode('g', false) + "IVU";
 			}
 			else {
@@ -1246,10 +1246,10 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			// Am I Invis?
 		if (pCharInfo->pSpawn->HideMode) {
 			stringBuffer += GetColorCode('o', false) + " Hidden:" + GetColorCode('w', false);
-			if (IHaveSpa(eEQSPA::SPA_INVIS) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS)) {
+			if (IHaveSpa(eEQSPA::SPA_INVISIBILITY) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS)) {
 				stringBuffer += GetColorCode('g', false) + " INVIS" + GetColorCode('w', false);
 			}
-			if (IHaveSpa(eEQSPA::SPA_INVIS_TO_UNDEAD) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS_UNDEAD)) {
+			if (IHaveSpa(eEQSPA::SPA_INVIS_VS_UNDEAD) || IHaveSpa(eEQSPA::SPA_IMPROVED_INVIS_UNDEAD)) {
 				stringBuffer += GetColorCode('g', false) + " IVU" + GetColorCode('w', false);
 			}
 		}
