@@ -883,9 +883,11 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					stringBuffer += LabeledText(" Max HPs", me->HPMax);
 					stringBuffer += LabeledText(" Health Pct", PercentHealth(me));
 				}
+#if HAS_LUCK_STAT
 				else if (!_stricmp(Arg, "luck")) {
 					stringBuffer += LabeledText("Luck", pCharInfo->LCK);
 				}
+#endif
 				else if (!_stricmp(Arg, "mana")) {
 					stringBuffer += LabeledText("Current Mana", me->GetCurrentMana());
 					stringBuffer += LabeledText(" Max Mana", me->GetMaxMana());
