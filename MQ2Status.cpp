@@ -45,6 +45,7 @@ void PutCommas(char* szLine);
 void ReverseString(char* szLine);
 void StatusCmd(SPAWNINFO* pChar, char* szLine);
 int AltCurrencyCheck(std::string tempArg);
+std::string GetSpellUpgradeType(int level);
 
 template <typename T>
 std::string LabeledText(const std::string& Label, T Value);
@@ -177,7 +178,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 	GetArg(Arg, szLine, 1);
 	GetArg(Arg2, szLine, 2);
 	GetArg(Arg3, szLine, 3);
-	PCHARINFO pCharInfo = GetCharInfo();
+	PcClient* pCharInfo = GetCharInfo();
 	PcProfile* pCharInfo2 = GetPcProfile();
 	if (strlen(szLine)) {
 		if (!_stricmp(Arg, "aa")) {
@@ -487,6 +488,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\ao/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
 			WriteChatf("\ao/status \agskill\aw \ayskill name\aw: reports out your current skill value for \ay skill name\aw.");
 			WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, Luck, Weight.");
+			WriteChatf("\ao/status \agspell \ayoption\aw: takes a spell by name, or level, and reports the spells you have that match. Useful to see what ranks of spells you have.");
 #if !defined(ROF2EMU)
 			WriteChatf("\ao/status \agsub\aw: Reports our subscription level, and if we are gold, how many days are left.");
 #endif
@@ -848,6 +850,59 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					}
 				}
 			}
+		}
+		else if (!_stricmp(Arg, "spell")) {
+			char* nextArg = GetNextArg(szLine);
+			int iArg = atoi(nextArg);
+			int mylevel = pCharInfo->GetLevel();
+			int myclass = pLocalPlayer->GetClass();
+			if (!strlen(nextArg) || iArg > mylevel) {
+				WriteChatf("\ao[MQ2Status] \arPlease provide a valid spell by name or level to search for.\aw");
+			}
+			else if (!IsNumber(nextArg)) {
+				bool bFound = false;
+				stringBuffer += " " + GetColorCode('r', false) + "(" + GetSpellUpgradeType(iArg) + ") ";
+				for (int i = 0; i < NUM_BOOK_SLOTS; i++) {
+					if (pCharInfo2->SpellBook[i] == -1)
+						continue;
+
+					if (EQ_Spell* thisSpell = GetSpellByID(pCharInfo2->SpellBook[i])) {
+						if (ci_starts_with(thisSpell->Name, nextArg)) {
+							bFound = true;
+							stringBuffer += LabeledText(thisSpell->Name, static_cast<int>(thisSpell->ClassLevel[myclass]));
+							
+							// unfortunately we CAN'T break early here, since there are spells with the same damn name.
+						}
+					}
+				}
+
+				if (!bFound) {
+					WriteChatf("\ao[MQ2Status] \arWe did not find a matching spell for %s.\aw", nextArg);
+					return;
+				}
+			}
+			else {
+				stringBuffer += LabeledText("Level", iArg);
+				stringBuffer += " " + GetColorCode('r', false) + "(" + GetSpellUpgradeType(iArg) + ") ";
+				int count = 0;
+				for (int i = 0; i < NUM_BOOK_SLOTS; i++) {
+					if (pCharInfo2->SpellBook[i] == -1)
+						continue;
+
+					if (EQ_Spell* thisSpell = GetSpellByID(pCharInfo2->SpellBook[i])) {
+
+
+						if (thisSpell->ClassLevel[myclass] == iArg) {
+							// we want to alternate green/orange for readability
+							// we can't use the for loop "i" here due to if spells are out of "order" in the spellbook
+							// Cool Spell -- Cooler Spell Rk. III -- Suck Spell Rk. II
+							stringBuffer += GetColorCode('y', false) + " -- " + (count % 2 == 0 ? GetColorCode('g', false)  : GetColorCode('o', false) ) + thisSpell->Name;
+							count++;
+						}
+					}
+				}
+			}
+
 		}
 		else if (!_stricmp(Arg, "stat")) {
 			SPAWNINFO* me = GetCharInfo()->pSpawn;
@@ -1557,4 +1612,27 @@ int AltCurrencyCheck(std::string tempArg) {
 		}
 	}
 	return -1;
+}
+
+std::string GetSpellUpgradeType(int level) {
+	int iLastDigit = level % 10;
+	switch (iLastDigit) {
+		case 0:
+		case 5:
+			return "Glowing";
+		case 1:
+		case 6:
+			return "Minor";
+		case 2:
+		case 7:
+			return "Lesser";
+		case 3:
+		case 8:
+			return "Median";
+		case 4:
+		case 9:
+			return "Greater";
+		default:
+			return "";
+	}
 }
