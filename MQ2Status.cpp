@@ -867,11 +867,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 						if (EQ_Spell* thisSpell = GetSpellByID(pCharInfo2->SpellBook[i])) {
 							if (ci_starts_with(thisSpell->Name, spellsearch)) {
 								bFound = true;
-
 								if (thisSpell->ClassLevel[myclass] > 70)
-									stringBuffer += fmt::format(" {}{}{}{} ", GetColorCode('r', false),"(", GetSpellUpgradeType(thisSpell->ClassLevel[myclass]), ")");
+									stringBuffer += fmt::format(" {}({}) ", GetColorCode('r', false), GetSpellUpgradeType(thisSpell->ClassLevel[myclass]));
 								stringBuffer += LabeledText(thisSpell->Name, static_cast<int>(thisSpell->ClassLevel[myclass]));
-
 								// unfortunately we CAN'T break early here, since there are spells with the same damn name.
 							}
 						}
@@ -881,12 +879,11 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				// discs
 				for (int j = 0; j < NUM_COMBAT_ABILITIES; j++) {
 					if (pCombatSkillsSelectWnd->ShouldDisplayThisSkill(j)) {
-
 						if (EQ_Spell* thisSpell = GetSpellByID(pPCData->GetCombatAbility(j))) {
 							if (ci_starts_with(thisSpell->Name, spellsearch)) {
 								bFound = true;
 								if (thisSpell->ClassLevel[myclass] > 70)
-									stringBuffer += fmt::format(" {}{}{}{} ", GetColorCode('r', false), "(", GetSpellUpgradeType(thisSpell->ClassLevel[myclass]), ")");
+									stringBuffer += fmt::format(" {}({}) ", GetColorCode('r', false), GetSpellUpgradeType(thisSpell->ClassLevel[myclass]));
 								stringBuffer += LabeledText(thisSpell->Name, static_cast<int>(thisSpell->ClassLevel[myclass]));
 								// unfortunately we CAN'T break early here, since there are spells with the same damn name.
 							}
