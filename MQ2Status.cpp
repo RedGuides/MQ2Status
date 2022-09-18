@@ -852,48 +852,48 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "spell")) {
-			char* nextArg = GetNextArg(szLine);
-			int iArg = atoi(nextArg);
-			int mylevel = pCharInfo->GetLevel();
+			char* spellsearch = GetNextArg(szLine);
+			int iArg = GetIntFromString(spellsearch, 0);
 			int myclass = pLocalPlayer->GetClass();
-			if (!strlen(nextArg) || iArg > mylevel) {
+			if (!strlen(spellsearch) || iArg > pCharInfo->GetLevel()) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid spell by name or level to search for.\aw");
 			}
-			else if (!IsNumber(nextArg)) {
+			else if (!IsNumber(spellsearch)) {
 				bool bFound = false;
-				stringBuffer += " " + GetColorCode('r', false) + "(" + GetSpellUpgradeType(iArg) + ") ";
+				stringBuffer += " " + GetColorCode('r', false) + "(";
 
 				// spells
 				for (int i = 0; i < NUM_BOOK_SLOTS; i++) {
-					if (pCharInfo2->SpellBook[i] == -1)
-						continue;
+					if (pCharInfo2->SpellBook[i] != -1) {
+						if (EQ_Spell* thisSpell = GetSpellByID(pCharInfo2->SpellBook[i])) {
+							if (ci_starts_with(thisSpell->Name, spellsearch)) {
+								bFound = true;
+								stringBuffer +=  GetSpellUpgradeType(thisSpell->ClassLevel[myclass]) + ") ";
+								stringBuffer += LabeledText(thisSpell->Name, static_cast<int>(thisSpell->ClassLevel[myclass]));
 
-					if (EQ_Spell* thisSpell = GetSpellByID(pCharInfo2->SpellBook[i])) {
-						if (ci_starts_with(thisSpell->Name, nextArg)) {
-							bFound = true;
-							stringBuffer += LabeledText(thisSpell->Name, static_cast<int>(thisSpell->ClassLevel[myclass]));
-							
-							// unfortunately we CAN'T break early here, since there are spells with the same damn name.
+								// unfortunately we CAN'T break early here, since there are spells with the same damn name.
+							}
 						}
 					}
 				}
 
 				// discs
 				for (int j = 0; j < NUM_COMBAT_ABILITIES; j++) {
-					if (!pCombatSkillsSelectWnd->ShouldDisplayThisSkill(j))
-						continue;
+					if (pCombatSkillsSelectWnd->ShouldDisplayThisSkill(j)) {
 
-					if (EQ_Spell* thisSpell = GetSpellByID(pPCData->GetCombatAbility(j))) {
-						if (ci_starts_with(thisSpell->Name, nextArg)) {
-							bFound = true;
-							stringBuffer += LabeledText(thisSpell->Name, static_cast<int>(thisSpell->ClassLevel[myclass]));
-							// unfortunately we CAN'T break early here, since there are spells with the same damn name.
+						if (EQ_Spell* thisSpell = GetSpellByID(pPCData->GetCombatAbility(j))) {
+							if (ci_starts_with(thisSpell->Name, spellsearch)) {
+								bFound = true;
+								stringBuffer += GetSpellUpgradeType(thisSpell->ClassLevel[myclass]) + ") ";
+								stringBuffer += LabeledText(thisSpell->Name, static_cast<int>(thisSpell->ClassLevel[myclass]));
+								// unfortunately we CAN'T break early here, since there are spells with the same damn name.
+							}
 						}
 					}
 				}
 
 				if (!bFound) {
-					WriteChatf("\ao[MQ2Status] \arWe did not find a matching spell/disc for %s.\aw", nextArg);
+					WriteChatf("\ao[MQ2Status] \arWe did not find a matching spell/disc for %s.\aw", spellsearch);
 					return;
 				}
 			}
@@ -904,37 +904,34 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 				// spells
 				for (int i = 0; i < NUM_BOOK_SLOTS; i++) {
-					if (pCharInfo2->SpellBook[i] == -1)
-						continue;
-
-					if (EQ_Spell* thisSpell = GetSpellByID(pCharInfo2->SpellBook[i])) {
-						if (thisSpell->ClassLevel[myclass] == iArg) {
-							// we want to alternate green/orange for readability, using count will always alternate
-							// we can't use the for loop "i" here due to if spells are out of "order" in the spellbook
-							// Cool Spell -- Cooler Spell Rk. III -- Suck Spell Rk. II
-							stringBuffer += GetColorCode('y', false) + " -- " + (count % 2 == 0 ? GetColorCode('g', false)  : GetColorCode('o', false) ) + thisSpell->Name;
-							count++;
+					if (pCharInfo2->SpellBook[i] != -1) {
+						if (EQ_Spell* thisSpell = GetSpellByID(pCharInfo2->SpellBook[i])) {
+							if (thisSpell->ClassLevel[myclass] == iArg) {
+								// we want to alternate green/orange for readability, using count will always alternate
+								// we can't use the for loop "i" here due to if spells are out of "order" in the spellbook
+								// Cool Spell -- Cooler Spell Rk. III -- Suck Spell Rk. II
+								stringBuffer += GetColorCode('y', false) + " -- " + (count % 2 == 0 ? GetColorCode('g', false) : GetColorCode('o', false)) + thisSpell->Name;
+								count++;
+							}
 						}
 					}
 				}
 
 				// discs
 				for (int j = 0; j < NUM_COMBAT_ABILITIES; j++) {
-					if (!pCombatSkillsSelectWnd->ShouldDisplayThisSkill(j))
-						continue;
-
-					if (EQ_Spell* thisSpell = GetSpellByID(pPCData->GetCombatAbility(j))) {
-						if (thisSpell->ClassLevel[myclass] == iArg) {
-							// we want to alternate green/orange for readability, using count will always alternate
-							// Cool Disc -- Cooler Disc Rk. III -- Suck Disc Rk. II
-							stringBuffer += GetColorCode('y', false) + " -- " + (count % 2 == 0 ? GetColorCode('g', false) : GetColorCode('o', false)) + thisSpell->Name;
-							count++;
+					if (pCombatSkillsSelectWnd->ShouldDisplayThisSkill(j)) {
+						if (EQ_Spell* thisSpell = GetSpellByID(pPCData->GetCombatAbility(j))) {
+							if (thisSpell->ClassLevel[myclass] == iArg) {
+								// we want to alternate green/orange for readability, using count will always alternate
+								// Cool Disc -- Cooler Disc Rk. III -- Suck Disc Rk. II
+								stringBuffer += GetColorCode('y', false) + " -- " + (count % 2 == 0 ? GetColorCode('g', false) : GetColorCode('o', false)) + thisSpell->Name;
+								count++;
+							}
 						}
 					}
 				}
 
 			}
-
 		}
 		else if (!_stricmp(Arg, "stat")) {
 			SPAWNINFO* me = GetCharInfo()->pSpawn;
