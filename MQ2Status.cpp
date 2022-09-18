@@ -855,7 +855,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			char* spellsearch = GetNextArg(szLine);
 			int iArg = GetIntFromString(spellsearch, 0);
 			int myclass = pLocalPlayer->GetClass();
-			if (!strlen(spellsearch) || iArg > pCharInfo->GetLevel()) {
+			if (spellsearch[0] == '\0' || iArg > pCharInfo->GetLevel()) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid spell by name or level to search for.\aw");
 			}
 			else if (!IsNumber(spellsearch)) {
@@ -930,7 +930,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 						}
 					}
 				}
-
 			}
 		}
 		else if (!_stricmp(Arg, "stat")) {
