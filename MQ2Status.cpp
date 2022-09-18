@@ -860,7 +860,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 			else if (!IsNumber(spellsearch)) {
 				bool bFound = false;
-				stringBuffer += " " + GetColorCode('r', false) + "(";
 
 				// spells
 				for (int i = 0; i < NUM_BOOK_SLOTS; i++) {
@@ -868,7 +867,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 						if (EQ_Spell* thisSpell = GetSpellByID(pCharInfo2->SpellBook[i])) {
 							if (ci_starts_with(thisSpell->Name, spellsearch)) {
 								bFound = true;
-								stringBuffer +=  GetSpellUpgradeType(thisSpell->ClassLevel[myclass]) + ") ";
+
+								if (thisSpell->ClassLevel[myclass] > 70)
+									stringBuffer += fmt::format(" {}{}{}{} ", GetColorCode('r', false),"(", GetSpellUpgradeType(thisSpell->ClassLevel[myclass]), ")");
 								stringBuffer += LabeledText(thisSpell->Name, static_cast<int>(thisSpell->ClassLevel[myclass]));
 
 								// unfortunately we CAN'T break early here, since there are spells with the same damn name.
@@ -884,7 +885,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 						if (EQ_Spell* thisSpell = GetSpellByID(pPCData->GetCombatAbility(j))) {
 							if (ci_starts_with(thisSpell->Name, spellsearch)) {
 								bFound = true;
-								stringBuffer += GetSpellUpgradeType(thisSpell->ClassLevel[myclass]) + ") ";
+								if (thisSpell->ClassLevel[myclass] > 70)
+									stringBuffer += fmt::format(" {}{}{}{} ", GetColorCode('r', false), "(", GetSpellUpgradeType(thisSpell->ClassLevel[myclass]), ")");
 								stringBuffer += LabeledText(thisSpell->Name, static_cast<int>(thisSpell->ClassLevel[myclass]));
 								// unfortunately we CAN'T break early here, since there are spells with the same damn name.
 							}
@@ -899,18 +901,32 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 			else {
 				stringBuffer += LabeledText("Level", iArg);
-				stringBuffer += " " + GetColorCode('r', false) + "(" + GetSpellUpgradeType(iArg) + ") ";
 				int count = 0;
 
 				// spells
+				bool bCheckSpellUpgradeType = true;
 				for (int i = 0; i < NUM_BOOK_SLOTS; i++) {
 					if (pCharInfo2->SpellBook[i] != -1) {
 						if (EQ_Spell* thisSpell = GetSpellByID(pCharInfo2->SpellBook[i])) {
 							if (thisSpell->ClassLevel[myclass] == iArg) {
+								// Rank II/III spells start at lvl 71
+								if (bCheckSpellUpgradeType && thisSpell->ClassLevel[myclass] > 70) {
+									stringBuffer += fmt::format(" {}{}{}{} ", GetColorCode('r', false), "(", GetSpellUpgradeType(thisSpell->ClassLevel[myclass]), ")");
+									// we only want to putput that the (Upgrade Type) once
+									bCheckSpellUpgradeType = false;
+								}
+
 								// we want to alternate green/orange for readability, using count will always alternate
 								// we can't use the for loop "i" here due to if spells are out of "order" in the spellbook
+								stringBuffer += fmt::format("{} {} ", GetColorCode('y', false), "--");
+								if (count % 2 == 0) {
+									stringBuffer += GetColorCode('g', false);
+								}
+								else {
+									stringBuffer += GetColorCode('o', false);
+								}
 								// Cool Spell -- Cooler Spell Rk. III -- Suck Spell Rk. II
-								stringBuffer += GetColorCode('y', false) + " -- " + (count % 2 == 0 ? GetColorCode('g', false) : GetColorCode('o', false)) + thisSpell->Name;
+								stringBuffer += thisSpell->Name;
 								count++;
 							}
 						}
@@ -918,13 +934,29 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				}
 
 				// discs
+				bCheckSpellUpgradeType = true;
 				for (int j = 0; j < NUM_COMBAT_ABILITIES; j++) {
 					if (pCombatSkillsSelectWnd->ShouldDisplayThisSkill(j)) {
 						if (EQ_Spell* thisSpell = GetSpellByID(pPCData->GetCombatAbility(j))) {
 							if (thisSpell->ClassLevel[myclass] == iArg) {
+								// Rank II/III spells start at lvl 71
+								if (bCheckSpellUpgradeType && thisSpell->ClassLevel[myclass] > 70) {
+									stringBuffer += fmt::format(" {}{}{}{} ", GetColorCode('r', false), "(", GetSpellUpgradeType(thisSpell->ClassLevel[myclass]), ")");
+									// we only want to putput that the (Upgrade Type) once
+									bCheckSpellUpgradeType = false;
+								}
+
 								// we want to alternate green/orange for readability, using count will always alternate
-								// Cool Disc -- Cooler Disc Rk. III -- Suck Disc Rk. II
-								stringBuffer += GetColorCode('y', false) + " -- " + (count % 2 == 0 ? GetColorCode('g', false) : GetColorCode('o', false)) + thisSpell->Name;
+								// we can't use the for loop "i" here due to if spells are out of "order" in the spellbook
+								stringBuffer += fmt::format("{} {} ", GetColorCode('y', false) , "--");
+								if (count % 2 == 0) {
+									stringBuffer += GetColorCode('g', false);
+								}
+								else {
+									stringBuffer += GetColorCode('o', false);
+								}
+								// Cool Spell -- Cooler Spell Rk. III -- Suck Spell Rk. II
+								stringBuffer += thisSpell->Name;
 								count++;
 							}
 						}
