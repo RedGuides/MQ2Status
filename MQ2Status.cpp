@@ -908,7 +908,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 							if (thisSpell->ClassLevel[myclass] == iArg) {
 								// Rank II/III spells start at lvl 71
 								if (bCheckSpellUpgradeType && thisSpell->ClassLevel[myclass] > 70) {
-									stringBuffer += fmt::format(" {}{}{}{} ", GetColorCode('r', false), "(", GetSpellUpgradeType(thisSpell->ClassLevel[myclass]), ")");
+									stringBuffer += fmt::format(" {}({}) ", GetColorCode('r', false), GetSpellUpgradeType(thisSpell->ClassLevel[myclass]));
 									// we only want to putput that the (Upgrade Type) once
 									bCheckSpellUpgradeType = false;
 								}
@@ -938,7 +938,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 							if (thisSpell->ClassLevel[myclass] == iArg) {
 								// Rank II/III spells start at lvl 71
 								if (bCheckSpellUpgradeType && thisSpell->ClassLevel[myclass] > 70) {
-									stringBuffer += fmt::format(" {}{}{}{} ", GetColorCode('r', false), "(", GetSpellUpgradeType(thisSpell->ClassLevel[myclass]), ")");
+									stringBuffer += fmt::format(" {}({}) ", GetColorCode('r', false), GetSpellUpgradeType(thisSpell->ClassLevel[myclass]));
 									// we only want to putput that the (Upgrade Type) once
 									bCheckSpellUpgradeType = false;
 								}
