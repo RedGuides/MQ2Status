@@ -1615,10 +1615,12 @@ std::string GetColorCode(char Color, bool Dark)
 const std::map<std::string, int>  mAltCurrency = {
 
 	{ "doubloon", ALTCURRENCY_DOUBLOONS },
-	{ "orux", ALTCURRENCY_ORUX },
+	{ "orux", ALTCURRENCY_ORUX }, // spelling of plural in currency window
+	{ "orum", ALTCURRENCY_ORUX }, // spelling of singular item in inventory
 	{ "phosphene", ALTCURRENCY_PHOSPHENES },
 	{ "phosphite", ALTCURRENCY_PHOSPHITES },
 	{ "faycitum", ALTCURRENCY_FAYCITES },
+	{ "faycetum", ALTCURRENCY_FAYCITES }, // spelling of item in inventory
 	{ "chronobine", ALTCURRENCY_CHRONOBINES },
 	{ "silver token", ALTCURRENCY_SILVERTOKENS },
 	{ "gold token", ALTCURRENCY_GOLDTOKENS },
@@ -1655,13 +1657,22 @@ const std::map<std::string, int>  mAltCurrency = {
 	{ "froststone ducat", ALTCURRENCY_FROSTSTONEDUCAT },
 	{ "warlord's symbol", ALTCURRENCY_WARLORDSSYMBOL },
 	{ "overseer", ALTCURRENCY_OVERSEERTETRADRACHM },
-	{ "warforged emblem", ALTCURRENCY_WARFORGEDEMBLEM },
 	{ "restless mark", ALTCURRENCY_RESTLESSMARK },
-	{ "scarlet marks", ALTCURRENCY_SCARLETMARKS },
+	{ "warforged emblem", ALTCURRENCY_WARFORGEDEMBLEM },
+	{ "scarlet mark", ALTCURRENCY_SCARLETMARKS },
 	{ "medals of conflict", ALTCURRENCY_MEDALSOFCONFLICT },
 };
 
 int AltCurrencyCheck(std::string tempArg) {
+	// to cover plural usage we are going to strip any ending 's' from the word
+	// the items in inventory vs in our currency window differ
+	if (tempArg.back() == 's')
+		tempArg.pop_back();
+
+	if (tempArg.back() == 'x') {
+		tempArg.pop_back();
+		tempArg += 'm';
+	}
 
 	for (auto& key_val : mAltCurrency) {
 		if (tempArg.find(key_val.first) != std::string::npos) {
