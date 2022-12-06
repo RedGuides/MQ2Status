@@ -1661,6 +1661,8 @@ const std::map<std::string, int>  mAltCurrency = {
 	{ "warforged emblem", ALTCURRENCY_WARFORGEDEMBLEM },
 	{ "scarlet mark", ALTCURRENCY_SCARLETMARKS },
 	{ "medals of conflict", ALTCURRENCY_MEDALSOFCONFLICT },
+	{ "shaded specie", ALTCURRENCY_SHADEDSPECIE },
+	{ "spiritual medallion", ALTCURRENCY_SPIRITUALMEDALLION },
 };
 
 int AltCurrencyCheck(std::string tempArg) {
