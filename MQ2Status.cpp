@@ -774,6 +774,59 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += tempTask;
 			}
 		}
+		else if (!_stricmp(Arg, "queststep") || !_stricmp(Arg, "taskstep")) {
+			GetArg(Arg, szLine, 2);
+			if (Arg[0] == 0) { // if an Argument after quest/task wasn't made, we need to ask for one
+				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Quest/Task Name to search for.\aw");
+			}
+			else {
+				std::string quest = GetNextArg(szLine);
+				char buffer[MAX_STRING] = {};
+				const int iElements = 20;
+				bool bReportNull = true;
+
+				for (int i = 0; i < MAX_SHARED_TASK_ENTRIES; ++i)
+				{
+					const auto& task = pTaskManager->SharedTaskEntries[i];
+					auto taskStatus = pTaskManager->GetTaskStatus(pLocalPC, i, task.TaskSystem);
+					if (ci_find_substr(task.TaskTitle, quest) != -1) {
+
+						for (int j = 0; j < iElements; j++)
+						{
+							if (taskStatus->CurrentCounts[j] < task.Elements[j].RequiredCount && !task.Elements[j].bOptional) {
+								pTaskManager->GetElementDescription(&task.Elements[j], buffer);
+								if (buffer[0]) {
+									stringBuffer += LabeledText(task.TaskTitle, buffer);
+									bReportNull = false;
+								}
+							}
+						}
+					}
+				}
+
+				for (int i = 0; i < MAX_QUEST_ENTRIES; ++i)
+				{
+					const auto& task = pTaskManager->QuestEntries[i];
+					auto taskStatus = pTaskManager->GetTaskStatus(pLocalPC, i, task.TaskSystem);
+					if (ci_find_substr(task.TaskTitle, quest) != -1) {
+
+						for (int j = 0; j < iElements; j++)
+						{
+							if (taskStatus->CurrentCounts[j] < task.Elements[j].RequiredCount && !task.Elements[j].bOptional) {
+								pTaskManager->GetElementDescription(&task.Elements[j], buffer);
+								if (buffer[0]) {
+									stringBuffer += LabeledText(task.TaskTitle, buffer);
+									bReportNull = false;
+								}
+							}
+						}
+					}
+				}
+
+				if (bReportNull)
+					stringBuffer += LabeledText(quest.c_str(), "NULL");
+			}
+		}
 		else if (!_stricmp(Arg, "show")) {
 			if (!_stricmp(Arg2, "plugin")) {
 				ParseBoolArg(Arg, Arg2, Arg3, &bShowPlugin, "ShowPlugin");
