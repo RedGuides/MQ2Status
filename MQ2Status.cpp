@@ -485,6 +485,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\ao/status \agmoney \aw or \agplat\aw: Reports how much plat you have.");
 			WriteChatf("\ao/status \agparcel\aw: Reports our \"Parcel\" status.");
 			WriteChatf("\ao/status \agquest\aw or \agtask\aw \ayQuest name\aw: Reports if you have a quest/task matching \ayQuest name\aw.");
+			WriteChatf("\ao/status \agqueststep\aw or \agtaskstep\aw \ayQuest name\aw: Reports what step you are on if you have a quest/task matching \ayQuest name\aw.");
 			WriteChatf("\ao/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
 			WriteChatf("\ao/status \agskill\aw \ayskill name\aw: reports out your current skill value for \ay skill name\aw.");
 			WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, Luck, Weight.");
@@ -784,39 +785,46 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				char buffer[MAX_STRING] = {};
 				const int iElements = 20;
 				bool bReportNull = true;
+				bool bBreak = false;
 
-				for (int i = 0; i < MAX_SHARED_TASK_ENTRIES; ++i)
-				{
+				for (int i = 0; i < MAX_SHARED_TASK_ENTRIES; ++i) {
 					const auto& task = pTaskManager->SharedTaskEntries[i];
 					auto taskStatus = pTaskManager->GetTaskStatus(pLocalPC, i, task.TaskSystem);
 					if (ci_find_substr(task.TaskTitle, quest) != -1) {
-
-						for (int j = 0; j < iElements; j++)
-						{
-							if (taskStatus->CurrentCounts[j] < task.Elements[j].RequiredCount && !task.Elements[j].bOptional) {
+						for (int j = 0; j < iElements; j++) {
+							int iCurrCount = taskStatus->CurrentCounts[j];
+							int iReqCount = task.Elements[j].RequiredCount;
+							if (!bBreak && iCurrCount < iReqCount && !task.Elements[j].bOptional) {
 								pTaskManager->GetElementDescription(&task.Elements[j], buffer);
 								if (buffer[0]) {
 									stringBuffer += LabeledText(task.TaskTitle, buffer);
+									stringBuffer += LabeledText(" Curr", iCurrCount);
+									stringBuffer += LabeledText(" Rec", iReqCount);
 									bReportNull = false;
+									// We only want to report the first step we find.
+									bBreak = true;
 								}
 							}
 						}
 					}
 				}
 
-				for (int i = 0; i < MAX_QUEST_ENTRIES; ++i)
-				{
+				for (int i = 0; i < MAX_QUEST_ENTRIES; ++i) {
 					const auto& task = pTaskManager->QuestEntries[i];
 					auto taskStatus = pTaskManager->GetTaskStatus(pLocalPC, i, task.TaskSystem);
 					if (ci_find_substr(task.TaskTitle, quest) != -1) {
-
-						for (int j = 0; j < iElements; j++)
-						{
-							if (taskStatus->CurrentCounts[j] < task.Elements[j].RequiredCount && !task.Elements[j].bOptional) {
+						for (int j = 0; j < iElements; j++) {
+							if (!bBreak && taskStatus->CurrentCounts[j] < task.Elements[j].RequiredCount && !task.Elements[j].bOptional) {
 								pTaskManager->GetElementDescription(&task.Elements[j], buffer);
 								if (buffer[0]) {
+									int iCurrCount = taskStatus->CurrentCounts[j];
+									int iReqCount = task.Elements[j].RequiredCount;
 									stringBuffer += LabeledText(task.TaskTitle, buffer);
+									stringBuffer += LabeledText(" Curr", iCurrCount);
+									stringBuffer += LabeledText(" Rec", iReqCount);
 									bReportNull = false;
+									// We only want to report the first step we find.
+									bBreak = true;
 								}
 							}
 						}
