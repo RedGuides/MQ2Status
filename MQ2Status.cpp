@@ -203,7 +203,6 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					Achieve = GetAchievementById(id);
 				}
 				else {
-					WriteChatf("%s", NextArg);
 					Achieve = GetAchievementByName(NextArg);
 					if (Achieve) {
 						id = Achieve->id;
