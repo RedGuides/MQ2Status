@@ -785,8 +785,8 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 								pTaskManager->GetElementDescription(&task.Elements[j], buffer);
 								if (buffer[0]) {
 									stringBuffer += LabeledText(task.TaskTitle, buffer);
-									stringBuffer += LabeledText(" Curr", iCurrCount);
-									stringBuffer += LabeledText(" Rec", iReqCount);
+									stringBuffer += LabeledText(" Have", iCurrCount);
+									stringBuffer += LabeledText(" Need", iReqCount);
 									bFoundMatch = true;
 									// We only want to report the first step we find.
 									//bBreak = true;
