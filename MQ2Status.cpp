@@ -192,7 +192,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 			int id = 0;
 			// if there is no second argument, we're going to give them the total completed achievement score
-			if (NextArg[0] == 0) {
+			if (NextArg[0] == '\0') {
 				stringBuffer += LabeledText("Score", achievemanager.completedAchievementScore);
 				stringBuffer += GetColorCode('g', false) + " Points";
 			}
@@ -297,7 +297,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "collected") || !_stricmp(Arg, "collection")) {
-			if (NextArg[0] == 0) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid \agCollection Item\ag to search for.\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: \agKromzek Bracer\ar, \agLucky Clover\ar, \agAir-Infused Opal\ar, etc.\aw");
 			}
@@ -350,7 +350,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "currency")) {
-			if (NextArg[0] == 0) { // if an Argument after currency wasn't made, we need to ask for one
+			if (NextArg[0] == '\0') { // if an Argument after currency wasn't made, we need to ask for one
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Currency Name to search for.\aw");
 			}
 			else { // We need to lowercase and be able to do a "find" in case someone puts an "s" on a currency
@@ -384,7 +384,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "evolve") || !_stricmp(Arg, "evolving")) {
-			if (NextArg[0] == 0) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to check your evolving status on\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Threadbare Weighted Tabard, Djarn's Tarnished Amethyst Ring, Wrathful Harasser's Earring of Rallos Zek, etc.\aw");
 			}
@@ -529,7 +529,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "item")) {
-			if (NextArg[0] == 0) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status item id 10037\"\aw.");
@@ -542,7 +542,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "itemall")) {
-			if (NextArg[0] == 0) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itemall id 10037\"\aw.");
@@ -555,7 +555,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "itembank")) {
-			if (NextArg[0] == 0) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itembank id 10037\"\aw.");
@@ -742,7 +742,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "quest") || !_stricmp(Arg, "task")) {
-			if (NextArg[0] == 0) { // if an Argument after quest/task wasn't made, we need to ask for one
+			if (NextArg[0] == '\0') { // if an Argument after quest/task wasn't made, we need to ask for one
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Quest/Task Name to search for.\aw");
 			}
 			else {
@@ -765,7 +765,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "queststep") || !_stricmp(Arg, "taskstep")) {
-			if (NextArg[0] == 0) { // if an Argument after quest/task wasn't made, we need to ask for one
+			if (NextArg[0] == '\0') { // if an Argument after quest/task wasn't made, we need to ask for one
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Quest/Task Name to search for.\aw");
 			}
 			else {
@@ -1009,7 +1009,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "stat")) {
-			if (Arg2[0] == 0) {
+			if (Arg2[0] == '\0) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid MQ2Status stat\aw");
 				WriteChatf("\ao[MQ2Status] \aoThese are currently: \aghstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, and weight.\aw");
 			}
