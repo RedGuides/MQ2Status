@@ -259,15 +259,15 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				std::string cfInfo;
 				std::string cfTimeRemainHMS;
 				std::string cfZoneLongName;
-				if (unsigned long cfTimeRemain = pLocalPlayer->CampfireTimestamp - GetFastTime()) {
-					unsigned long Hrs = ((cfTimeRemain / 60) / 60);
+				if (int cfTimeRemain = pLocalPlayer->CampfireTimestamp - GetFastTime()) {
+					int Hrs = ((cfTimeRemain / 60) / 60);
 					std::string sHrs = std::to_string(Hrs);
-					unsigned long Mins = ((cfTimeRemain / 60) - (Hrs * 60));
+					int Mins = ((cfTimeRemain / 60) - (Hrs * 60));
 					std::string sMins = std::to_string(Mins);
-					unsigned long Secs = ((cfTimeRemain)-((Mins + (Hrs * 60)) * 60));
+					int Secs = ((cfTimeRemain)-((Mins + (Hrs * 60)) * 60));
 					std::string sSecs = std::to_string(Secs);
 					cfTimeRemainHMS += sHrs + ":" + sMins + ":" + sSecs;
-					if (unsigned long ZoneID = (pLocalPlayer->CampfireZoneID & 0x7FFF)) {
+					if (int ZoneID = (pLocalPlayer->CampfireZoneID & 0x7FFF)) {
 						if (ZoneID < MAX_ZONES && pWorldData) {
 							if (EQZoneInfo* pZoneID = ((EQWorldData*)pWorldData)->ZoneArray[ZoneID]) {
 								cfZoneLongName += pZoneID->LongName;
