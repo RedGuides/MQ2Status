@@ -183,7 +183,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 	strcpy_s(NextArg, GetNextArg(szLine));
 	PcClient* pCharInfo = GetCharInfo();
 	PcProfile* pCharInfo2 = GetPcProfile();
-	if (Arg[0] != 0) {
+	if (Arg[0] != '\0') {
 		if (!_stricmp(Arg, "aa")) {
 			stringBuffer += LabeledText("Available AA Points", pCharInfo2->AAPoints);
 		}
@@ -267,7 +267,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 					int Secs = ((cfTimeRemain)-((Mins + (Hrs * 60)) * 60));
 					std::string sSecs = std::to_string(Secs);
 					cfTimeRemainHMS += sHrs + ":" + sMins + ":" + sSecs;
-					if (int ZoneID = (pLocalPlayer->CampfireZoneID & 0x7FFF)) {
+					if (int ZoneID = pWorldData->GetZoneBaseId(pLocalPlayer->CampfireZoneID)) {
 						if (ZoneID < MAX_ZONES && pWorldData) {
 							if (EQZoneInfo* pZoneID = ((EQWorldData*)pWorldData)->ZoneArray[ZoneID]) {
 								cfZoneLongName += pZoneID->LongName;
