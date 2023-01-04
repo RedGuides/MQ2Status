@@ -357,9 +357,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				std::string tempArg = NextArg; // convert our arg to string for transform
 				std::transform(tempArg.begin(), tempArg.end(), tempArg.begin(), tolower); // lowercase
 #if !defined (ROF2EMU)
-				if (tempArg.find("loyalty") == 0)
+				if (tempArg.find("loyalty") == '\0')
 					stringBuffer += LabeledText("Loyalty Tokens", pCharInfo->LoyaltyRewardBalance); // Using LoyaltyRewardBalance instead of AltCurrency since we can access directly
-				else if (tempArg.find("dbc") == 0 || tempArg.find("daybreak") == 0) { // DayBreakCurrency
+				else if (tempArg.find("dbc") == '\0' || tempArg.find("daybreak") == '\0') { // DayBreakCurrency
 					if (CSidlScreenWnd* MarketWnd = (CSidlScreenWnd*)FindMQ2Window("MarketPlaceWnd")) {
 						if (CXWnd* Funds = MarketWnd->GetChildItem("MKPW_AvailableFundsUpper")) {
 							if (Funds) {
