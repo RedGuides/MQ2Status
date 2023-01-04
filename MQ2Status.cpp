@@ -175,33 +175,35 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 	char Arg[MAX_STRING] = { 0 };
 	char Arg2[MAX_STRING] = { 0 };
 	char Arg3[MAX_STRING] = { 0 };
+	char NextArg[MAX_STRING] = { 0 };
+	// TODO:: refactor parseboolarg to not need arg, arg2, and arg3 passed
 	GetArg(Arg, szLine, 1);
 	GetArg(Arg2, szLine, 2);
 	GetArg(Arg3, szLine, 3);
+	strcpy_s(NextArg, GetNextArg(szLine));
 	PcClient* pCharInfo = GetCharInfo();
 	PcProfile* pCharInfo2 = GetPcProfile();
-	if (strlen(szLine)) {
+	if (Arg[0] != '\0') {
 		if (!_stricmp(Arg, "aa")) {
 			stringBuffer += LabeledText("Available AA Points", pCharInfo2->AAPoints);
 		}
 		else if (!_stricmp(Arg, "achieve") || !_stricmp(Arg, "achievement")) {
 			AchievementManager& achievemanager = AchievementManager::Instance();
-			char* fullArgument = GetNextArg(szLine);
 
 			int id = 0;
 			// if there is no second argument, we're going to give them the total completed achievement score
-			if (fullArgument[0] == 0) {
+			if (NextArg[0] == '\0') {
 				stringBuffer += LabeledText("Score", achievemanager.completedAchievementScore);
 				stringBuffer += GetColorCode('g', false) + " Points";
 			}
 			else {
 				const Achievement* Achieve = nullptr;
-				if (IsNumber(fullArgument)) {
-					id = atoi(fullArgument);
+				if (IsNumber(NextArg)) {
+					id = atoi(NextArg);
 					Achieve = GetAchievementById(id);
 				}
 				else {
-					Achieve = GetAchievementByName(fullArgument);
+					Achieve = GetAchievementByName(NextArg);
 					if (Achieve) {
 						id = Achieve->id;
 					}
@@ -252,20 +254,20 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			stringBuffer += LabeledText("Bagspace", GetFreeInventory(1));
 		}
 		else if (!_stricmp(Arg, "campfire")) {
-			if (pLocalPlayer && ((PSPAWNINFO)pLocalPlayer)->Campfire) {
+			if (pLocalPlayer && pLocalPlayer->Campfire) {
 				std::string cfStatus;
 				std::string cfInfo;
 				std::string cfTimeRemainHMS;
 				std::string cfZoneLongName;
-				if (unsigned long cfTimeRemain = ((PSPAWNINFO)pLocalPlayer)->CampfireTimestamp - GetFastTime()) {
-					unsigned long Hrs = ((cfTimeRemain / 60) / 60);
+				if (int cfTimeRemain = pLocalPlayer->CampfireTimestamp - GetFastTime()) {
+					int Hrs = ((cfTimeRemain / 60) / 60);
 					std::string sHrs = std::to_string(Hrs);
-					unsigned long Mins = ((cfTimeRemain / 60) - (Hrs * 60));
+					int Mins = ((cfTimeRemain / 60) - (Hrs * 60));
 					std::string sMins = std::to_string(Mins);
-					unsigned long Secs = ((cfTimeRemain)-((Mins + (Hrs * 60)) * 60));
+					int Secs = ((cfTimeRemain)-((Mins + (Hrs * 60)) * 60));
 					std::string sSecs = std::to_string(Secs);
 					cfTimeRemainHMS += sHrs + ":" + sMins + ":" + sSecs;
-					if (unsigned long ZoneID = (((PSPAWNINFO)pLocalPlayer)->CampfireZoneID & 0x7FFF)) {
+					if (int ZoneID = pWorldData->GetZoneBaseId(pLocalPlayer->CampfireZoneID)) {
 						if (ZoneID < MAX_ZONES && pWorldData) {
 							if (EQZoneInfo* pZoneID = ((EQWorldData*)pWorldData)->ZoneArray[ZoneID]) {
 								cfZoneLongName += pZoneID->LongName;
@@ -295,13 +297,11 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "collected") || !_stricmp(Arg, "collection")) {
-			GetArg(Arg, szLine, 2);
-			if (Arg[0] == 0) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid \agCollection Item\ag to search for.\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: \agKromzek Bracer\ar, \agLucky Clover\ar, \agAir-Infused Opal\ar, etc.\aw");
 			}
 			else {
-				char* collectionItem = GetNextArg(szLine);
 				// start an achievement manager
 				AchievementManager& achievemanager = AchievementManager::Instance();
 				// We need this bool so we can output if there was invalid component search
@@ -325,7 +325,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 								// we want to go through these achievements and check their completion status
 								for (int i = 0; i < Achieve->componentsByType[AchievementComponentCompletion].GetCount(); i++) {
 									const AchievementComponent& component = Achieve->componentsByType[AchievementComponentCompletion][i];
-									if (ci_equals(collectionItem, component.description)) {
+									if (ci_equals(NextArg, component.description)) {
 										bFoundComponent = true;
 										// if it is not set, then we are missing it.
 										if (!info->IsComponentComplete(AchievementComponentCompletion, i)) {
@@ -343,24 +343,23 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 				// if we didn't find what we're checking for in any achievement, output it was invalid
 				if (!bFoundComponent) {
-					WriteChatf("\ao[MQ2Status] \arNo such collection item: \ay%s\ax.", collectionItem);
+					WriteChatf("\ao[MQ2Status] \arNo such collection item: \ay%s\ax.", NextArg);
 					WriteChatf("\ao[MQ2Status] \arPlease provide a valid \agCollection Item\ar to search for.");
 					WriteChatf("\ao[MQ2Status] \arExamples: \agKromzek Bracer\ar, \agLucky Clover\ar, \agAir-Infused Opal\ar, etc.");
 				}
 			}
 		}
 		else if (!_stricmp(Arg, "currency")) {
-			GetArg(Arg, szLine, 2);
-			if (Arg[0] == 0) { // if an Argument after currency wasn't made, we need to ask for one
+			if (NextArg[0] == '\0') { // if an Argument after currency wasn't made, we need to ask for one
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Currency Name to search for.\aw");
 			}
 			else { // We need to lowercase and be able to do a "find" in case someone puts an "s" on a currency
-				std::string tempArg = GetNextArg(szLine); // convert our arg to string for transform
+				std::string tempArg = NextArg; // convert our arg to string for transform
 				std::transform(tempArg.begin(), tempArg.end(), tempArg.begin(), tolower); // lowercase
 #if !defined (ROF2EMU)
-				if (tempArg.find("loyalty") == 0)
+				if (tempArg.find("loyalty") == '\0')
 					stringBuffer += LabeledText("Loyalty Tokens", pCharInfo->LoyaltyRewardBalance); // Using LoyaltyRewardBalance instead of AltCurrency since we can access directly
-				else if (tempArg.find("dbc") == 0 || tempArg.find("daybreak") == 0) { // DayBreakCurrency
+				else if (tempArg.find("dbc") == '\0' || tempArg.find("daybreak") == '\0') { // DayBreakCurrency
 					if (CSidlScreenWnd* MarketWnd = (CSidlScreenWnd*)FindMQ2Window("MarketPlaceWnd")) {
 						if (CXWnd* Funds = MarketWnd->GetChildItem("MKPW_AvailableFundsUpper")) {
 							if (Funds) {
@@ -385,13 +384,12 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "evolve") || !_stricmp(Arg, "evolving")) {
-			char* findItem = GetNextArg(szLine);
-			if (!strlen(findItem)) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to check your evolving status on\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Threadbare Weighted Tabard, Djarn's Tarnished Amethyst Ring, Wrathful Harasser's Earring of Rallos Zek, etc.\aw");
 			}
 			else {
-				if (ItemClient* myItem = FindItemByName(findItem)) {
+				if (ItemClient* myItem = FindItemByName(NextArg)) {
 					if (IsEvolvingItem(myItem)) {
 						stringBuffer += LabeledText("Item", myItem->GetName());
 						stringBuffer += LabeledText(" Level", myItem->pEvolutionData->EvolvingCurrentLevel);
@@ -423,11 +421,10 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		}
 		else if (!_stricmp(Arg, "gear")) {
 			bool bFound = false;
-			char* slot = GetNextArg(szLine);
-			size_t size = strlen(slot);
+			size_t size = strlen(NextArg);
 			if (size) {
 				for (const auto& x : mEquipInvSlotName) {
-					if (ci_equals(x.first, slot)) {
+					if (ci_equals(x.first, NextArg)) {
 						// did we find a valid gear slot?
 						bFound = true;
 						if (ItemClient* item = FindItemBySlot(x.second)) {
@@ -446,7 +443,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			// this bool check also covers if !strlen as found would be false
 			if (!bFound) {
 				if (size)
-					WriteChatf("\ao[MQ2Status] \ag%s\ar is invalid.", slot);
+					WriteChatf("\ao[MQ2Status] \ag%s\ar is invalid.", NextArg);
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid gear slot.");
 				WriteChatf("\ao[MQ2Status] \arExamples: primary, secondary, left ring, etc.\aw");
 			}
@@ -485,6 +482,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\ao/status \agmoney \aw or \agplat\aw: Reports how much plat you have.");
 			WriteChatf("\ao/status \agparcel\aw: Reports our \"Parcel\" status.");
 			WriteChatf("\ao/status \agquest\aw or \agtask\aw \ayQuest name\aw: Reports if you have a quest/task matching \ayQuest name\aw.");
+			WriteChatf("\ao/status \agqueststep\aw or \agtaskstep\aw \ayQuest name\aw: Reports what step you are on if you have a quest/task matching \ayQuest name\aw.");
 			WriteChatf("\ao/status \agshow\aw: Allows toggling on/off of the CWTN Class Plugins to be visible during /status.");
 			WriteChatf("\ao/status \agskill\aw \ayskill name\aw: reports out your current skill value for \ay skill name\aw.");
 			WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, Luck, Weight.");
@@ -531,48 +529,42 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "item")) {
-			GetArg(Arg, szLine, 2);
-			if (!strlen(Arg)) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status item id 10037\"\aw.");
 			}
-			else if (ci_equals(Arg, "id")) {
+			else if (ci_equals(NextArg, "id")) {
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::Item);
 			}
 			else {
-				char* findItem = GetNextArg(szLine);
-				stringBuffer += LabeledText(findItem, FindItemCountByName(findItem));
+				stringBuffer += LabeledText(NextArg, FindItemCountByName(NextArg));
 			}
 		}
 		else if (!_stricmp(Arg, "itemall")) {
-			GetArg(Arg, szLine, 2);
-			if (!strlen(Arg)) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itemall id 10037\"\aw.");
 			}
-			else if (ci_equals(Arg, "id")) {
+			else if (ci_equals(NextArg, "id")) {
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemAll);
 			}
 			else {
-				char* findItem = GetNextArg(szLine);
-				stringBuffer += LabeledText(findItem, FindItemCountByName(findItem) + FindBankItemCountByName(findItem, 0)); // FindBankItemCountByName requires bExact
+				stringBuffer += LabeledText(NextArg, FindItemCountByName(NextArg) + FindBankItemCountByName(NextArg, 0)); // FindBankItemCountByName requires bExact
 			}
 		}
 		else if (!_stricmp(Arg, "itembank")) {
-			GetArg(Arg, szLine, 2);
-			if (!strlen(Arg)) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Item to search for\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Bone Chips, Diamond, Blue Diamond, etc.\aw");
 				WriteChatf("\ao[MQ2Status] \arOr ID using the id tag. Example: \ay\"/status itembank id 10037\"\aw.");
 			}
-			else if (ci_equals(Arg, "id")) {
+			else if (ci_equals(NextArg, "id")) {
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemBank);
 			}
 			else {
-				char* findItem = GetNextArg(szLine);
-				stringBuffer += LabeledText(findItem, FindBankItemCountByName(findItem, 0)); // FindBankItemCountByName requires bExact
+				stringBuffer += LabeledText(NextArg, FindBankItemCountByName(NextArg, 0)); // FindBankItemCountByName requires bExact
 			}
 		}
 		else if (!_stricmp(Arg, "krono")) {
@@ -605,7 +597,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 						{
 							int mercStance = pMercManager->currentMercenary.GetCurrentStanceId();
-							if (PSPAWNINFO myMerc = (PSPAWNINFO)GetSpawnByID(pMercManager->mercenarySpawnId)) {
+							if (PlayerClient* myMerc = GetSpawnByID(pMercManager->mercenarySpawnId)) {
 								switch (myMerc->GetClass()) {
 									case Cleric:
 										stringBuffer += GetColorCode('o', false) + "Class: " + GetColorCode('g', false) + "Cleric " + GetColorCode('w', false);
@@ -750,20 +742,18 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "quest") || !_stricmp(Arg, "task")) {
-			GetArg(Arg, szLine, 2);
-			if (Arg[0] == 0) { // if an Argument after quest/task wasn't made, we need to ask for one
+			if (NextArg[0] == '\0') { // if an Argument after quest/task wasn't made, we need to ask for one
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Quest/Task Name to search for.\aw");
 			}
 			else {
-				const char* tempArg = GetNextArg(szLine);
 				stringBuffer += GetColorCode('o', false);
 				stringBuffer += "Quest/Task \"";
 				stringBuffer += GetColorCode('t', true);
-				stringBuffer += tempArg;
+				stringBuffer += NextArg;
 				stringBuffer += GetColorCode('o', false);
 				stringBuffer += "\": ";
 				char tempTask[MAX_STRING] = "";
-				sprintf_s(tempTask, "${Task[%s]}", tempArg);
+				sprintf_s(tempTask, "${Task[%s]}", NextArg);
 				ParseMacroData(tempTask, MAX_STRING);
 				if (_stricmp(tempTask, "NULL")) {
 					stringBuffer += GetColorCode('g', false);
@@ -774,57 +764,116 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				stringBuffer += tempTask;
 			}
 		}
+		else if (!_stricmp(Arg, "queststep") || !_stricmp(Arg, "taskstep")) {
+			if (NextArg[0] == '\0') { // if an Argument after quest/task wasn't made, we need to ask for one
+				WriteChatf("\ao[MQ2Status] \arPlease provide a valid Quest/Task Name to search for.\aw");
+			}
+			else {
+				char buffer[MAX_STRING] = {};
+				bool bFoundMatch = false;
+
+				for (int i = 0; i < MAX_SHARED_TASK_ENTRIES; ++i) {
+					const auto& task = pTaskManager->SharedTaskEntries[i];
+					auto taskStatus = pTaskManager->GetTaskStatus(pLocalPC, i, task.TaskSystem);
+					if (ci_find_substr(task.TaskTitle, NextArg) != -1) {
+						for (int j = 0; j < MAX_TASK_ELEMENTS; ++j) {
+							int iCurrCount = taskStatus->CurrentCounts[j];
+							int iReqCount = task.Elements[j].RequiredCount;
+							if (iCurrCount < iReqCount && !task.Elements[j].bOptional) {
+								pTaskManager->GetElementDescription(&task.Elements[j], buffer);
+								if (buffer[0]) {
+									stringBuffer += LabeledText(task.TaskTitle, buffer);
+									stringBuffer += LabeledText(" Have", iCurrCount);
+									stringBuffer += LabeledText(" Need", iReqCount);
+									bFoundMatch = true;
+									// We only want to report the first step we find.
+									//bBreak = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+
+				if (!bFoundMatch) {
+					for (int i = 0; i < MAX_QUEST_ENTRIES; ++i) {
+						const auto& task = pTaskManager->QuestEntries[i];
+						auto taskStatus = pTaskManager->GetTaskStatus(pLocalPC, i, task.TaskSystem);
+						if (ci_find_substr(task.TaskTitle, NextArg) != -1) {
+							for (int j = 0; j < MAX_TASK_ELEMENTS; ++j) {
+								if (taskStatus->CurrentCounts[j] < task.Elements[j].RequiredCount && !task.Elements[j].bOptional) {
+									pTaskManager->GetElementDescription(&task.Elements[j], buffer);
+									if (buffer[0]) {
+										int iCurrCount = taskStatus->CurrentCounts[j];
+										int iReqCount = task.Elements[j].RequiredCount;
+										stringBuffer += LabeledText(task.TaskTitle, buffer);
+										stringBuffer += LabeledText(" Curr", iCurrCount);
+										stringBuffer += LabeledText(" Rec", iReqCount);
+										bFoundMatch = true;
+										// We only want to report the first step we find.
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (!bFoundMatch)
+					stringBuffer += LabeledText(NextArg, "NULL");
+			}
+		}
 		else if (!_stricmp(Arg, "show")) {
-			if (!_stricmp(Arg2, "plugin")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowPlugin, "ShowPlugin");
+			if (!_stricmp(NextArg, "plugin")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowPlugin, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "warrior")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowWarrior, "ShowPlugin");
+			else if (!_stricmp(NextArg, "warrior")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowWarrior, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "cleric")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowCleric, "ShowPlugin");
+			else if (!_stricmp(NextArg, "cleric")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowCleric, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "paladin")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowPaladin, "ShowPlugin");
+			else if (!_stricmp(NextArg, "paladin")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowPaladin, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "ranger")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowRanger, "ShowPlugin");
+			else if (!_stricmp(NextArg, "ranger")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowRanger, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "shadowknight")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowShadowknight, "ShowPlugin");
+			else if (!_stricmp(NextArg, "shadowknight")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowShadowknight, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "druid")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowDruid, "ShowPlugin");
+			else if (!_stricmp(NextArg, "druid")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowDruid, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "monk")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowMonk, "ShowPlugin");
+			else if (!_stricmp(NextArg, "monk")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowMonk, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "bard")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowBard, "ShowPlugin");
+			else if (!_stricmp(NextArg, "bard")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowBard, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "rogue")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowRogue, "ShowPlugin");
+			else if (!_stricmp(NextArg, "rogue")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowRogue, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "shaman")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowShaman, "ShowPlugin");
+			else if (!_stricmp(NextArg, "shaman")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowShaman, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "necromancer")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowNecromancer, "ShowPlugin");
+			else if (!_stricmp(NextArg, "necromancer")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowNecromancer, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "wizard")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowWizard, "ShowPlugin");
+			else if (!_stricmp(NextArg, "wizard")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowWizard, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "magician")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowMage, "ShowPlugin");
+			else if (!_stricmp(NextArg, "magician")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowMage, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "enchanter")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowEnchanter, "ShowPlugin");
+			else if (!_stricmp(NextArg, "enchanter")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowEnchanter, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "beastlord")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowBeastlord, "ShowPlugin");
+			else if (!_stricmp(NextArg, "beastlord")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowBeastlord, "ShowPlugin");
 			}
-			else if (!_stricmp(Arg2, "berserker")) {
-				ParseBoolArg(Arg, Arg2, Arg3, &bShowBerserker, "ShowPlugin");
+			else if (!_stricmp(NextArg, "berserker")) {
+				ParseBoolArg(Arg, NextArg, Arg3, &bShowBerserker, "ShowPlugin");
 			}
 			else {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid \agShow\aw option.\aw");
@@ -835,37 +884,34 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "skill")) {
-			GetArg(Arg, szLine, 2);
-			if (!strlen(Arg)) {
+			if (NextArg[0] = 0) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid skill to search for.\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Baking, Fishing, Jewelry Making, etc.\aw");
 			}
 			else {
-				char* skillname = GetNextArg(szLine);
 				for (int iSkillNum = 0; iSkillNum < NUM_SKILLS; iSkillNum++) {
-					if (!_stricmp(skillname, szSkills[iSkillNum])) {
+					if (!_stricmp(NextArg, szSkills[iSkillNum])) {
 						if (pCharInfo2->Skill[iSkillNum]) {
-							stringBuffer += LabeledText(skillname, GetAdjustedSkill(iSkillNum));
+							stringBuffer += LabeledText(NextArg, GetAdjustedSkill(iSkillNum));
 						}
 					}
 				}
 			}
 		}
 		else if (!_stricmp(Arg, "spell")) {
-			char* spellsearch = GetNextArg(szLine);
-			int iArg = GetIntFromString(spellsearch, 0);
+			int iArg = GetIntFromString(NextArg, 0);
 			int myclass = pLocalPlayer->GetClass();
-			if (spellsearch[0] == '\0' || iArg > pCharInfo->GetLevel()) {
+			if (NextArg[0] == '\0' || iArg > pCharInfo->GetLevel()) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid spell by name or level to search for.\aw");
 			}
-			else if (!IsNumber(spellsearch)) {
+			else if (!IsNumber(NextArg)) {
 				bool bFound = false;
 
 				// spells
 				for (int i = 0; i < NUM_BOOK_SLOTS; i++) {
 					if (pCharInfo2->SpellBook[i] != -1) {
 						if (EQ_Spell* thisSpell = GetSpellByID(pCharInfo2->SpellBook[i])) {
-							if (ci_starts_with(thisSpell->Name, spellsearch)) {
+							if (ci_starts_with(thisSpell->Name, NextArg)) {
 								bFound = true;
 								if (thisSpell->ClassLevel[myclass] > 70)
 									stringBuffer += fmt::format(" {}({}) ", GetColorCode('r', false), GetSpellUpgradeType(thisSpell->ClassLevel[myclass]));
@@ -880,7 +926,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				for (int j = 0; j < NUM_COMBAT_ABILITIES; j++) {
 					if (pCombatSkillsSelectWnd->ShouldDisplayThisSkill(j)) {
 						if (EQ_Spell* thisSpell = GetSpellByID(pPCData->GetCombatAbility(j))) {
-							if (ci_starts_with(thisSpell->Name, spellsearch)) {
+							if (ci_starts_with(thisSpell->Name, NextArg)) {
 								bFound = true;
 								if (thisSpell->ClassLevel[myclass] > 70)
 									stringBuffer += fmt::format(" {}({}) ", GetColorCode('r', false), GetSpellUpgradeType(thisSpell->ClassLevel[myclass]));
@@ -892,7 +938,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				}
 
 				if (!bFound) {
-					WriteChatf("\ao[MQ2Status] \arWe did not find a matching spell/disc for %s.\aw", spellsearch);
+					WriteChatf("\ao[MQ2Status] \arWe did not find a matching spell/disc for %s.\aw", NextArg);
 					return;
 				}
 			}
@@ -962,55 +1008,53 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "stat")) {
-			SPAWNINFO* me = GetCharInfo()->pSpawn;
-			GetArg(Arg, szLine, 2);
-			if (!strlen(Arg)) {
+			if (Arg2[0] == '\0) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid MQ2Status stat\aw");
 				WriteChatf("\ao[MQ2Status] \aoThese are currently: \aghstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, and weight.\aw");
 			}
 			else {
-				if (!_stricmp(Arg, "hstr")) {
+				if (!_stricmp(Arg2, "hstr")) {
 					stringBuffer += LabeledText("HSTR", pCharInfo->HeroicSTRBonus);
 				}
-				else if (!_stricmp(Arg, "hsta")) {
+				else if (!_stricmp(Arg2, "hsta")) {
 					stringBuffer += LabeledText("HSTA", pCharInfo->HeroicSTABonus);
 				}
-				else if (!_stricmp(Arg, "hint")) {
+				else if (!_stricmp(Arg2, "hint")) {
 					stringBuffer += LabeledText("HINT", pCharInfo->HeroicINTBonus);
 				}
-				else if (!_stricmp(Arg, "hwis")) {
+				else if (!_stricmp(Arg2, "hwis")) {
 					stringBuffer += LabeledText("HWIS", pCharInfo->HeroicWISBonus);
 				}
-				else if (!_stricmp(Arg, "hagi")) {
+				else if (!_stricmp(Arg2, "hagi")) {
 					stringBuffer += LabeledText("HAGI", pCharInfo->HeroicAGIBonus);
 				}
-				else if (!_stricmp(Arg, "hdex")) {
+				else if (!_stricmp(Arg2, "hdex")) {
 					stringBuffer += LabeledText("HDEX", pCharInfo->HeroicDEXBonus);
 				}
-				else if (!_stricmp(Arg, "hcha")) {
+				else if (!_stricmp(Arg2, "hcha")) {
 					stringBuffer += LabeledText("HCHA", pCharInfo->HeroicCHABonus);
 				}
-				else if (!_stricmp(Arg, "hps")) {
-					stringBuffer += LabeledText("Current HPs", me->HPCurrent);
-					stringBuffer += LabeledText(" Max HPs", me->HPMax);
-					stringBuffer += LabeledText(" Health Pct", PercentHealth(me));
+				else if (!_stricmp(Arg2, "hps")) {
+					stringBuffer += LabeledText("Current HPs", pLocalPlayer->HPCurrent);
+					stringBuffer += LabeledText(" Max HPs", pLocalPlayer->HPMax);
+					stringBuffer += LabeledText(" Health Pct", PercentHealth(pLocalPlayer));
 				}
 #if HAS_LUCK_STAT
-				else if (!_stricmp(Arg, "luck")) {
+				else if (!_stricmp(Arg2, "luck")) {
 					stringBuffer += LabeledText("Luck", pCharInfo->LCK);
 				}
 #endif
-				else if (!_stricmp(Arg, "mana")) {
-					stringBuffer += LabeledText("Current Mana", me->GetCurrentMana());
-					stringBuffer += LabeledText(" Max Mana", me->GetMaxMana());
-					stringBuffer += LabeledText(" Mana Pct", PercentMana(me));
+				else if (!_stricmp(Arg2, "mana")) {
+					stringBuffer += LabeledText("Current Mana", pLocalPlayer->GetCurrentMana());
+					stringBuffer += LabeledText(" Max Mana", pLocalPlayer->GetMaxMana());
+					stringBuffer += LabeledText(" Mana Pct", PercentMana(pLocalPlayer));
 				}
-				else if (!_stricmp(Arg, "endurance")) {
-					stringBuffer += LabeledText("Current Endurance", me->GetCurrentEndurance());
-					stringBuffer += LabeledText(" Max Endurance", me->GetMaxEndurance());
-					stringBuffer += LabeledText(" Endurance Pct", PercentEndurance(me));
+				else if (!_stricmp(Arg2, "endurance")) {
+					stringBuffer += LabeledText("Current Endurance", pLocalPlayer->GetCurrentEndurance());
+					stringBuffer += LabeledText(" Max Endurance", pLocalPlayer->GetMaxEndurance());
+					stringBuffer += LabeledText(" Endurance Pct", PercentEndurance(pLocalPlayer));
 				}
-				else if (!_stricmp(Arg, "weight")) {
+				else if (!_stricmp(Arg2, "weight")) {
 					stringBuffer += LabeledText("Current Weight", pCharInfo->CurrWeight);
 					stringBuffer += LabeledText(" Max Weight", pCharInfo->STR);
 					stringBuffer += LabeledText(" Remaining", (long)(pCharInfo->STR - pCharInfo->CurrWeight));
@@ -1057,8 +1101,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			stringBuffer += LabeledText(" Favor", prettyFavor);
 		}
 		else if (!_stricmp(Arg, "xp")) {
-			PlayerClient* pMe = pLocalPlayer;
-			stringBuffer += LabeledText("Level", (int)pMe->Level);
+			stringBuffer += LabeledText("Level", static_cast<int>(pLocalPlayer->Level));
 			stringBuffer += LabeledText(" XP", pCharInfo->Exp / 1000.0f);
 			stringBuffer += LabeledText(" Banked AA", pCharInfo2->AAPoints);
 			stringBuffer += LabeledText(" AAXP", pCharInfo->AAExp * 0.001);
