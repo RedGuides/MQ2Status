@@ -770,14 +770,13 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 			else {
 				char buffer[MAX_STRING] = {};
-				const int iElements = 20;
 				bool bFoundMatch = false;
 
 				for (int i = 0; i < MAX_SHARED_TASK_ENTRIES; ++i) {
 					const auto& task = pTaskManager->SharedTaskEntries[i];
 					auto taskStatus = pTaskManager->GetTaskStatus(pLocalPC, i, task.TaskSystem);
 					if (ci_find_substr(task.TaskTitle, NextArg) != -1) {
-						for (int j = 0; j < iElements; ++j) {
+						for (int j = 0; j < MAX_TASK_ELEMENTS; ++j) {
 							int iCurrCount = taskStatus->CurrentCounts[j];
 							int iReqCount = task.Elements[j].RequiredCount;
 							if (iCurrCount < iReqCount && !task.Elements[j].bOptional) {
@@ -801,7 +800,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 						const auto& task = pTaskManager->QuestEntries[i];
 						auto taskStatus = pTaskManager->GetTaskStatus(pLocalPC, i, task.TaskSystem);
 						if (ci_find_substr(task.TaskTitle, NextArg) != -1) {
-							for (int j = 0; j < iElements; ++j) {
+							for (int j = 0; j < MAX_TASK_ELEMENTS; ++j) {
 								if (taskStatus->CurrentCounts[j] < task.Elements[j].RequiredCount && !task.Elements[j].bOptional) {
 									pTaskManager->GetElementDescription(&task.Elements[j], buffer);
 									if (buffer[0]) {
