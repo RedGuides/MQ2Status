@@ -1008,7 +1008,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "stat")) {
-			if (Arg2[0] == '\0) {
+			if (Arg2[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid MQ2Status stat\aw");
 				WriteChatf("\ao[MQ2Status] \aoThese are currently: \aghstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, and weight.\aw");
 			}
