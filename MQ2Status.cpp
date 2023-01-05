@@ -884,7 +884,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "skill")) {
-			if (NextArg[0] = 0) {
+			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid skill to search for.\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Baking, Fishing, Jewelry Making, etc.\aw");
 			}
