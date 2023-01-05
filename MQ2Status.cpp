@@ -884,6 +884,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			}
 		}
 		else if (!_stricmp(Arg, "skill")) {
+			bool bFoundMatch = false;
 			if (NextArg[0] == '\0') {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid skill to search for.\aw");
 				WriteChatf("\ao[MQ2Status] \arExamples: Baking, Fishing, Jewelry Making, etc.\aw");
@@ -891,12 +892,20 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			else {
 				for (int iSkillNum = 0; iSkillNum < NUM_SKILLS; iSkillNum++) {
 					if (!_stricmp(NextArg, szSkills[iSkillNum])) {
-						if (pCharInfo2->Skill[iSkillNum]) {
+						if (pCharInfo2->Skill[iSkillNum] >= 0) {
 							stringBuffer += LabeledText(NextArg, GetAdjustedSkill(iSkillNum));
+							bFoundMatch = true;
+							break;
 						}
 					}
 				}
 			}
+
+			if (!bFoundMatch) {
+				WriteChatf("\ao[MQ2Status] \ay%s \arwas not found to be a valid skill.", NextArg);
+				return;
+			}
+				
 		}
 		else if (!_stricmp(Arg, "spell")) {
 			int iArg = GetIntFromString(NextArg, 0);
