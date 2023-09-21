@@ -61,12 +61,6 @@ std::string to_string_with_precision(const T a_value, const int n = 6)
 	return out.str();
 }
 
-enum Subscription {
-	SUB_BRONZE,
-	SUB_SILVER,
-	SUB_GOLD
-};
-
 // TODO remove once an appropriate function is in main/core.
 int ItemCountByType(int type) {
 	PcProfile* pcProfile = GetPcProfile();
@@ -488,7 +482,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 			WriteChatf("\ao/status \agstat\aw \ayoption\aw: reports the following options: Hdex, HStr, HSta, HInt, HAgi, HWis, HCha, HPS, Mana, Endurance, Luck, Weight.");
 			WriteChatf("\ao/status \agspell \ayoption\aw: takes a spell by name, or level, and reports the spells you have that match. Useful to see what ranks of spells you have.");
 #if !defined(ROF2EMU)
-			WriteChatf("\ao/status \agsub\aw: Reports our subscription level, and if we are gold, how many days are left.");
+			WriteChatf("\ao/status \agsub\aw: Reports our subscription level, and if we are All Access, how many days are left.");
 #endif
 			WriteChatf("\ao/status \agtribute\aw: Displays if your current Tribute Status is On or Off and the current Favor");
 			WriteChatf("\ao/status \agxp\aw: Reports our level, Current XP %%, Banked AA, and our AAXP %%.");
@@ -905,7 +899,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \ay%s \arwas not found to be a valid skill.", NextArg);
 				return;
 			}
-				
+
 		}
 		else if (!_stricmp(Arg, "spell")) {
 			int iArg = GetIntFromString(NextArg, 0);
@@ -1075,30 +1069,22 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		}
 #if !defined(ROF2EMU) // Subscription doesn't exist in EMU'
 		else if (!_stricmp(Arg, "sub") || !_stricmp(Arg, "subscription")) {
-			switch (GetSubscriptionLevel())
+			switch (GetMembershipLevel())
 			{
-				case SUB_GOLD:
-					stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('g', false) + "Gold ";
+				case MembershipLevel::LifetimeAllAccess:
+					stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Lifetime.";
 					break;
-				case SUB_SILVER:
-					stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Silver ";
+				case MembershipLevel::AllAccess:
+					stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('g', false) + "All Access " + LabeledText("Days Remaining", pCharInfo->SubscriptionDays);
 					break;
-				case SUB_BRONZE:
-					stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Bronze ";
+				case MembershipLevel::Silver:
+					stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Silver.";
+					break;
+				case MembershipLevel::Free:
+					stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Free.";
 					break;
 				default:
 					break;
-			}
-			if (GetSubscriptionLevel() == SUB_GOLD) {
-				if (pCharInfo->SubscriptionDays == -1) {
-					stringBuffer += GetColorCode('o', false) + "& I appear to have a lifetime subscription.";
-				}
-				else if (pCharInfo->SubscriptionDays == 0) {
-					stringBuffer += GetColorCode('o', false) + "& I have a 0 days left or a lifetime subscription.";
-				}
-				else if (pCharInfo->SubscriptionDays) {
-					stringBuffer += LabeledText("Days Remaining", pCharInfo->SubscriptionDays);
-				}
 			}
 		}
 #endif
@@ -1129,11 +1115,11 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 	}
 	else {
 #if !defined(ROF2EMU) // Subscription doesn't exist in EMU'
-		if (GetSubscriptionLevel() == SUB_SILVER) {
+		if (GetMembershipLevel() == MembershipLevel::Silver) {
 			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Silver ";
 		}
-		else if (GetSubscriptionLevel() == SUB_BRONZE) {
-			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Bronze ";
+		else if (GetMembershipLevel() == MembershipLevel::Free) {
+			stringBuffer += GetColorCode('o', false) + "Sub: " + GetColorCode('r', false) + "Free ";
 		}
 #endif
 		if (bShowPlugin) {
