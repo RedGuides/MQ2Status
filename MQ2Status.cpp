@@ -1651,97 +1651,63 @@ std::string GetColorCode(char Color, bool Dark)
 }
 
 const std::map<std::string, int>  mAltCurrency = {
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_TBS))
 	{ "doubloon", ALTCURRENCY_DOUBLOONS },
 	{ "orux", ALTCURRENCY_ORUX }, // spelling of plural in currency window
 	{ "orum", ALTCURRENCY_ORUX }, // spelling of singular item in inventory
 	{ "phosphene", ALTCURRENCY_PHOSPHENES },
 	{ "phosphite", ALTCURRENCY_PHOSPHITES },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_SoF))
 	{ "faycitum", ALTCURRENCY_FAYCITES },
 	{ "faycetum", ALTCURRENCY_FAYCITES }, // spelling of item in inventory
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_SoD))
 	{ "chronobine", ALTCURRENCY_CHRONOBINES },
 	{ "mckenzie", ALTCURRENCY_MCKENZIE },
 	{ "bayle mark", ALTCURRENCY_BAYLE },
-#endif
 	{ "tokens of reclamation", ALTCURRENCY_RECLAMATION },
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_UF))
 	{ "silver token", ALTCURRENCY_SILVERTOKENS },
 	{ "gold token", ALTCURRENCY_GOLDTOKENS },
 	{ "brellium", ALTCURRENCY_BRELLIUM },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_HoT))
 	{ "dream mote", ALTCURRENCY_MOTES },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_VoA))
 	{ "rebellion chit", ALTCURRENCY_REBELLIONCHITS },
 	{ "diamond coin", ALTCURRENCY_DIAMONDCOINS },
 	{ "bronze fiat", ALTCURRENCY_BRONZEFIATS },
 	{ "commemorative coin", ALTCURRENCY_COMMEMORATIVE_COINS },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_RoF))
 	{ "velium shard", ALTCURRENCY_VELIUMSHARDS },
 	{ "crystallized fear", ALTCURRENCY_CRYSTALLIZEDFEAR },
 	{ "shadowstone", ALTCURRENCY_SHADOWSTONES },
 	{ "dreadstone", ALTCURRENCY_DREADSTONES },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_CoTF))
 	{ "marks of valor", ALTCURRENCY_MARKSOFVALOR },
 	{ "medals of heroism", ALTCURRENCY_MEDALSOFHEROISM },
 	{ "fists of bayle", ALTCURRENCY_FISTSOFBAYLE },
-#endif
 	// Nobles are listed as "everquest" by expansion by dbg currency window
 	{ "nobles", ALTCURRENCY_NOBLES },
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_TDS))
 	{ "expedient delivery voucher", ALTCURRENCY_VOUCHER },
 	{ "arx energy crystal", ALTCURRENCY_ENERGYCRYSTALS },
 	{ "pieces of eight",ALTCURRENCY_PIECESOFEIGHT },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_TBM))
 	{ "remnants of tranquility", ALTCURRENCY_REMNANTSOFTRANQUILITY },
 	{ "bifurcated coin", ALTCURRENCY_BIFURCATEDCOIN },
-#endif
 	// adoption coins are listed as "everquest" by expansion by dbg currency window
 	{ "adoption coin", ALTCURRENCY_ADOPTIVE },
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_EOK))
 	{ "sathir's trade gem", ALTCURRENCY_SATHIRSTRADEGEMS },
 	{ "ancient sebilisian coin", ALTCURRENCY_ANCIENTSEBILISIANCOINS },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_ROS))
 	{ "bathezid trade gem", ALTCURRENCY_BATHEZIDTRADEGEMS },
 	{ "ancient draconic coin", ALTCURRENCY_ANCIENTDRACONICCOIN },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_TBL))
 	{ "fettered ifrit coin", ALTCURRENCY_FETTERREDIFRITCOINS },
 	{ "entwined djinn coin", ALTCURRENCY_ENTWINEDDJINNCOINS },
-#endif
-#if HAS_LUCK_STAT
 	{ "crystallized luck", ALTCURRENCY_CRYSTALLIZEDLUCK },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_ToV))
 	{ "froststone ducat", ALTCURRENCY_FROSTSTONEDUCAT },
 	{ "warlord's symbol", ALTCURRENCY_WARLORDSSYMBOL },
-#endif
 	// Is there an overseer flag?
 	{ "overseer", ALTCURRENCY_OVERSEERTETRADRACHM },
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_CoV))
 	{ "restless mark", ALTCURRENCY_RESTLESSMARK },
 	{ "warforged emblem", ALTCURRENCY_WARFORGEDEMBLEM },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_ToL))
 	{ "scarlet mark", ALTCURRENCY_SCARLETMARKS },
 	{ "medals of conflict", ALTCURRENCY_MEDALSOFCONFLICT },
-#endif
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_NoS))
 	{ "shaded specie", ALTCURRENCY_SHADEDSPECIE },
 	{ "spiritual medallion", ALTCURRENCY_SPIRITUALMEDALLION },
-#endif
+#ifdef EXPANSION_LEVEL_LS
 #if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_LS))
 	{ "laurion inn voucher", ALTCURRENCY_LAURIONINNVOUCHER },
 	{ "shalowain's private reserve", ALTCURRENCY_SHALOWAINSPRIVATERESERVE },
+#endif
 #endif
 };
 
