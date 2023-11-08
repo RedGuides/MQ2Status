@@ -1703,12 +1703,8 @@ const std::map<std::string, int>  mAltCurrency = {
 	{ "medals of conflict", ALTCURRENCY_MEDALSOFCONFLICT },
 	{ "shaded specie", ALTCURRENCY_SHADEDSPECIE },
 	{ "spiritual medallion", ALTCURRENCY_SPIRITUALMEDALLION },
-#ifdef EXPANSION_LEVEL_LS
-#if (IS_EXPANSION_LEVEL(EXPANSION_LEVEL_LS))
 	{ "laurion inn voucher", ALTCURRENCY_LAURIONINNVOUCHER },
 	{ "shalowain's private reserve", ALTCURRENCY_SHALOWAINSPRIVATERESERVE },
-#endif
-#endif
 };
 
 int AltCurrencyCheck(std::string tempArg) {
