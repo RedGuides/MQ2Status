@@ -1651,7 +1651,6 @@ std::string GetColorCode(char Color, bool Dark)
 }
 
 const std::map<std::string, int>  mAltCurrency = {
-
 	{ "doubloon", ALTCURRENCY_DOUBLOONS },
 	{ "orux", ALTCURRENCY_ORUX }, // spelling of plural in currency window
 	{ "orum", ALTCURRENCY_ORUX }, // spelling of singular item in inventory
@@ -1660,30 +1659,32 @@ const std::map<std::string, int>  mAltCurrency = {
 	{ "faycitum", ALTCURRENCY_FAYCITES },
 	{ "faycetum", ALTCURRENCY_FAYCITES }, // spelling of item in inventory
 	{ "chronobine", ALTCURRENCY_CHRONOBINES },
-	{ "silver token", ALTCURRENCY_SILVERTOKENS },
-	{ "gold token", ALTCURRENCY_GOLDTOKENS },
 	{ "mckenzie", ALTCURRENCY_MCKENZIE },
 	{ "bayle mark", ALTCURRENCY_BAYLE },
 	{ "tokens of reclamation", ALTCURRENCY_RECLAMATION },
+	{ "silver token", ALTCURRENCY_SILVERTOKENS },
+	{ "gold token", ALTCURRENCY_GOLDTOKENS },
 	{ "brellium", ALTCURRENCY_BRELLIUM },
 	{ "dream mote", ALTCURRENCY_MOTES },
 	{ "rebellion chit", ALTCURRENCY_REBELLIONCHITS },
 	{ "diamond coin", ALTCURRENCY_DIAMONDCOINS },
 	{ "bronze fiat", ALTCURRENCY_BRONZEFIATS },
-	{ "expedient delivery voucher", ALTCURRENCY_VOUCHER },
+	{ "commemorative coin", ALTCURRENCY_COMMEMORATIVE_COINS },
 	{ "velium shard", ALTCURRENCY_VELIUMSHARDS },
 	{ "crystallized fear", ALTCURRENCY_CRYSTALLIZEDFEAR },
 	{ "shadowstone", ALTCURRENCY_SHADOWSTONES },
 	{ "dreadstone", ALTCURRENCY_DREADSTONES },
 	{ "marks of valor", ALTCURRENCY_MARKSOFVALOR },
 	{ "medals of heroism", ALTCURRENCY_MEDALSOFHEROISM },
-	{ "commemorative coin", ALTCURRENCY_COMMEMORATIVE_COINS },
 	{ "fists of bayle", ALTCURRENCY_FISTSOFBAYLE },
+	// Nobles are listed as "everquest" by expansion by dbg currency window
 	{ "nobles", ALTCURRENCY_NOBLES },
+	{ "expedient delivery voucher", ALTCURRENCY_VOUCHER },
 	{ "arx energy crystal", ALTCURRENCY_ENERGYCRYSTALS },
 	{ "pieces of eight",ALTCURRENCY_PIECESOFEIGHT },
 	{ "remnants of tranquility", ALTCURRENCY_REMNANTSOFTRANQUILITY },
 	{ "bifurcated coin", ALTCURRENCY_BIFURCATEDCOIN },
+	// adoption coins are listed as "everquest" by expansion by dbg currency window
 	{ "adoption coin", ALTCURRENCY_ADOPTIVE },
 	{ "sathir's trade gem", ALTCURRENCY_SATHIRSTRADEGEMS },
 	{ "ancient sebilisian coin", ALTCURRENCY_ANCIENTSEBILISIANCOINS },
@@ -1694,6 +1695,7 @@ const std::map<std::string, int>  mAltCurrency = {
 	{ "crystallized luck", ALTCURRENCY_CRYSTALLIZEDLUCK },
 	{ "froststone ducat", ALTCURRENCY_FROSTSTONEDUCAT },
 	{ "warlord's symbol", ALTCURRENCY_WARLORDSSYMBOL },
+	// Is there an overseer flag?
 	{ "overseer", ALTCURRENCY_OVERSEERTETRADRACHM },
 	{ "restless mark", ALTCURRENCY_RESTLESSMARK },
 	{ "warforged emblem", ALTCURRENCY_WARFORGEDEMBLEM },
@@ -1701,6 +1703,8 @@ const std::map<std::string, int>  mAltCurrency = {
 	{ "medals of conflict", ALTCURRENCY_MEDALSOFCONFLICT },
 	{ "shaded specie", ALTCURRENCY_SHADEDSPECIE },
 	{ "spiritual medallion", ALTCURRENCY_SPIRITUALMEDALLION },
+	{ "laurion inn voucher", ALTCURRENCY_LAURIONINNVOUCHER },
+	{ "shalowain's private reserve", ALTCURRENCY_SHALOWAINSPRIVATERESERVE },
 };
 
 int AltCurrencyCheck(std::string tempArg) {
