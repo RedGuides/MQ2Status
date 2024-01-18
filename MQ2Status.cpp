@@ -1705,6 +1705,7 @@ const std::map<std::string, int>  mAltCurrency = {
 	{ "spiritual medallion", ALTCURRENCY_SPIRITUALMEDALLION },
 	{ "laurion inn voucher", ALTCURRENCY_LAURIONINNVOUCHER },
 	{ "shalowain's private reserve", ALTCURRENCY_SHALOWAINSPRIVATERESERVE },
+	{ "Timeless Token", ALTCURRENCY_TIMELESSTOKEN },
 };
 
 int AltCurrencyCheck(std::string tempArg) {
