@@ -44,7 +44,6 @@ void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption
 void PutCommas(char* szLine);
 void ReverseString(char* szLine);
 void StatusCmd(SPAWNINFO* pChar, char* szLine);
-int AltCurrencyCheck(std::string tempArg);
 std::string GetSpellUpgradeType(int level);
 
 template <typename T>
@@ -366,9 +365,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				}
 				else {
 #endif !defined (ROF2EMU)
-					int altCurrency = AltCurrencyCheck(tempArg);
+					int altCurrency = GetCurrencyIDByName(tempArg.c_str());
 					if (altCurrency != -1)
-						stringBuffer += LabeledText(tempArg, altCurrency);
+						stringBuffer += LabeledText(tempArg, pPlayerPointManager->GetAltCurrency(altCurrency));
 					else {
 						stringBuffer += LabeledText(tempArg, "Is not a valid currency");
 					}
@@ -1016,7 +1015,11 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				WriteChatf("\ao[MQ2Status] \aoThese are currently: \aghstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, and weight.\aw");
 			}
 			else {
-				if (!_stricmp(Arg2, "hstr")) {
+				if (ci_equals(Arg2, "crit")) {
+					stringBuffer += LabeledText("Dot Crit", pLocalPC->TotalEffect(SPA_DOTCRIT));
+					stringBuffer += LabeledText(" Spell Crit", pLocalPC->TotalEffect(SPA_SPELL_CRIT_CHANCE));
+				}
+				else if (!_stricmp(Arg2, "hstr")) {
 					stringBuffer += LabeledText("HSTR", pCharInfo->HeroicSTRBonus);
 				}
 				else if (!_stricmp(Arg2, "hsta")) {
@@ -1648,83 +1651,6 @@ std::string GetColorCode(char Color, bool Dark)
 	}
 	else
 		return bConnectedToDannet ? std::string("\a") + Color : std::string("[+") + Color + "+]";
-}
-
-const std::map<std::string, int>  mAltCurrency = {
-	{ "doubloon", ALTCURRENCY_DOUBLOONS },
-	{ "orux", ALTCURRENCY_ORUX }, // spelling of plural in currency window
-	{ "orum", ALTCURRENCY_ORUX }, // spelling of singular item in inventory
-	{ "phosphene", ALTCURRENCY_PHOSPHENES },
-	{ "phosphite", ALTCURRENCY_PHOSPHITES },
-	{ "faycitum", ALTCURRENCY_FAYCITES },
-	{ "faycetum", ALTCURRENCY_FAYCITES }, // spelling of item in inventory
-	{ "chronobine", ALTCURRENCY_CHRONOBINES },
-	{ "mckenzie", ALTCURRENCY_MCKENZIE },
-	{ "bayle mark", ALTCURRENCY_BAYLE },
-	{ "tokens of reclamation", ALTCURRENCY_RECLAMATION },
-	{ "silver token", ALTCURRENCY_SILVERTOKENS },
-	{ "gold token", ALTCURRENCY_GOLDTOKENS },
-	{ "brellium", ALTCURRENCY_BRELLIUM },
-	{ "dream mote", ALTCURRENCY_MOTES },
-	{ "rebellion chit", ALTCURRENCY_REBELLIONCHITS },
-	{ "diamond coin", ALTCURRENCY_DIAMONDCOINS },
-	{ "bronze fiat", ALTCURRENCY_BRONZEFIATS },
-	{ "commemorative coin", ALTCURRENCY_COMMEMORATIVE_COINS },
-	{ "velium shard", ALTCURRENCY_VELIUMSHARDS },
-	{ "crystallized fear", ALTCURRENCY_CRYSTALLIZEDFEAR },
-	{ "shadowstone", ALTCURRENCY_SHADOWSTONES },
-	{ "dreadstone", ALTCURRENCY_DREADSTONES },
-	{ "marks of valor", ALTCURRENCY_MARKSOFVALOR },
-	{ "medals of heroism", ALTCURRENCY_MEDALSOFHEROISM },
-	{ "fists of bayle", ALTCURRENCY_FISTSOFBAYLE },
-	// Nobles are listed as "everquest" by expansion by dbg currency window
-	{ "nobles", ALTCURRENCY_NOBLES },
-	{ "expedient delivery voucher", ALTCURRENCY_VOUCHER },
-	{ "arx energy crystal", ALTCURRENCY_ENERGYCRYSTALS },
-	{ "pieces of eight",ALTCURRENCY_PIECESOFEIGHT },
-	{ "remnants of tranquility", ALTCURRENCY_REMNANTSOFTRANQUILITY },
-	{ "bifurcated coin", ALTCURRENCY_BIFURCATEDCOIN },
-	// adoption coins are listed as "everquest" by expansion by dbg currency window
-	{ "adoption coin", ALTCURRENCY_ADOPTIVE },
-	{ "sathir's trade gem", ALTCURRENCY_SATHIRSTRADEGEMS },
-	{ "ancient sebilisian coin", ALTCURRENCY_ANCIENTSEBILISIANCOINS },
-	{ "bathezid trade gem", ALTCURRENCY_BATHEZIDTRADEGEMS },
-	{ "ancient draconic coin", ALTCURRENCY_ANCIENTDRACONICCOIN },
-	{ "fettered ifrit coin", ALTCURRENCY_FETTERREDIFRITCOINS },
-	{ "entwined djinn coin", ALTCURRENCY_ENTWINEDDJINNCOINS },
-	{ "crystallized luck", ALTCURRENCY_CRYSTALLIZEDLUCK },
-	{ "froststone ducat", ALTCURRENCY_FROSTSTONEDUCAT },
-	{ "warlord's symbol", ALTCURRENCY_WARLORDSSYMBOL },
-	// Is there an overseer flag?
-	{ "overseer", ALTCURRENCY_OVERSEERTETRADRACHM },
-	{ "restless mark", ALTCURRENCY_RESTLESSMARK },
-	{ "warforged emblem", ALTCURRENCY_WARFORGEDEMBLEM },
-	{ "scarlet mark", ALTCURRENCY_SCARLETMARKS },
-	{ "medals of conflict", ALTCURRENCY_MEDALSOFCONFLICT },
-	{ "shaded specie", ALTCURRENCY_SHADEDSPECIE },
-	{ "spiritual medallion", ALTCURRENCY_SPIRITUALMEDALLION },
-	{ "laurion inn voucher", ALTCURRENCY_LAURIONINNVOUCHER },
-	{ "shalowain's private reserve", ALTCURRENCY_SHALOWAINSPRIVATERESERVE },
-	{ "Timeless Token", ALTCURRENCY_TIMELESSTOKEN },
-};
-
-int AltCurrencyCheck(std::string tempArg) {
-	// to cover plural usage we are going to strip any ending 's' from the word
-	// the items in inventory vs in our currency window differ
-	if (tempArg.back() == 's')
-		tempArg.pop_back();
-
-	if (tempArg.back() == 'x') {
-		tempArg.pop_back();
-		tempArg += 'm';
-	}
-
-	for (auto& key_val : mAltCurrency) {
-		if (tempArg.find(key_val.first) != std::string::npos) {
-			return pPlayerPointManager->GetAltCurrency(key_val.second);
-		}
-	}
-	return -1;
 }
 
 std::string GetSpellUpgradeType(int level) {
