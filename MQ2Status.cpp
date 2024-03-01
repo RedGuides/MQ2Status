@@ -365,7 +365,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				}
 				else {
 #endif !defined (ROF2EMU)
-					int altCurrency = GetCurrencyIDByName(tempArg.c_str());
+					int altCurrency = GetCurrencyIDByName(NextArg);
 					if (altCurrency != -1)
 						stringBuffer += LabeledText(tempArg, pPlayerPointManager->GetAltCurrency(altCurrency));
 					else {
