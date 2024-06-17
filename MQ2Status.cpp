@@ -60,6 +60,37 @@ std::string to_string_with_precision(const T a_value, const int n = 6)
 	return out.str();
 }
 
+// TODO: FIXME
+// There currently isn't a way to check what lua stuff is running in c++ land
+// unlike plugins that use the g_pluginMap global
+// MQ2Lua uses a s_infoMap which is local to MQ2Lua
+static char* LuaScriptStatus(const char* scriptname) {
+	static char luaScript[64] = "";
+	if (IsPluginLoaded("Lua")) {
+		// format is "${Lua.Script[scriptname].Status}"
+		sprintf_s(luaScript, "${Lua.Script[");
+		strcat_s(luaScript, scriptname);
+		strcat_s(luaScript, "].Status}");
+		ParseMacroData(luaScript, 64);
+	}
+	/* return values as defined in LuaThread.h
+		"STARTING";
+		"RUNNING";
+		"PAUSED";
+		"EXITED";
+		"UNKNOWN";
+	*/
+	return luaScript;
+}
+
+// TODO:: FIXME
+// ideally would actually be able to pull in-script TLO's
+// so we can see if it is paused
+// which is not the same as the paused lua status in some circumstances
+bool IsLuaScriptRunning(const char* scriptname) {
+	return ci_equals(LuaScriptStatus(scriptname), "RUNNING");
+}
+
 // TODO remove once an appropriate function is in main/core.
 int ItemCountByType(int type) {
 	PcProfile* pcProfile = GetPcProfile();
@@ -1376,6 +1407,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		}
 		else {
 			if (!classPlugin) {
+				if (IsLuaScriptRunning("RGMercs")) {
+					stringBuffer += GetColorCode('o', false) + "Lua: RGMercs " + GetColorCode('w', false);
+				}
 				stringBuffer += GetColorCode('o', false) + "Macro: " + GetColorCode('r', false) + "FALSE! " + GetColorCode('w', false);
 			}
 		}
