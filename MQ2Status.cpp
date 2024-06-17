@@ -68,9 +68,7 @@ static char* LuaScriptStatus(const char* scriptname) {
 	static char luaScript[64] = "";
 	if (IsPluginLoaded("Lua")) {
 		// format is "${Lua.Script[scriptname].Status}"
-		sprintf_s(luaScript, "${Lua.Script[");
-		strcat_s(luaScript, scriptname);
-		strcat_s(luaScript, "].Status}");
+		sprintf_s(luaScript, "${Lua.Script[%s].Status}", scriptname);
 		ParseMacroData(luaScript, 64);
 	}
 	/* return values as defined in LuaThread.h
