@@ -1408,7 +1408,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 		else {
 			if (!classPlugin) {
 				if (IsLuaScriptRunning("RGMercs")) {
-					stringBuffer += GetColorCode('o', false) + "Lua: RGMercs " + GetColorCode('w', false);
+					stringBuffer += GetColorCode('o', false) + "Lua: " + GetColorCode('g', false) +"RGMercs " + GetColorCode('w', false);
 				}
 				stringBuffer += GetColorCode('o', false) + "Macro: " + GetColorCode('r', false) + "FALSE! " + GetColorCode('w', false);
 			}
