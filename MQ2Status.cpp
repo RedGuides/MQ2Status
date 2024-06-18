@@ -65,14 +65,13 @@ std::string to_string_with_precision(const T a_value, const int n = 6)
 // unlike plugins that use the g_pluginMap global
 // MQ2Lua uses a s_infoMap which is local to MQ2Lua
 std::string LuaScriptStatus(const char* scriptname) {
-	std::ostringstream outputBuffer;
 	char luaScript[64] = "";
+	std::string outputBuffer = {};
 	if (IsPluginLoaded("Lua")) {
 		// format is "${Lua.Script[scriptname].Status}"
 		sprintf_s(luaScript, "${Lua.Script[%s].Status}", scriptname);
 		ParseMacroData(luaScript, 64);
-		std::ostringstream out;
-		outputBuffer << luaScript;
+		outputBuffer = luaScript;
 	}
 	/* return values as defined in LuaThread.h
 		"STARTING";
@@ -81,7 +80,7 @@ std::string LuaScriptStatus(const char* scriptname) {
 		"EXITED";
 		"UNKNOWN";
 	*/
-	return outputBuffer.str();
+	return outputBuffer;
 }
 
 // TODO:: FIXME
