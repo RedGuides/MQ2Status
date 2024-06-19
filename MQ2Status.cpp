@@ -64,12 +64,14 @@ std::string to_string_with_precision(const T a_value, const int n = 6)
 // There currently isn't a way to check what lua stuff is running in c++ land
 // unlike plugins that use the g_pluginMap global
 // MQ2Lua uses a s_infoMap which is local to MQ2Lua
-static char* LuaScriptStatus(const char* scriptname) {
-	static char luaScript[64] = "";
+std::string LuaScriptStatus(const char* scriptname) {
+	std::string outputBuffer = {};
 	if (IsPluginLoaded("Lua")) {
+		char luaScript[64] = { 0 };
 		// format is "${Lua.Script[scriptname].Status}"
 		sprintf_s(luaScript, "${Lua.Script[%s].Status}", scriptname);
 		ParseMacroData(luaScript, 64);
+		outputBuffer = luaScript;
 	}
 	/* return values as defined in LuaThread.h
 		"STARTING";
@@ -78,7 +80,7 @@ static char* LuaScriptStatus(const char* scriptname) {
 		"EXITED";
 		"UNKNOWN";
 	*/
-	return luaScript;
+	return outputBuffer;
 }
 
 // TODO:: FIXME
@@ -86,7 +88,7 @@ static char* LuaScriptStatus(const char* scriptname) {
 // so we can see if it is paused
 // which is not the same as the paused lua status in some circumstances
 bool IsLuaScriptRunning(const char* scriptname) {
-	return ci_equals(LuaScriptStatus(scriptname), "RUNNING");
+	return string_equals(LuaScriptStatus(scriptname), "RUNNING");
 }
 
 // TODO remove once an appropriate function is in main/core.
