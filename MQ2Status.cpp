@@ -524,7 +524,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				if (CLabelWnd* GuildTributeStatus = (CLabelWnd*)TributeBenefitWnd->GetChildItem("TBWG_ActivateButton")) {
 					std::string strGuildTributeStatus = GuildTributeStatus->GetWindowText().c_str();
 					if (!strGuildTributeStatus.empty()) {
-						stringBuffer += LabeledText("Guild Tribute Status", !ci_equals(strGuildTributeStatus, "Deactivate") ? "On" : "Off");
+						stringBuffer += LabeledText("Guild Tribute Status", ci_equals(strGuildTributeStatus, "Deactivate") ? "On" : "Off");
 					}
 				}
 
