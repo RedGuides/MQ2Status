@@ -958,7 +958,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				// discs
 				for (int j = 0; j < NUM_COMBAT_ABILITIES; j++) {
 					if (pCombatSkillsSelectWnd->ShouldDisplayThisSkill(j)) {
-						if (EQ_Spell* thisSpell = GetSpellByID(pPCData->GetCombatAbility(j))) {
+						if (EQ_Spell* thisSpell = GetSpellByID(pLocalPC->GetCombatAbility(j))) {
 							if (ci_starts_with(thisSpell->Name, NextArg)) {
 								bFound = true;
 								if (thisSpell->ClassLevel[myclass] > 70)
@@ -1013,7 +1013,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				bCheckSpellUpgradeType = true;
 				for (int j = 0; j < NUM_COMBAT_ABILITIES; j++) {
 					if (pCombatSkillsSelectWnd->ShouldDisplayThisSkill(j)) {
-						if (EQ_Spell* thisSpell = GetSpellByID(pPCData->GetCombatAbility(j))) {
+						if (EQ_Spell* thisSpell = GetSpellByID(pLocalPC->GetCombatAbility(j))) {
 							if (thisSpell->ClassLevel[myclass] == iArg) {
 								// Rank II/III spells start at lvl 71
 								if (bCheckSpellUpgradeType && thisSpell->ClassLevel[myclass] > 70) {
