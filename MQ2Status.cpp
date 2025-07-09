@@ -186,6 +186,26 @@ const std::map<std::string, int>  mEquipInvSlotName {
 	{ "Waist",        eInventorySlot::InvSlot_Waist },
 };
 
+const std::vector<std::pair<const char*, bool*>> vShowClassesOptions = {
+	{ "plugin", &bShowPlugin },
+	{ "warrior", &bShowWarrior },
+	{ "cleric", &bShowCleric },
+	{ "paladin", &bShowPaladin },
+	{ "ranger", &bShowRanger },
+	{ "shadowknight", &bShowShadowknight },
+	{ "druid", &bShowDruid },
+	{ "monk", &bShowMonk },
+	{ "bard", &bShowBard },
+	{ "rogue", &bShowRogue },
+	{ "shaman", &bShowShaman },
+	{ "necromancer", &bShowNecromancer },
+	{ "wizard", &bShowWizard },
+	{ "magician", &bShowMage },
+	{ "enchanter", &bShowEnchanter },
+	{ "beastlord", &bShowBeastlord },
+	{ "berserker", &bShowBerserker },
+};
+
 void StatusCmd(SPAWNINFO* pChar, char* szLine)
 {
 	std::string outputcmd = ConnectedToReportOutput();
@@ -845,61 +865,20 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 
 				if (!bFoundMatch)
 					stringBuffer += LabeledText(NextArg, "NULL");
+				}
 			}
 		}
-		else if (!_stricmp(Arg, "show")) {
-			if (!_stricmp(NextArg, "plugin")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowPlugin, "ShowPlugin");
+		else if (ci_equals(Arg, "show")) {
+			bool bFound = false;
+			for (const auto& options : vShowClassesOptions) {
+				if (ci_equals(Arg2, options.first)) {
+					ParseBoolArg(Arg, Arg2, Arg3, options.second, "ShowPlugin");
+					bFound = true;
+					break;
+				}
 			}
-			else if (!_stricmp(NextArg, "warrior")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowWarrior, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "cleric")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowCleric, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "paladin")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowPaladin, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "ranger")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowRanger, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "shadowknight")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowShadowknight, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "druid")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowDruid, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "monk")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowMonk, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "bard")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowBard, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "rogue")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowRogue, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "shaman")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowShaman, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "necromancer")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowNecromancer, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "wizard")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowWizard, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "magician")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowMage, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "enchanter")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowEnchanter, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "beastlord")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowBeastlord, "ShowPlugin");
-			}
-			else if (!_stricmp(NextArg, "berserker")) {
-				ParseBoolArg(Arg, NextArg, Arg3, &bShowBerserker, "ShowPlugin");
-			}
-			else {
+
+			if (!bFound) {
 				WriteChatf("\ao[MQ2Status] \arPlease provide a valid \agShow\aw option.\aw");
 				WriteChatf("\ao[MQ2Status] \ayImportant!\aw \agShow Plugin Off\aw will hide ALL the plugins.");
 				WriteChatf("\ao[MQ2Status] \ayImportant!\aw To display an individual plugin, you will need \agShow Plugin On\aw as well as the individual class plugin set to on.");
