@@ -51,6 +51,25 @@ std::string LabeledText(const std::string& Label, T Value);
 std::string stringBuffer;
 std::string GetColorCode(char Color, bool Dark);
 
+struct XpacCurrency {
+	std::string XpacShortName;
+	ALTCURRENCY Group;
+	ALTCURRENCY Raid;
+};
+
+const std::vector<XpacCurrency> currencyxpac = {
+	//{ Xpac, group, raid },
+	{ "ToB", ALTCURRENCY_SCALEWROUGHTEMBLEM, ALTCURRENCY_BROODOFFICERSEMBLEM },
+	{ "LS", ALTCURRENCY_LAURIONINNVOUCHER, ALTCURRENCY_SHALOWAINSPRIVATERESERVE },
+	{ "NoS", ALTCURRENCY_SHADEDSPECIE, ALTCURRENCY_SPIRITUALMEDALLIONS },
+	{ "ToL", ALTCURRENCY_SCARLETMARKS, ALTCURRENCY_MEDALSOFCONFLICT },
+	{ "CoV", ALTCURRENCY_RESTLESSMARKS, ALTCURRENCY_WARFORGEDEMBLEMS },
+	{ "ToV", ALTCURRENCY_FROSTSTONEDUCATS, ALTCURRENCY_WARLORDSSYMBOLS },
+	{ "TBL", ALTCURRENCY_FETTEREDIFRITCOINS, ALTCURRENCY_ENTWINEDDJINNCOINS },
+	{ "RoS", ALTCURRENCY_BATHEZIDTRADEGEMS, ALTCURRENCY_ANCIENTDRACONICCOIN },
+	{ "EoK", ALTCURRENCY_SATHIRTRADEGEMS, ALTCURRENCY_ANCIENTSEBILISIANCOINS },
+};
+
 template <typename T>
 std::string to_string_with_precision(const T a_value, const int n = 6)
 {
@@ -401,8 +420,9 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				std::string tempArg = NextArg; // convert our arg to string for transform
 				std::transform(tempArg.begin(), tempArg.end(), tempArg.begin(), tolower); // lowercase
 #if !defined (ROF2EMU)
-				if (tempArg.find("loyalty") == '\0')
+				if (tempArg.find("loyalty") == '\0') {
 					stringBuffer += LabeledText("Loyalty Tokens", pCharInfo->LoyaltyRewardBalance); // Using LoyaltyRewardBalance instead of AltCurrency since we can access directly
+				}
 				else if (tempArg.find("dbc") == '\0' || tempArg.find("daybreak") == '\0') { // DayBreakCurrency
 					if (CSidlScreenWnd* MarketWnd = (CSidlScreenWnd*)FindMQ2Window("MarketPlaceWnd")) {
 						if (CXWnd* Funds = MarketWnd->GetChildItem("MKPW_AvailableFundsUpper")) {
@@ -417,9 +437,24 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 				else {
 #endif !defined (ROF2EMU)
 					int altCurrency = GetCurrencyIDByName(NextArg);
-					if (altCurrency != -1)
+					bool bFound = false;
+					if (altCurrency != -1) {
 						stringBuffer += LabeledText(tempArg, pPlayerPointManager->GetAltCurrency(altCurrency));
+						bFound = true;
+					}
 					else {
+						for (const auto& xpac : currencyxpac) {
+							if (ci_equals(xpac.XpacShortName, NextArg)) {
+
+								stringBuffer += LabeledText("Xpac", xpac.XpacShortName);
+								stringBuffer += LabeledText(" Group", pPlayerPointManager->GetAltCurrency(xpac.Group));
+								stringBuffer += LabeledText(" Raid", pPlayerPointManager->GetAltCurrency(xpac.Raid));
+								bFound = true;
+							}
+						}
+					}
+
+					if (!bFound) {
 						stringBuffer += LabeledText(tempArg, "Is not a valid currency");
 					}
 #if !defined (ROF2EMU)
