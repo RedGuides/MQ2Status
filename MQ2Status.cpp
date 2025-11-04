@@ -30,20 +30,19 @@ bool bConnectedToDannet = false;
 
 const int MAX_ARGS = 20;
 
-bool atob(char* pChar);
 std::string ConnectedToReportOutput();
 bool HaveAlias(const std::string& aliasName);
 bool IHaveSpa(int spa);
-bool IsDefined(char* szLine);
-bool VerifyINI(char* Section, char* Key, char* Default);
+bool IsDefined(const char* szLine);
+bool VerifyINI(const char* Section, const char* Key, const char* Default);
 inline float PercentHealth(SPAWNINFO* pSpawn);
 inline float PercentEndurance(SPAWNINFO* pSpawn);
 inline float PercentMana(SPAWNINFO* pSpawn);
 void DoINIThings();
-void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption, char* INIsection);
+void ParseBoolArg(const char* Arg, const char* Arg2, const char* Arg3, bool* theOption, const char* INIsection);
 void PutCommas(char* szLine);
 void ReverseString(char* szLine);
-void StatusCmd(SPAWNINFO* pChar, char* szLine);
+void StatusCmd(SPAWNINFO* pChar, const char* szLine);
 std::string GetSpellUpgradeType(int level);
 
 template <typename T>
@@ -225,7 +224,7 @@ const std::vector<std::pair<const char*, bool*>> vShowClassesOptions = {
 	{ "berserker", &bShowBerserker },
 };
 
-void StatusCmd(SPAWNINFO* pChar, char* szLine)
+void StatusCmd(SPAWNINFO* pChar, const char* szLine)
 {
 	std::string outputcmd = ConnectedToReportOutput();
 	std::string stringBuffer;
@@ -1463,7 +1462,7 @@ void StatusCmd(SPAWNINFO* pChar, char* szLine)
 	}
 }
 
-bool IsDefined(char* szLine)
+bool IsDefined(const char* szLine)
 {
 	return (FindMQ2DataVariable(szLine) != 0);
 }
@@ -1598,48 +1597,36 @@ PLUGIN_API void ShutdownPlugin()
 	RemoveSettingsPanel("plugins/Status");
 }
 
-bool VerifyINI(char* Section, char* Key, char* Default) {
-	char temp[MAX_STRING] = { 0 };
-	if (GetPrivateProfileString(Section, Key, nullptr, temp, MAX_STRING, INIFileName) == 0) {
-		WritePrivateProfileString(Section, Key, Default, INIFileName);
-		// Because there was nothing in the ini, we're going to return the default value
-		return atob(Default);
-	}
-	// Because there was a value in the ini, we're going to atob and return it
-	return atob(temp);
+bool VerifyINI(const char* Section, const char* Key, bool Default)
+{
+	bool value = GetPrivateProfileBool(Section, Key, Default, INIFileName);
+	WritePrivateProfileBool(Section, Key, value, INIFileName);
+	return value;
 }
 
 void DoINIThings() {
 	// We are going to Check the ini status, and if there is no ini
 	// We are going to write these defaults
-	bShowPlugin =       VerifyINI("ShowPlugin", "Plugin", "on");
-	bShowWarrior =      VerifyINI("ShowPlugin", "Warrior", "on");
-	bShowCleric =       VerifyINI("ShowPlugin", "Cleric", "on");
-	bShowPaladin =      VerifyINI("ShowPlugin", "Paladin", "on");
-	bShowRanger =       VerifyINI("ShowPlugin", "Ranger", "on");
-	bShowShadowknight = VerifyINI("ShowPlugin", "Shadowknight", "on");
-	bShowDruid =        VerifyINI("ShowPlugin", "Druid", "on");
-	bShowMonk =         VerifyINI("ShowPlugin", "Monk", "on");
-	bShowBard =         VerifyINI("ShowPlugin", "Bard", "on");
-	bShowRogue =        VerifyINI("ShowPlugin", "Rogue", "on");
-	bShowShaman =       VerifyINI("ShowPlugin", "Shaman", "on");
-	bShowNecromancer =  VerifyINI("ShowPlugin", "Necromancer", "on");
-	bShowWizard =       VerifyINI("ShowPlugin", "Wizard", "on");
-	bShowMage =         VerifyINI("ShowPlugin", "Magician", "on");
-	bShowEnchanter =    VerifyINI("ShowPlugin", "Enchanter", "on");
-	bShowBeastlord =    VerifyINI("ShowPlugin", "Beastlord", "on");
-	bShowBerserker =    VerifyINI("ShowPlugin", "Berserker", "on");
+	bShowPlugin =       VerifyINI("ShowPlugin", "Plugin", true);
+	bShowWarrior =      VerifyINI("ShowPlugin", "Warrior", true);
+	bShowCleric =       VerifyINI("ShowPlugin", "Cleric", true);
+	bShowPaladin =      VerifyINI("ShowPlugin", "Paladin", true);
+	bShowRanger =       VerifyINI("ShowPlugin", "Ranger", true);
+	bShowShadowknight = VerifyINI("ShowPlugin", "Shadowknight", true);
+	bShowDruid =        VerifyINI("ShowPlugin", "Druid", true);
+	bShowMonk =         VerifyINI("ShowPlugin", "Monk", true);
+	bShowBard =         VerifyINI("ShowPlugin", "Bard", true);
+	bShowRogue =        VerifyINI("ShowPlugin", "Rogue", true);
+	bShowShaman =       VerifyINI("ShowPlugin", "Shaman", true);
+	bShowNecromancer =  VerifyINI("ShowPlugin", "Necromancer", true);
+	bShowWizard =       VerifyINI("ShowPlugin", "Wizard", true);
+	bShowMage =         VerifyINI("ShowPlugin", "Magician", true);
+	bShowEnchanter =    VerifyINI("ShowPlugin", "Enchanter", true);
+	bShowBeastlord =    VerifyINI("ShowPlugin", "Beastlord", true);
+	bShowBerserker =    VerifyINI("ShowPlugin", "Berserker", true);
 }
 
-bool atob(char* pChar)
-{
-	if (ci_equals(pChar, "true") || strtol(pChar, nullptr, 10) != 0 || ci_equals(pChar, "on")) {
-		return true;
-	}
-	return false;
-}
-
-void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption, char* INIsection)
+void ParseBoolArg(const char* Arg, const char* Arg2, const char* Arg3, bool* theOption, const char* INIsection)
 {
 	// Arg3 must be a char* because we are using it with IsNumber which needs a char* and will not accept const char*
 	if (!strlen(Arg3)) {
@@ -1648,30 +1635,23 @@ void ParseBoolArg(const char* Arg, const char* Arg2, char* Arg3, bool* theOption
 		return;
 	}
 
-	if (IsNumber(Arg3) || ci_equals(Arg3, "true") || ci_equals(Arg3, "false") || ci_equals(Arg3, "on") || ci_equals(Arg3, "off")) {
-		*theOption = atob(Arg3);
-		WritePrivateProfileString(INIsection, Arg2, *theOption ? "on" : "off", INIFileName);
-		WriteChatf("\at%s is now: \ap%s", Arg2, *theOption ? "\agOn" : "\arOff");
-	}
-	else {
-		WriteChatf("\ap%s \aris not a valid option for \ag%s %s\aw. \arValid options are: \aytrue, false, 0, 1, on, off.", Arg3, Arg, Arg2);
-	}
-
-	return;
+	bool value = GetBoolFromString(Arg3, false);
+	*theOption = value;
+	WritePrivateProfileBool(INIsection, Arg2, *theOption, INIFileName);
+	WriteChatf("\at%s is now: \ap%s", Arg2, *theOption ? "\agOn" : "\arOff");
 }
 
 std::string ConnectedToReportOutput()
 {
-	if (HMODULE hMod = GetModuleHandle("mq2eqbc")) {
-		if (auto isConnected = (unsigned short(*)())GetProcAddress(hMod, "isConnected")) {
-			if (isConnected()) {
-				bConnectedToEQBC = true;
-				return "/bc ";
-			}
+	using pfnIsConnected = unsigned short(*)();
+	if (auto isConnected = (pfnIsConnected)GetPluginProc("mq2eqbc", "isConnected")) {
+		if (isConnected()) {
+			bConnectedToEQBC = true;
+			return "/bc ";
 		}
 	}
 
-	if (auto hMod = GetModuleHandle("mq2dannet")) {
+	if (GetPlugin("mq2dannet") != nullptr) {
 		bConnectedToDannet = true;
 		return "/dgtell all ";
 	}
