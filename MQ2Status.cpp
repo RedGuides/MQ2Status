@@ -34,15 +34,13 @@ std::string ConnectedToReportOutput();
 bool HaveAlias(const std::string& aliasName);
 bool IHaveSpa(int spa);
 bool IsDefined(const char* szLine);
-bool VerifyINI(const char* Section, const char* Key, const char* Default);
-inline float PercentHealth(SPAWNINFO* pSpawn);
-inline float PercentEndurance(SPAWNINFO* pSpawn);
-inline float PercentMana(SPAWNINFO* pSpawn);
+inline float PercentHealth(PlayerClient* pSpawn);
+inline float PercentEndurance(PlayerClient* pSpawn);
+inline float PercentMana(PlayerClient* pSpawn);
 void DoINIThings();
 void ParseBoolArg(const char* Arg, const char* Arg2, const char* Arg3, bool* theOption, const char* INIsection);
-void PutCommas(char* szLine);
-void ReverseString(char* szLine);
-void StatusCmd(SPAWNINFO* pChar, const char* szLine);
+std::string PutCommas(const std::string& input);
+void StatusCmd(PlayerClient* pChar, const char* szLine);
 std::string GetSpellUpgradeType(int level);
 
 template <typename T>
@@ -50,14 +48,25 @@ std::string LabeledText(const std::string& Label, T Value);
 std::string stringBuffer;
 std::string GetColorCode(char Color, bool Dark);
 
-struct XpacCurrency {
+struct XpacCurrency
+{
 	std::string XpacShortName;
 	ALTCURRENCY Group;
 	ALTCURRENCY Raid;
+	// currently the only usage of this optional is for additional secondary raid currency
+	// so if we label is "Raid2" it means in the future we can add "Group2" options currency if needed
+	std::optional<ALTCURRENCY> Raid2;
+	// I'm not including RoF atm, it has 4 raid currencys but no group currency
+	// std::optional<ALTCURRENCY> Raid3;
+	// std::optional<ALTCURRENCY> Raid4;
+	//
+
 };
 
-const std::vector<XpacCurrency> currencyxpac = {
+const std::vector<XpacCurrency> currencyxpac =
+{
 	//{ Xpac, group, raid },
+	{ "SoR", ALTCURRENCY_RIFTTOUCHEDSIGILS, ALTCURRENCY_FORGOTTENRUINEDCOINS },
 	{ "ToB", ALTCURRENCY_SCALEWROUGHTEMBLEM, ALTCURRENCY_BROODOFFICERSEMBLEM },
 	{ "LS", ALTCURRENCY_LAURIONINNVOUCHER, ALTCURRENCY_SHALOWAINSPRIVATERESERVE },
 	{ "NoS", ALTCURRENCY_SHADEDSPECIE, ALTCURRENCY_SPIRITUALMEDALLIONS },
@@ -67,6 +76,12 @@ const std::vector<XpacCurrency> currencyxpac = {
 	{ "TBL", ALTCURRENCY_FETTEREDIFRITCOINS, ALTCURRENCY_ENTWINEDDJINNCOINS },
 	{ "RoS", ALTCURRENCY_BATHEZIDTRADEGEMS, ALTCURRENCY_ANCIENTDRACONICCOIN },
 	{ "EoK", ALTCURRENCY_SATHIRTRADEGEMS, ALTCURRENCY_ANCIENTSEBILISIANCOINS },
+	{ "TBM", ALTCURRENCY_REMNANTSOFTRANQUILITY, ALTCURRENCY_BIFURCATEDCOINS },
+	{ "TDS", ALTCURRENCY_PIECESOFEIGHT, ALTCURRENCY_ARXENERGYCRYSTALS },
+	{ "CoTF", ALTCURRENCY_MARKSOFVALOR, ALTCURRENCY_MEDALSOFHEROISM, ALTCURRENCY_FISTSOFBAYLE },
+	// I haven't decided how to handle when there is no group currency
+	//{ "RoF", ALTCURRENCY_MARKSOFVALOR, ALTCURRENCY_VELIUMSHARDS, ALTCURRENCY_CRYSTALLIZEDFEAR, ALTCURRENCY_SHADOWSTONES, ALTCURRENCY_DREADSTONES },
+
 };
 
 template <typename T>
@@ -82,7 +97,8 @@ std::string to_string_with_precision(const T a_value, const int n = 6)
 // There currently isn't a way to check what lua stuff is running in c++ land
 // unlike plugins that use the g_pluginMap global
 // MQ2Lua uses a s_infoMap which is local to MQ2Lua
-std::string LuaScriptStatus(const char* scriptname) {
+std::string LuaScriptStatus(const char* scriptname)
+{
 	std::string outputBuffer = {};
 	if (IsPluginLoaded("Lua")) {
 		char luaScript[64] = { 0 };
@@ -105,12 +121,14 @@ std::string LuaScriptStatus(const char* scriptname) {
 // ideally would actually be able to pull in-script TLO's
 // so we can see if it is paused
 // which is not the same as the paused lua status in some circumstances
-bool IsLuaScriptRunning(const char* scriptname) {
+bool IsLuaScriptRunning(const char* scriptname)
+{
 	return string_equals(LuaScriptStatus(scriptname), "RUNNING");
 }
 
 // TODO remove once an appropriate function is in main/core.
-int ItemCountByType(int type) {
+int ItemCountByType(int type)
+{
 	PcProfile* pcProfile = GetPcProfile();
 	int count = 0;
 	for (int i = InvSlot_FirstWornItem; i < InvSlot_Max; i++) {
@@ -134,7 +152,8 @@ int ItemCountByType(int type) {
 	return count;
 };
 
-enum eItemCountStatusType {
+enum eItemCountStatusType
+{
 	Item,
 	ItemAll,
 	ItemBank
@@ -174,7 +193,8 @@ std::string ItemCountStatusByID(const char* Arg, const int type)
 	return output;
 }
 
-const std::map<std::string, int>  mEquipInvSlotName {
+const std::map<std::string, int>  mEquipInvSlotName
+{
 	{ "Ammo",         eInventorySlot::InvSlot_Ammo },
 	{ "Arms",         eInventorySlot::InvSlot_Arms },
 	{ "Back",         eInventorySlot::InvSlot_Back },
@@ -204,7 +224,8 @@ const std::map<std::string, int>  mEquipInvSlotName {
 	{ "Waist",        eInventorySlot::InvSlot_Waist },
 };
 
-const std::vector<std::pair<const char*, bool*>> vShowClassesOptions = {
+const std::vector<std::pair<const char*, bool*>> vShowClassesOptions =
+{
 	{ "plugin", &bShowPlugin },
 	{ "warrior", &bShowWarrior },
 	{ "cleric", &bShowCleric },
@@ -224,7 +245,7 @@ const std::vector<std::pair<const char*, bool*>> vShowClassesOptions = {
 	{ "berserker", &bShowBerserker },
 };
 
-void StatusCmd(SPAWNINFO* pChar, const char* szLine)
+void StatusCmd(PlayerClient* pChar, const char* szLine)
 {
 	std::string outputcmd = ConnectedToReportOutput();
 	std::string stringBuffer;
@@ -448,6 +469,9 @@ void StatusCmd(SPAWNINFO* pChar, const char* szLine)
 								stringBuffer += LabeledText("Xpac", xpac.XpacShortName);
 								stringBuffer += LabeledText(" Group", pPlayerPointManager->GetAltCurrency(xpac.Group));
 								stringBuffer += LabeledText(" Raid", pPlayerPointManager->GetAltCurrency(xpac.Raid));
+								if (xpac.Raid2) {
+									stringBuffer += LabeledText(" Raid2", pPlayerPointManager->GetAltCurrency(xpac.Raid2.value()));
+								}
 								bFound = true;
 							}
 						}
@@ -790,10 +814,8 @@ void StatusCmd(SPAWNINFO* pChar, const char* szLine)
 			}
 		}
 		else if (ci_equals(Arg, "money") || ci_equals(Arg, "plat")) {
-			char szmyPlat[MAX_STRING] = "";
-			_ltoa_s(pCharInfo2->Plat, szmyPlat, 10);
-			PutCommas(szmyPlat);
-			stringBuffer += LabeledText("Plat", szmyPlat);
+			std::string myPlat = PutCommas(std::to_string(pLocalPC->GetCurrentPcProfile()->Plat));
+			stringBuffer += LabeledText("Plat", myPlat);
 		}
 		else if (ci_equals(Arg, "parcel")) {
 			switch (GetCharInfo()->ParcelStatus) {
@@ -1467,7 +1489,8 @@ bool IsDefined(const char* szLine)
 	return (FindMQ2DataVariable(szLine) != 0);
 }
 
-bool HaveAlias(const std::string& aliasName) {
+bool HaveAlias(const std::string& aliasName)
+{
 	const std::string alias = GetPrivateProfileString("Aliases", aliasName, "None", gPathMQini);
 	if (alias == "None") {
 		return false;
@@ -1475,41 +1498,37 @@ bool HaveAlias(const std::string& aliasName) {
 	return true;
 }
 
-void ReverseString(char* szLine)
-{
-	std::reverse(szLine, szLine + strlen(szLine));
-}
+std::string PutCommas(const std::string& input) {
+	std::string reversed = input;
+	std::reverse(reversed.begin(), reversed.end());
 
-void PutCommas(char* szLine)
-{
-	ReverseString(szLine);
-	unsigned int j = 0;
-	char temp[MAX_STRING] = { 0 };
-	for (unsigned int i = 0; i < strlen(szLine) + 1; i++) {
-		if (i % 3 == 0 && i != 0 && i != strlen(szLine)) {
-			temp[j] = ',';
-			j++;
+	std::string result;
+	result.reserve(input.length() + input.length() / 3);
+
+	for (size_t i = 0; i < reversed.length(); i++) {
+		if (i % 3 == 0 && i != 0) {
+			result += ',';
 		}
-		temp[j] = szLine[i];
-		j++;
+		result += reversed[i];
 	}
-	strcpy_s(szLine, MAX_STRING, temp);
-	ReverseString(szLine);
+
+	std::reverse(result.begin(), result.end());
+	return result;
 }
 
-inline float PercentHealth(SPAWNINFO* pSpawn)
+inline float PercentHealth(PlayerClient* pSpawn)
 {
 	//TODO: Verify / Update for EMU
 	return ((float)pSpawn->HPCurrent / (float)pSpawn->HPMax) * 100.0f;
 }
 
-inline float PercentEndurance(SPAWNINFO* pSpawn)
+inline float PercentEndurance(PlayerClient* pSpawn)
 {
 	//TODO: Verify / Update for EMU
 	return ((float)pSpawn->GetCurrentEndurance() / (float)pSpawn->GetMaxEndurance()) * 100.0f;
 }
 
-inline float PercentMana(SPAWNINFO* pSpawn)
+inline float PercentMana(PlayerClient* pSpawn)
 {
 	//TODO: Verify / Update for EMU
 	if (pSpawn->GetMaxMana() <= 0) return 100.0f;
@@ -1529,12 +1548,14 @@ bool IHaveSpa(int spa)
 	return false;
 }
 
-struct PluginCheckbox {
+struct PluginCheckbox
+{
 	const char* name;
 	bool* value;
 };
 
-static const PluginCheckbox checkboxes[] = {
+static const PluginCheckbox checkboxes[] =
+{
 	{ "Bard", &bShowBard },
 	{ "Beastlord", &bShowBeastlord },
 	{ "Berserker", &bShowBerserker },
@@ -1604,7 +1625,8 @@ bool VerifyINI(const char* Section, const char* Key, bool Default)
 	return value;
 }
 
-void DoINIThings() {
+void DoINIThings()
+{
 	// We are going to Check the ini status, and if there is no ini
 	// We are going to write these defaults
 	bShowPlugin =       VerifyINI("ShowPlugin", "Plugin", true);
@@ -1677,11 +1699,13 @@ std::string GetColorCode(char Color, bool Dark)
 		char ColorU = toupper(Color);
 		return bConnectedToDannet ? std::string("\a-") + Color : std::string("[+") + ColorU + "+]";
 	}
-	else
+	else {
 		return bConnectedToDannet ? std::string("\a") + Color : std::string("[+") + Color + "+]";
+	}
 }
 
-std::string GetSpellUpgradeType(int level) {
+std::string GetSpellUpgradeType(int level)
+{
 	int iLastDigit = level % 10;
 	switch (iLastDigit) {
 		case 0:
