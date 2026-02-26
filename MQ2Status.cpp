@@ -193,6 +193,26 @@ std::string ItemCountStatusByID(const char* Arg, const int type)
 	return output;
 }
 
+std::string ItemCountStatusByName(const char* Arg, const int type)
+{
+	size_t len = strlen(Arg);
+	std::string name = Arg;
+	if (len >= 2 && Arg[0] == '"' && Arg[len - 1] == '"') {
+		name = "=" + std::string(Arg + 1, len - 2);
+	}
+
+	switch (type) {
+		case eItemCountStatusType::Item:
+			return LabeledText(name, FindItemCountByName(name.c_str()));
+		case eItemCountStatusType::ItemAll:
+			return LabeledText(name, FindItemCountByName(name.c_str()) + FindBankItemCountByName(name.c_str(), 0));
+		case eItemCountStatusType::ItemBank:
+			return LabeledText(name, FindBankItemCountByName(name.c_str(), 0));
+		default:
+			return {};
+	}
+}
+
 const std::map<std::string, int>  mEquipInvSlotName
 {
 	{ "Ammo",         eInventorySlot::InvSlot_Ammo },
@@ -640,16 +660,7 @@ void StatusCmd(PlayerClient* pChar, const char* szLine)
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::Item);
 			}
 			else {
-				size_t len = strlen(NextArg);
-				// finditemcountbyname -> mq2inlines uses = for exact match
-				// so let's replace quotes with an =
-				if (len >= 2 && NextArg[0] == '"' && NextArg[len - 1] == '"') {
-					std::string exact = "=" + std::string(NextArg + 1, len - 2);
-					stringBuffer += LabeledText(exact, FindItemCountByName(exact.c_str()));
-				}
-				else {
-					stringBuffer += LabeledText(NextArg, FindItemCountByName(NextArg));
-				}
+				stringBuffer += ItemCountStatusByName(NextArg, eItemCountStatusType::Item);
 			}
 		}
 		else if (ci_equals(Arg, "itemall")) {
@@ -662,16 +673,7 @@ void StatusCmd(PlayerClient* pChar, const char* szLine)
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemAll);
 			}
 			else {
-				size_t len = strlen(NextArg);
-				// finditemcountbyname -> mq2inlines uses = for exact match
-				// so let's replace quotes with an =
-				if (len >= 2 && NextArg[0] == '"' && NextArg[len - 1] == '"') {
-					std::string exact = "=" + std::string(NextArg + 1, len - 2);
-					stringBuffer += LabeledText(exact, FindItemCountByName(exact.c_str()) + FindBankItemCountByName(exact.c_str(), 0));
-				}
-				else {
-					stringBuffer += LabeledText(NextArg, FindItemCountByName(NextArg) + FindBankItemCountByName(NextArg, 0));
-				}
+				stringBuffer += ItemCountStatusByName(NextArg, eItemCountStatusType::ItemAll);
 			}
 		}
 		else if (ci_equals(Arg, "itembank")) {
@@ -684,16 +686,7 @@ void StatusCmd(PlayerClient* pChar, const char* szLine)
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemBank);
 			}
 			else {
-				size_t len = strlen(NextArg);
-				// finditemcountbyname -> mq2inlines uses = for exact match
-				// so let's replace quotes with an =
-				if (len >= 2 && NextArg[0] == '"' && NextArg[len - 1] == '"') {
-					std::string exact = "=" + std::string(NextArg + 1, len - 2);
-					stringBuffer += LabeledText(exact, FindBankItemCountByName(exact.c_str(), 0));
-				}
-				else {
-					stringBuffer += LabeledText(NextArg, FindBankItemCountByName(NextArg, 0));
-				}
+				stringBuffer += ItemCountStatusByName(NextArg, eItemCountStatusType::ItemBank);
 			}
 		}
 		else if (ci_equals(Arg, "krono")) {
@@ -1156,7 +1149,7 @@ void StatusCmd(PlayerClient* pChar, const char* szLine)
 				else if (ci_equals(Arg2, "weight")) {
 					stringBuffer += LabeledText("Current Weight", pCharInfo->CurrWeight);
 					stringBuffer += LabeledText(" Max Weight", pCharInfo->STR);
-					stringBuffer += LabeledText(" Remaining", (long)(pCharInfo->STR - pCharInfo->CurrWeight));
+					stringBuffer += LabeledText(" Remaining", pCharInfo->STR - pCharInfo->CurrWeight);
 				}
 				else {
 					WriteChatf("\ao[MQ2Status] \arThat was not a valid stat, \agplease use hstr, hsta, hint, hwis, hagi, hdex, hcha, hps, mana, endurance, or weight for this option!\aw");
