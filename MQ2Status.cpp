@@ -640,7 +640,16 @@ void StatusCmd(PlayerClient* pChar, const char* szLine)
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::Item);
 			}
 			else {
-				stringBuffer += LabeledText(NextArg, FindItemCountByName(NextArg));
+				size_t len = strlen(NextArg);
+				// finditemcountbyname -> mq2inlines uses = for exact match
+				// so let's replace quotes with an =
+				if (len >= 2 && NextArg[0] == '"' && NextArg[len - 1] == '"') {
+					std::string exact = "=" + std::string(NextArg + 1, len - 2);
+					stringBuffer += LabeledText(exact, FindItemCountByName(exact.c_str()));
+				}
+				else {
+					stringBuffer += LabeledText(NextArg, FindItemCountByName(NextArg));
+				}
 			}
 		}
 		else if (ci_equals(Arg, "itemall")) {
@@ -653,7 +662,16 @@ void StatusCmd(PlayerClient* pChar, const char* szLine)
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemAll);
 			}
 			else {
-				stringBuffer += LabeledText(NextArg, FindItemCountByName(NextArg) + FindBankItemCountByName(NextArg, 0)); // FindBankItemCountByName requires bExact
+				size_t len = strlen(NextArg);
+				// finditemcountbyname -> mq2inlines uses = for exact match
+				// so let's replace quotes with an =
+				if (len >= 2 && NextArg[0] == '"' && NextArg[len - 1] == '"') {
+					std::string exact = "=" + std::string(NextArg + 1, len - 2);
+					stringBuffer += LabeledText(exact, FindItemCountByName(exact.c_str()) + FindBankItemCountByName(exact.c_str(), 0));
+				}
+				else {
+					stringBuffer += LabeledText(NextArg, FindItemCountByName(NextArg) + FindBankItemCountByName(NextArg, 0));
+				}
 			}
 		}
 		else if (ci_equals(Arg, "itembank")) {
@@ -666,7 +684,16 @@ void StatusCmd(PlayerClient* pChar, const char* szLine)
 				stringBuffer += ItemCountStatusByID(szLine, eItemCountStatusType::ItemBank);
 			}
 			else {
-				stringBuffer += LabeledText(NextArg, FindBankItemCountByName(NextArg, 0)); // FindBankItemCountByName requires bExact
+				size_t len = strlen(NextArg);
+				// finditemcountbyname -> mq2inlines uses = for exact match
+				// so let's replace quotes with an =
+				if (len >= 2 && NextArg[0] == '"' && NextArg[len - 1] == '"') {
+					std::string exact = "=" + std::string(NextArg + 1, len - 2);
+					stringBuffer += LabeledText(exact, FindBankItemCountByName(exact.c_str(), 0));
+				}
+				else {
+					stringBuffer += LabeledText(NextArg, FindBankItemCountByName(NextArg, 0));
+				}
 			}
 		}
 		else if (ci_equals(Arg, "krono")) {
